@@ -1,0 +1,42 @@
+{
+  "config": {
+    "country": "DE",
+    "lambda_sparse": 0.5,
+    "seed": 1,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.39192510507938616,
+    "mse": 470574.53330782906,
+    "mae": 685.9838481392038,
+    "r2": -606166.6577568977
+  },
+  "structure": {
+    "n_instantaneous_edges": 42,
+    "n_lagged_edges": 170,
+    "total_edges": 212,
+    "instantaneous_parents": 3,
+    "lagged_parents": 0
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "DE_RESIDUAL_LOAD",
+        0,
+        "0.052258853"
+      ],
+      [
+        "DE_HYDRO",
+        0,
+        "0.023587398"
+      ],
+      [
+        "DE_WINDPOW",
+        0,
+        "-0.010656257"
+      ]
+    ],
+    "lagged": []
+  },
+  "timestamp": "2026-01-16T01:38:02.689196"
+}

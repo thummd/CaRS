@@ -1,0 +1,8 @@
+DE,2,42,independent
+FR,2,42,independent
+DE,2,42,high_lambda
+FR,2,42,high_lambda
+DE,2,42,noise_init
+FR,2,42,noise_init
+DE,2,42,combined
+FR,2,42,combined

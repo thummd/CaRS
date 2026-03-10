@@ -1,0 +1,152 @@
+{
+  "country": "DE",
+  "n_regimes": 2,
+  "init_mode": "seasonal",
+  "min_regime_size": 50,
+  "seed": 1,
+  "spearman": 0.2549700249010018,
+  "samples_per_regime": [
+    589.0,
+    53.0
+  ],
+  "structures": [
+    {
+      "regime": 0,
+      "parents": {
+        "instantaneous": [
+          [
+            "DE_RESIDUAL_LOAD",
+            0,
+            "0.18781567"
+          ],
+          [
+            "DE_WINDPOW",
+            0,
+            "0.16563606"
+          ],
+          [
+            "DE_RAIN",
+            0,
+            "0.12868583"
+          ],
+          [
+            "FR_DE_EXCHANGE",
+            0,
+            "0.034552325"
+          ]
+        ],
+        "lagged": [
+          [
+            "DE_SOLAR",
+            1,
+            "0.1873803"
+          ],
+          [
+            "CARBON_RET",
+            1,
+            "0.18267627"
+          ],
+          [
+            "DE_GAS",
+            1,
+            "0.14210105"
+          ],
+          [
+            "DE_RAIN",
+            1,
+            "0.13028507"
+          ],
+          [
+            "DE_TEMP",
+            1,
+            "0.07471209"
+          ],
+          [
+            "DE_CONSUMPTION",
+            1,
+            "-0.07209078"
+          ],
+          [
+            "DE_FR_EXCHANGE",
+            1,
+            "0.048085775"
+          ],
+          [
+            "FR_DE_EXCHANGE",
+            1,
+            "0.04423913"
+          ],
+          [
+            "GAS_RET",
+            1,
+            "0.0429379"
+          ],
+          [
+            "COAL_RET",
+            1,
+            "0.037385385"
+          ],
+          [
+            "DE_NUCLEAR",
+            1,
+            "0.02047633"
+          ],
+          [
+            "DE_RESIDUAL_LOAD",
+            1,
+            "0.019058857"
+          ]
+        ]
+      }
+    },
+    {
+      "regime": 1,
+      "parents": {
+        "instantaneous": [
+          [
+            "CARBON_RET",
+            0,
+            "0.16659218"
+          ],
+          [
+            "DE_RESIDUAL_LOAD",
+            0,
+            "0.10658322"
+          ],
+          [
+            "COAL_RET",
+            0,
+            "-0.044470727"
+          ],
+          [
+            "DE_HYDRO",
+            0,
+            "-0.028292771"
+          ]
+        ],
+        "lagged": [
+          [
+            "DE_RESIDUAL_LOAD",
+            1,
+            "0.1054878"
+          ],
+          [
+            "FR_DE_EXCHANGE",
+            1,
+            "-0.027142903"
+          ],
+          [
+            "DE_WIND",
+            1,
+            "-0.016382087"
+          ],
+          [
+            "COAL_RET",
+            1,
+            "0.011849401"
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+# HTCondor submission file for DS3MCausal hybrid regime experiments
+# Requires 81GB GPU (g099-g106 nodes)
+# Usage: condor_submit_bid 100 hybrid_regimes.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_hybrid_regimes.sh
+
+# Arguments: COUNTRY D_DIM SEED
+Arguments = $(country) $(d_dim) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_regime_$(country)_d$(d_dim)_s$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_regime_$(country)_d$(d_dim)_s$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_regime_$(country)_d$(d_dim)_s$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 32GB
+Request_GPUs = 1
+
+# GPU requirements (81GB for full feature set with 105 variables)
+Requirements = (CUDAGlobalMemoryMb >= 80000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 6 hours per job (hybrid with full features takes longer)
+MaxTime = 21600
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, d_dim, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_hybrid_regimes.txt

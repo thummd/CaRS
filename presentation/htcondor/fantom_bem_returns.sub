@@ -1,0 +1,43 @@
+# HTCondor submit file for FANTOM_BEM with returns target
+# Runs FANTOM with Bayesian EM on price_change_pct (returns) instead of raw prices
+# This makes results comparable to CaRS/DS3M which predict returns
+#
+# Total jobs: 60 (3 markets × 2 d_dims × 5 seeds × 2 task_types)
+# Markets: DE, FR, DE_FR
+# d_dims: 2, 3
+# Seeds: 42, 123, 456, 789, 1011
+# Task types: estimation, prediction
+#
+# Submit with: condor_submit_bid 100 fantom_bem_returns.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/FANTOM/presentation/htcondor/run_fantom_bem_returns.sh
+
+# Resource requirements
+# FANTOM needs significant GPU memory due to ICGNN
+request_cpus = 4
+request_memory = 64GB
+request_disk = 10GB
+request_gpus = 1
+
+# Require high-memory GPU (40GB+ VRAM for stability with large feature sets)
+requirements = (CUDAGlobalMemoryMb >= 40000)
+
+# Job priority
+priority = 100
+
+# Max runtime 8 hours (FANTOM BEM can be slow)
++MaxRuntime = 28800
+
+# Output and log files
+log = /lustre/home/dthumm/FANTOM/presentation/logs/fantom_bem_returns_$(market)_d$(d_dim)_s$(seed)_$(task_type).log
+output = /lustre/home/dthumm/FANTOM/presentation/logs/fantom_bem_returns_$(market)_d$(d_dim)_s$(seed)_$(task_type).out
+error = /lustre/home/dthumm/FANTOM/presentation/logs/fantom_bem_returns_$(market)_d$(d_dim)_s$(seed)_$(task_type).err
+
+# Environment
+getenv = True
+
+# Job arguments: market d_dim seed task_type
+arguments = $(market) $(d_dim) $(seed) $(task_type)
+
+queue market,d_dim,seed,task_type from /lustre/home/dthumm/FANTOM/presentation/htcondor/fantom_bem_returns_params.txt

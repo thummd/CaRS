@@ -1,0 +1,8 @@
+DE, price_load_weather, 42
+DE, price_load_weather, 123
+DE, price_load_weather_calendar, 42
+DE, price_load_weather_calendar, 123
+FR, price_load_weather, 42
+FR, price_load_weather, 123
+FR, price_load_weather_calendar, 42
+FR, price_load_weather_calendar, 123

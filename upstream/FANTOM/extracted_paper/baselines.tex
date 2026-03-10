@@ -1,0 +1,35 @@
+\textbf{DYNOTEARS \citep{pamfil2020dynotears}. } 
+DYNOTEARS formulates causal discovery for multivariate time series through a linear vector autoregressive (VAR) model that simultaneously captures lagged \emph{and} instantaneous causal effects.  
+Its key innovation is the \emph{DAGness} penalty a smooth, continuously differentiable relaxation of the acyclicity constraint optimized via an augmented Lagrangian scheme alongside a mean squared error loss.  
+DYNOTEARS emerges as the special case of \textsc{FANTOM} obtained by setting \(K=1\), using linear component functions \(f^{i,1}\), fixing the noise scaling to \(g^{i,1}=1\) and $\epsilon_t^{i,1} \sim \mathcal{N}(0,1)$ in Eq(\ref{eq_multi_reg_hetero}). For comparing with this model, we use publicly available package \texttt{causalnex}\footnote{\url{https://causalnex.readthedocs.io/en/latest/}}.
+
+\textbf{PCMCI+ \citep{runge2020discovering}. }a scalable two-stage algorithm for time series, enabling the identification of contemporaneous causal connection. As DYNOTEARS, PCMCI+ is a special case of \textsc{FANTOM}, obtained by setting $K=1$, using linear or non linear component functions \(f^{i,1}\), fixing the noise scaling to \(g^{i,1}=1\) and allowing $\epsilon_t^{i,1}$ to follow any distribution. For the comparison, we use publicly available package \texttt{Tigramite}\footnote{\url{https://jakobrunge.github.io/tigramite/}}.
+
+\textbf{Rhino \citep{gong2022rhino}. }Gong et al. propose the first structural equation models with historically dependent noise, where noise variance depends solely on time-lagged variables, the Rhino's SEM is as follow:
+\begin{equation}
+x_t^i=f^i\left(\mathbf{P a}_G^i(<t), \mathbf{P a}_G^i(t)\right)+g^i\left(\mathbf{P a}_G^i(<t), \epsilon_t^i\right),
+\end{equation}
+where $\epsilon_t^i \sim \mathcal{N}(0,1)$. Rhino neglects heteroscedasticity, and assumes a single stationary regime governed by a one causal graph. By our SEM proposed in Eq(\ref{eq_multi_reg_hetero}), we can recover the Rhino's SEM by setting \(K=1\) and making $g^{i,1}$ a function of only time lagged parents. In Rhino, they took a non linear transformation of normal noise which is equivalent in our case to allowing $\epsilon_t^{i,1}$ to follow any distribution. To compare with Rhino, we used the open package \texttt{causica}\footnote{\url{https://github.com/microsoft/causica/blob/main/README.md}}. 
+
+\textbf{RPCMCI \citep{saggioro2020reconstructing}. } RPCMCI learns regime indices and time lagged causal relationships from multi-regime MTS. FANTOM's SEM in Eq(\ref{eq_multi_reg_hetero}) generalize it. We can recover RPCMCI settings by making \(f^{i,r}\) depends only on time lagged relations and \(g^{i,r}=1\). For the comparison, we use publicly available package \texttt{Tigramite}\footnote{\url{https://jakobrunge.github.io/tigramite/}}.
+
+\textbf{CASTOR \citep{rahmanicausal}. } CASTOR learns number of regimes their indices and also their corresponding DAGs including instantaneous and time lagged causal relationships from multi-regime MTS. But they assume that they only have gaussian noise with equivariance. FANTOM's SEM in Eq(\ref{eq_multi_reg_hetero}) generalize it. We can recover CASTOR settings by making \(g^{i,r}=1\) and $\epsilon_t^{i,r} \sim \mathcal{N}(0,1)$. For the comparison, we use publicly available code \texttt{CASTOR}\footnote{\url{https://github.com/arahmani1/CASTOR}}.
+\subsection{Optimization parameters}
+\label{optim_param}
+\textbf{Heteroscedastic settings. }
+Unless noted (i.e., in the synthetic-data study), we set the model lag to the true value of~1 and allow \textsc{Fantom} to capture instantaneous effects.  
+The variational posterior $q_{\phi^r}(\mathcal{G}^r)$ is initialized to prefer sparse graphs (edge probability $<0.5$).  
+Heteroscedastic noise is modeled with conditional normalizing flows (CNFs). Every neural block is a two-layer MLP with 32 hidden units, residual connections, and layer normalization.
+
+Gradients for discrete edges are estimated via the Gumbel–Softmax trick, using a hard forward pass and a soft backward pass with temperature~0.25.  
+All spline flows employ 128 bins, and each transformation uses an embedding dimension equal to the number of nodes.
+
+The sparsity penalty is fixed at $\lambda_s = 50$. For graphs with 10 or 20 nodes we use $\rho = 1$ and $\alpha = 0$, whereas for 40 nodes we set $\rho = 0.001$.  
+Models are optimized with Adam~\citep{kingma2014adam} at a learning rate of~0.005. We establish $\zeta = 900$ as the minimum regime duration, and we use 1000 as initial window size.
+
+\textbf{Homoscedastic non-Gaussian settings. }
+Unless noted (i.e., in the synthetic-data study), we set the model lag to the true value of~1 and allow \textsc{Fantom} to capture instantaneous effects. We use the same parameters as the heteroscedastic settings. The main difference is the use of a composite of affine-spline transformation. 
+All spline flows employ 16 bins, and each transformation uses an embedding dimension equal to the number of nodes.
+
+The sparsity penalty is fixed at $\lambda_s = 5$. For graphs with 10 or 20 nodes we use $\rho = 1$ and $\alpha = 0$, whereas for 40 nodes we set $\rho = 0.001$.  
+Models are optimized with Adam~\citep{kingma2014adam} at a learning rate of~0.005.

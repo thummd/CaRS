@@ -1,0 +1,11 @@
+# d_dim, seed
+# DE-FR Spread experiments with varying regimes
+2, 42
+3, 42
+4, 42
+2, 123
+3, 123
+4, 123
+2, 456
+3, 456
+4, 456

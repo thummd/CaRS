@@ -1,0 +1,26 @@
+# Test that lambda_sparse fix is working (using results['loss'])
+# lambda_sparse=10.0 should produce very different loss values now
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 7200
++JobBatchName = "lambda_fix_test"
+
+# Test on FR dataset with d=2 estimation (single run with 5 seeds)
+Arguments = ds3m_causal FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/lambda_fix_test.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/lambda_fix_test.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/lambda_fix_test.err
+
+queue 1

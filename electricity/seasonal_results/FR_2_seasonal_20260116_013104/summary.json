@@ -1,0 +1,97 @@
+{
+  "country": "FR",
+  "n_regimes": 1,
+  "init_mode": "seasonal",
+  "min_regime_size": 50,
+  "seed": 0,
+  "spearman": 0.09950246495992121,
+  "samples_per_regime": [
+    850.0
+  ],
+  "structures": [
+    {
+      "regime": 0,
+      "parents": {
+        "instantaneous": [
+          [
+            "CARBON_RET",
+            0,
+            "0.19861393"
+          ],
+          [
+            "FR_WIND",
+            0,
+            "0.13467935"
+          ],
+          [
+            "COAL_RET",
+            0,
+            "-0.10870321"
+          ],
+          [
+            "FR_WINDPOW",
+            0,
+            "-0.104385324"
+          ],
+          [
+            "FR_HYDRO",
+            0,
+            "-0.09445647"
+          ]
+        ],
+        "lagged": [
+          [
+            "COAL_RET",
+            1,
+            "0.16659915"
+          ],
+          [
+            "FR_WINDPOW",
+            1,
+            "-0.12992002"
+          ],
+          [
+            "FR_CONSUMPTION",
+            1,
+            "0.12628546"
+          ],
+          [
+            "FR_NET_EXPORT",
+            1,
+            "0.10804478"
+          ],
+          [
+            "DE_FR_EXCHANGE",
+            1,
+            "-0.08861463"
+          ],
+          [
+            "FR_HYDRO",
+            1,
+            "-0.058951292"
+          ],
+          [
+            "FR_RESIDUAL_LOAD",
+            1,
+            "-0.054848447"
+          ],
+          [
+            "FR_DE_EXCHANGE",
+            1,
+            "0.038122334"
+          ],
+          [
+            "FR_GAS",
+            1,
+            "0.033765238"
+          ],
+          [
+            "FR_TEMP",
+            1,
+            "-0.025437873"
+          ]
+        ]
+      }
+    }
+  ]
+}

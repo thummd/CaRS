@@ -1,0 +1,54 @@
+# HTCondor submission file for FANTOM_BEM experiments (with infinite loop fix)
+# Created: 2026-01-25
+#
+# Re-running after fixing the infinite loop bug in train_prior_network()
+# Missing experiments:
+# - All d=4 (prediction and estimation)
+# - d=2 estimation (all datasets)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration - increased timeout for d=4 which may still be slower
++MaxRuntime = 28800
++JobBatchName = "fantom_bem_fixed"
+
+# ============================================================================
+# FANTOM_BEM - Missing PREDICTION experiments (d=4)
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim)
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_pred.err
+
+Queue model, dataset, d_dim from (
+fantom_bem, DE, 4
+fantom_bem, FR, 4
+fantom_bem, DE_FR, 4
+)
+
+# ============================================================================
+# FANTOM_BEM - Missing ESTIMATION experiments (d=2 and d=4)
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_est.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_est.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(model)_$(dataset)_d$(d_dim)_est.err
+
+Queue model, dataset, d_dim from (
+fantom_bem, DE, 2
+fantom_bem, FR, 2
+fantom_bem, DE_FR, 2
+fantom_bem, DE, 4
+fantom_bem, FR, 4
+fantom_bem, DE_FR, 4
+)

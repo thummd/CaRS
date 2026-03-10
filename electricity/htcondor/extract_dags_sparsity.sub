@@ -1,0 +1,30 @@
+# HTCondor submission file for sparsity sweep on DAG extraction
+# Tests lambda_sparse = 50, 100 for sparser causal graphs
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse).err
+
++MaxRuntime = 14400
++JobBatchName = "extract_dags_sparsity"
+
+# Sparsity sweep: lambda = 50, 100 for DE d=3, FR d=3
+Queue dataset, d_dim, seed, lambda_sparse from (
+DE, 3, 42, 50
+DE, 3, 42, 100
+FR, 3, 42, 50
+FR, 3, 42, 100
+DE_FR, 3, 42, 50
+DE_FR, 3, 42, 100
+)

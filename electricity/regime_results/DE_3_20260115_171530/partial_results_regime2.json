@@ -1,0 +1,9 @@
+{
+  "failed_regime": 2,
+  "gamma_hat": null,
+  "completed_regimes": [
+    0,
+    2,
+    4
+  ]
+}

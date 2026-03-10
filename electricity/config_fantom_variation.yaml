@@ -1,0 +1,104 @@
+# FANTOM Configuration for Daily Electricity Price Variation Estimation
+# =====================================================================
+#
+# QRT ENS Data Challenge 2023: EXPLANATION Task
+# Goal: Model the daily price variation of 24h electricity futures contracts
+#       using SIMULTANEOUS explanatory variables (same-day data).
+#
+# Key Points:
+# 1. This is NOT a prediction/forecasting problem
+# 2. Variables are SIMULTANEOUS - explain today's price with today's data
+# 3. Target: Daily variation of electricity futures (24h baseload contracts)
+# 4. Metric: Spearman correlation (rank-based, measures monotonic relationship)
+#
+# Explanatory Variables (35 total per country):
+# - Weather: temperature, rain, wind (3 per country)
+# - Commodities: GAS_RET, COAL_RET, CARBON_RET (3 shared)
+# - Production: GAS, COAL, HYDRO, NUCLEAR, SOLAR, WINDPOW, LIGNITE (7 per country)
+# - Electricity use: CONSUMPTION, RESIDUAL_LOAD, NET_IMPORT, NET_EXPORT (4 per country)
+# - Cross-border: DE_FR_EXCHANGE, FR_DE_EXCHANGE (2 shared)
+#
+# Benchmark: Linear regression achieves Spearman = 0.1586
+
+# Model configuration - optimized for explanation with simultaneous variables
+model_config:
+  # DAG constraints
+  lambda_dag: 100.0           # Strong DAG enforcement
+  lambda_sparse: 1.0          # Moderate sparsity for interpretable structure
+  lambda_sparse_l2: 0.0       # Optional L2 group penalty
+
+  # Temperature for Gumbel-softmax
+  tau_gumbel: 1.0             # Graph sampling temperature
+
+  # Distribution modeling - important for heavy-tailed electricity prices
+  base_distribution_type: "spline"  # Flexible non-Gaussian
+  spline_bins: 8
+
+  # Network architecture
+  encoder_layer_sizes: [32, 32]
+  decoder_layer_sizes: [32, 32]
+  norm_layers: true
+  res_connection: true
+
+  # Critical settings for EXPLANATION task
+  heteroscedastic: true       # Different noise variance per variable
+  allow_instantaneous: true   # ESSENTIAL: same-day causal effects
+  constrain_target: true      # TARGET has no outgoing edges (effect only)
+
+# Training parameters
+training_params:
+  batch_size: 32
+  learning_rate: 0.001
+
+  # Augmented Lagrangian for DAG constraint
+  max_steps_auglag: 15
+  max_auglag_inner_epochs: 1500
+  rho: 1.0
+  alpha: 0.0
+  progress_rate: 0.9
+  safety_rho: 1.0e9
+  safety_alpha: 1.0e9
+  tol_dag: 1.0e-6
+
+  anneal_entropy: "noanneal"
+  reconstruction_loss_factor: 1.0
+
+# Dataset configuration
+dataset_config:
+  # CRITICAL: lag=0 for purely simultaneous relationships
+  # lag=1 can be used if we want to include lagged commodity returns
+  lag: 1                      # Include t-1 for commodities, but focus on t=0
+  use_temporal: true
+  imputation: "mean"          # Mean imputation for missing values
+  standardize: true
+
+# Experiment configurations (per country)
+experiments:
+  germany:
+    country: "DE"
+    description: "German electricity price variation explanation"
+    # Best known Spearman: 0.484 (with rho=1.0, lambda_sparse=1.0)
+    # Key drivers:
+    #   Instantaneous: DE_RESIDUAL_LOAD, DE_WINDPOW, DE_RAIN, COAL_RET
+    #   Lagged: COAL_RET, DE_SOLAR, FR_DE_EXCHANGE
+
+  france:
+    country: "FR"
+    description: "French electricity price variation explanation"
+    # Best known Spearman: 0.296
+    # More sensitive to hyperparameters than Germany
+    # Key drivers:
+    #   Instantaneous: CARBON_RET, GAS_RET
+    #   Lagged: COAL_RET, FR_WINDPOW
+
+  joint:
+    country: null
+    description: "Joint model for both markets"
+
+# Output settings
+output:
+  save_dir: "./outputs/fantom_variation"
+  save_model: true
+  save_predictions: true
+  save_adjacency: true
+  visualize: true

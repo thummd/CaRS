@@ -1,0 +1,20 @@
+# Seed sweep for univariate ALL d_dim=2
+# Format: country, mode, d_dim, seed
+ALL, univariate, 2, 40
+ALL, univariate, 2, 41
+ALL, univariate, 2, 45
+ALL, univariate, 2, 46
+ALL, univariate, 2, 47
+ALL, univariate, 2, 48
+ALL, univariate, 2, 49
+ALL, univariate, 2, 50
+ALL, univariate, 2, 51
+ALL, univariate, 2, 52
+ALL, univariate, 2, 53
+ALL, univariate, 2, 54
+ALL, univariate, 2, 55
+ALL, univariate, 2, 56
+ALL, univariate, 2, 57
+ALL, univariate, 2, 58
+ALL, univariate, 2, 59
+ALL, univariate, 2, 60

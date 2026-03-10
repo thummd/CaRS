@@ -1,0 +1,347 @@
+[
+  {
+    "trial": 5,
+    "params": {
+      "lambda_sparse": 0.5,
+      "lambda_dag": 100.0,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "spline_bins": 8,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "model_config": {
+      "lambda_dag": 100.0,
+      "lambda_sparse": 0.5,
+      "tau_gumbel": 1.0,
+      "base_distribution_type": "spline",
+      "spline_bins": 8,
+      "norm_layers": true,
+      "res_connection": true,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "decoder_layer_sizes": [
+        32,
+        32
+      ],
+      "heteroscedastic": true,
+      "allow_instantaneous": true,
+      "constrain_target": true
+    },
+    "training_params": {
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "max_steps_auglag": 8,
+      "max_auglag_inner_epochs": 800,
+      "rho": 1.0,
+      "alpha": 0.0,
+      "progress_rate": 0.9,
+      "safety_rho": 1000000000.0,
+      "safety_alpha": 1000000000.0,
+      "tol_dag": 1e-06,
+      "anneal_entropy": "noanneal",
+      "reconstruction_loss_factor": 1.0
+    },
+    "spearman_mean": 0.29045345754793267,
+    "spearman_std": 0.006676614111167378,
+    "mse_mean": 54496.89222105948,
+    "r2_mean": -41698.25263862233,
+    "fold_metrics": [
+      {
+        "spearman": 0.29713007165910005,
+        "spearman_pval": 0.000659405526005656,
+        "mse": 102432.7548179933,
+        "mae": 320.0492351987991,
+        "r2": -79353.29548190643
+      },
+      {
+        "spearman": 0.2837768434367653,
+        "spearman_pval": 0.0011700863793171485,
+        "mse": 6561.029624125674,
+        "mae": 80.99005276885705,
+        "r2": -4043.2097953382313
+      }
+    ],
+    "n_successful_folds": 2
+  },
+  {
+    "trial": 1,
+    "params": {
+      "lambda_sparse": 0.5,
+      "lambda_dag": 100.0,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "spline_bins": 8,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "model_config": {
+      "lambda_dag": 100.0,
+      "lambda_sparse": 0.5,
+      "tau_gumbel": 1.0,
+      "base_distribution_type": "spline",
+      "spline_bins": 8,
+      "norm_layers": true,
+      "res_connection": true,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "decoder_layer_sizes": [
+        32,
+        32
+      ],
+      "heteroscedastic": true,
+      "allow_instantaneous": true,
+      "constrain_target": true
+    },
+    "training_params": {
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "max_steps_auglag": 8,
+      "max_auglag_inner_epochs": 800,
+      "rho": 1.0,
+      "alpha": 0.0,
+      "progress_rate": 0.9,
+      "safety_rho": 1000000000.0,
+      "safety_alpha": 1000000000.0,
+      "tol_dag": 1e-06,
+      "anneal_entropy": "noanneal",
+      "reconstruction_loss_factor": 1.0
+    },
+    "spearman_mean": 0.26451380315245654,
+    "spearman_std": 0.05779770445795443,
+    "mse_mean": 161580.05537628813,
+    "r2_mean": -122674.64797724201,
+    "fold_metrics": [
+      {
+        "spearman": 0.322311507610411,
+        "spearman_pval": 0.00020702453358357954,
+        "mse": 291575.93292586354,
+        "mae": 539.9765637853775,
+        "r2": -225881.85141724147
+      },
+      {
+        "spearman": 0.20671609869450214,
+        "spearman_pval": 0.01922552377207269,
+        "mse": 31584.177826712712,
+        "mae": 177.7148499396734,
+        "r2": -19467.444537242565
+      }
+    ],
+    "n_successful_folds": 2
+  },
+  {
+    "trial": 2,
+    "params": {
+      "lambda_sparse": 1.0,
+      "lambda_dag": 100.0,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "spline_bins": 8,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "model_config": {
+      "lambda_dag": 100.0,
+      "lambda_sparse": 1.0,
+      "tau_gumbel": 1.0,
+      "base_distribution_type": "spline",
+      "spline_bins": 8,
+      "norm_layers": true,
+      "res_connection": true,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "decoder_layer_sizes": [
+        32,
+        32
+      ],
+      "heteroscedastic": true,
+      "allow_instantaneous": true,
+      "constrain_target": true
+    },
+    "training_params": {
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "max_steps_auglag": 8,
+      "max_auglag_inner_epochs": 800,
+      "rho": 1.0,
+      "alpha": 0.0,
+      "progress_rate": 0.9,
+      "safety_rho": 1000000000.0,
+      "safety_alpha": 1000000000.0,
+      "tol_dag": 1e-06,
+      "anneal_entropy": "noanneal",
+      "reconstruction_loss_factor": 1.0
+    },
+    "spearman_mean": 0.253003323689986,
+    "spearman_std": 0.0644384186677115,
+    "mse_mean": 72671.95466116031,
+    "r2_mean": -46696.405734876855,
+    "fold_metrics": [
+      {
+        "spearman": 0.3174417423576975,
+        "spearman_pval": 0.0002611050335993644,
+        "mse": 24037.107202551502,
+        "mae": 155.03506121427154,
+        "r2": -18620.462547509967
+      },
+      {
+        "spearman": 0.18856490502227452,
+        "spearman_pval": 0.03303961471883392,
+        "mse": 121306.80211976913,
+        "mae": 348.2888932320185,
+        "r2": -74772.34892224375
+      }
+    ],
+    "n_successful_folds": 2
+  },
+  {
+    "trial": 4,
+    "params": {
+      "lambda_sparse": 0.5,
+      "lambda_dag": 100.0,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "spline_bins": 8,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "model_config": {
+      "lambda_dag": 100.0,
+      "lambda_sparse": 0.5,
+      "tau_gumbel": 1.0,
+      "base_distribution_type": "spline",
+      "spline_bins": 8,
+      "norm_layers": true,
+      "res_connection": true,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "decoder_layer_sizes": [
+        32,
+        32
+      ],
+      "heteroscedastic": true,
+      "allow_instantaneous": true,
+      "constrain_target": true
+    },
+    "training_params": {
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "max_steps_auglag": 8,
+      "max_auglag_inner_epochs": 800,
+      "rho": 1.0,
+      "alpha": 0.0,
+      "progress_rate": 0.9,
+      "safety_rho": 1000000000.0,
+      "safety_alpha": 1000000000.0,
+      "tol_dag": 1e-06,
+      "anneal_entropy": "noanneal",
+      "reconstruction_loss_factor": 1.0
+    },
+    "spearman_mean": 0.25115914432928377,
+    "spearman_std": 0.07007369024923944,
+    "mse_mean": 139898.28058161584,
+    "r2_mean": -108363.95573152935,
+    "fold_metrics": [
+      {
+        "spearman": 0.3212328345785232,
+        "spearman_pval": 0.00021801936527302793,
+        "mse": 279622.8253055038,
+        "mae": 528.7925690153274,
+        "r2": -216621.82091509944
+      },
+      {
+        "spearman": 0.1810854540800443,
+        "spearman_pval": 0.04079629495701867,
+        "mse": 173.73585772785702,
+        "mae": 13.114122407407319,
+        "r2": -106.09054795924973
+      }
+    ],
+    "n_successful_folds": 2
+  },
+  {
+    "trial": 3,
+    "params": {
+      "lambda_sparse": 5.0,
+      "lambda_dag": 100.0,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "spline_bins": 8,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "model_config": {
+      "lambda_dag": 100.0,
+      "lambda_sparse": 5.0,
+      "tau_gumbel": 1.0,
+      "base_distribution_type": "spline",
+      "spline_bins": 8,
+      "norm_layers": true,
+      "res_connection": true,
+      "encoder_layer_sizes": [
+        32,
+        32
+      ],
+      "decoder_layer_sizes": [
+        32,
+        32
+      ],
+      "heteroscedastic": true,
+      "allow_instantaneous": true,
+      "constrain_target": true
+    },
+    "training_params": {
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "max_steps_auglag": 8,
+      "max_auglag_inner_epochs": 800,
+      "rho": 1.0,
+      "alpha": 0.0,
+      "progress_rate": 0.9,
+      "safety_rho": 1000000000.0,
+      "safety_alpha": 1000000000.0,
+      "tol_dag": 1e-06,
+      "anneal_entropy": "noanneal",
+      "reconstruction_loss_factor": 1.0
+    },
+    "spearman_mean": 0.23934505013251803,
+    "spearman_std": 0.029739137745160044,
+    "mse_mean": 23610.479412449047,
+    "r2_mean": -14904.79593454658,
+    "fold_metrics": [
+      {
+        "spearman": 0.26908418787767807,
+        "spearman_pval": 0.002131067608097312,
+        "mse": 4451.460949107679,
+        "mae": 66.70984455555342,
+        "r2": -3447.531166708483
+      },
+      {
+        "spearman": 0.20960591238735798,
+        "spearman_pval": 0.01756804684723424,
+        "mse": 42769.49787579042,
+        "mae": 206.80397140058798,
+        "r2": -26362.06070238468
+      }
+    ],
+    "n_successful_folds": 2
+  }
+]

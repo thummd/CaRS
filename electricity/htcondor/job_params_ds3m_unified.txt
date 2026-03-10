@@ -1,0 +1,8 @@
+DE, price_load_weather_calendar, 0
+DE, price_load_weather_calendar, 1
+DE, price_load_weather_calendar_outage_commodity, 0
+DE, price_load_weather_calendar_outage_commodity, 1
+FR, price_load_weather_calendar, 0
+FR, price_load_weather_calendar, 1
+FR, price_load_weather_calendar_outage_commodity, 0
+FR, price_load_weather_calendar_outage_commodity, 1

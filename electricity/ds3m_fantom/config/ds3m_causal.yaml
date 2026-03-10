@@ -1,0 +1,95 @@
+# DS3M-Causal Hybrid Model Configuration
+# Combines DS3M regime switching with FANTOM causal discovery
+# v4: Sparser initialization and longer training for better performance
+
+# Model architecture
+model:
+  # DS3M parameters
+  h_dim: 32           # GRU hidden dimension
+  z_dim: 8            # Continuous latent dimension
+  d_dim: 2            # Number of regimes
+  n_layers: 1         # GRU layers
+
+  # FANTOM causal parameters
+  lag: 1              # Temporal lag for causal graph
+  embedding_size: 16  # ICGNN node embedding size (reduced for memory)
+  encoder_layers: [32, 32]  # ICGNN encoder (reduced from 64)
+  decoder_layers: [32, 32]  # ICGNN decoder (reduced from 64)
+  norm_layers: true   # Use layer normalization
+
+  # DAG sharing
+  sharing_mode: independent  # or "shared_backbone"
+  tau_gumbel: 1.0     # Gumbel-Softmax temperature
+  init_logits: [1.5, 1.5]  # POSITIVE = sparser (~69% no-edge vs old 23%)
+
+# Training parameters
+training:
+  # Optimization
+  learning_rate: 0.001
+  weight_decay: 0.0
+  gradient_clip: 10.0
+
+  # Augmented Lagrangian
+  alpha_init: 0.0     # Initial Lagrangian multiplier
+  rho_init: 1.0       # Initial penalty coefficient
+  rho_max: 1.0e+9     # Maximum rho
+  alpha_max: 1.0e+9   # Maximum alpha
+  progress_rate: 0.9  # Required progress per step
+  tol_dag: 1.0e-6     # DAG tolerance for convergence
+
+  # Epochs and patience - v4: extended training
+  max_auglag_steps: 100    # Increased from 50
+  max_inner_epochs: 25     # Reduced from 50 to prevent inner overfitting
+  patience_dag: 5          # Steps below tolerance before stopping
+  patience_rho: 3          # Steps at max rho before stopping
+
+  # Early stopping - v4: more patient
+  early_stopping_patience: 20   # Increased from 10
+  early_stopping_min_delta: 0.01
+
+  # Loss weights - v4: stronger sparsity
+  lambda_kl: 1.0        # KL divergence weight
+  lambda_dag: 100.0     # DAG constraint weight
+  lambda_sparse: 5.0    # Increased from 1.0 for sparser graphs
+
+# Data parameters
+data:
+  timestep: 14        # Lookback window
+  test_ratio: 0.2     # Test set fraction
+  val_ratio: 0.1      # Validation set fraction
+  # Feature groups for unified data (to avoid OOM with 105 features)
+  # Use subset for memory efficiency: ~20-30 features instead of 105
+  feature_groups:
+    - price           # Price features (4 features)
+    - load            # Load features (1 feature)
+    - weather         # Weather features (6 features)
+    - calendar        # Calendar features (9 features)
+    # Optionally add more but watch GPU memory:
+    # - generation    # Power generation (9 features) - adds ~9 features
+    # - commodity     # Commodity prices (3 features) - adds ~3 features
+
+# Experiments
+experiments:
+  - name: FR_independent
+    country: FR
+    sharing_mode: independent
+
+  - name: FR_shared
+    country: FR
+    sharing_mode: shared_backbone
+
+  - name: DE_independent
+    country: DE
+    sharing_mode: independent
+
+  - name: DE_shared
+    country: DE
+    sharing_mode: shared_backbone
+
+  - name: ALL_independent
+    country: ALL
+    sharing_mode: independent
+
+  - name: ALL_shared
+    country: ALL
+    sharing_mode: shared_backbone

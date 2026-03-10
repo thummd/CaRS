@@ -1,0 +1,62 @@
+\section{Experiments}\label{sec:experiments}
+\subsection{Synthetic data}
+\textbf{Data generation. }We conduct extensive experiments to evaluate FANTOM's performance on synthetic datasets. For ground truth graph generation, we use the Barabási-Albert model (degree 4) for instantaneous links and the Erdos–Rényi model (degree 1–2) for time-lagged relationships. For data generation process, $f^r_i, g^r_i$ are chosen to be randomly initialized MLPs with one hidden layer and activation functions randomly chosen from $\{\texttt{Tanh, Exp}\}$. We evaluate the different models on multiple complex noise distributions; non-stationary MTS with either (1) heteroscedastic noise or (2) non-Gaussian homoscedastic noise, details in Appendix \ref{synthetic_data_gen}. We consider $L = 1$, while additional experiments with multiple lags are provided in the Appendix \ref{ablation}. Regime durations are randomly selected from $\{1000, 1500, 2000, 2500\}$. We test different numbers of nodes $\{5, 10, 20, 40\}$ and varying regime counts ($K \in \{2, 3\}$). Each combination of $K$ and $d$ nodes is repeated three times, resulting in over 24 distinct datasets \footnote{\textcolor{RoyalBlue}{https://github.com/arahmani1/fantom.git}}.
+
+\textbf{Benchmarks. }We benchmark our model against several baselines, including causal discovery methods for MTS with multiple regimes, such as CASTOR \citep{rahmanicausal}, CD-NOD \citep{huang2020causal} and RPCMCI \citep{saggioro2020reconstructing}. Since CD-NOD returns a summary graph (see Appendix \ref{ablation}), we compute a comparable summary graph from FANTOM's output for fair evaluation. FANTOM is also compared with models for single-regime MTS, including Rhino \citep{gong2022rhino}, PCMCI+ \citep{runge2020discovering}, DYNOTEARS \citep{pamfil2020dynotears}.
+\textit{Given that these models cannot deal with multiple regimes, we put them in a more favorable position than ours and provide these models with the true regime partition information. This is done by training the aforementioned models on each pure regime separately (regime governed by the same causal model)}.
+
+\textbf{Evaluation Metrics. }We assess the performance of our proposed method for learning the DAGs using four key metrics: 1) F1 score, representing the harmonic mean of precision and recall; 2) Structural Hamming Distance (SHD), which counts discrepancies (e.g., reversed, missing, or redundant edges) between two DAGs; 3) Normalized Hamming Distance (NHD) measures how many edges differ normalized by the total number of possible edges; 4) Ratio NHD computes the ratio between the NHD and the baseline NHD of an output with the same number of edges but with all of them incorrect. For the regime detection task, we use Accuracy (Reg Acc) metric.
+
+\begin{table}[t]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with $d=10$ nodes and $K=3$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$), and \textit{Type} classifies the graph as window (W) or summary (S). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+    \resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+    \begin{tabular}{l l l | cccc | cccc |c|cccc| cccc| c|cc }
+    \toprule
+    &  & &  \multicolumn{9}{c}{\textcolor{teal}{Homoscedastic non-Gaussian noise}} & \multicolumn{9}{c}{\textcolor{teal}{Heteroscedastic noise}} \\ \cmidrule(lr){4-12} \cmidrule(lr){13-21}
+    Model &  Split  & Type & \multicolumn{4}{c}{Inst.} & \multicolumn{4}{c}{Lag}& Regime & \multicolumn{4}{c}{Inst.} & \multicolumn{4}{c}{Lag} & Regime\\ \cmidrule(lr){4-7} \cmidrule(lr){8-11} \cmidrule(lr){12-12} \cmidrule(lr){13-16} \cmidrule(lr){17-20}\cmidrule(lr){21-21}
+    & & & SHD$\downarrow$ & F1$\uparrow$ & NHD$\downarrow$ & Ratio$\downarrow$ & SHD$\downarrow$ & F1$\uparrow $& NHD $\downarrow$ & Ratio $\downarrow$ & Acc.  & SHD $\downarrow$ & F1$\uparrow$ & NHD $\downarrow$ & Ratio$\downarrow$ & SHD$\downarrow$ & F1$\uparrow$ & NHD $\downarrow$ & Ratio$\downarrow$ & Acc.  \\ \midrule
+    PCMCI+ & $\times$ & W  & 17.5 & 74.9 & 0.02 & 0.24 & 14.5 & 88.3 & 0.01 & 0.11 & $\times$ & 46.1 & 11.1 & 0.05 & 0.88 & 46.0 & 19.0 & 0.05 & 0.80& $\times$ \\
+    Rhino & $\times$ & W & 2.50 & 96.8 & 0.002 & 0.03 & \textbf{6.00} & \textbf{95.2} & \textbf{0.006} & \textbf{0.04} & $\times$ & 44.5 & 5.11 & 0.06 & 0.94 & 53.5 & 64.7 & 0.07 & 0.35 & $\times$ \\
+    DYNOTEARS & $\times$ & W & 42.0 & 54.4 & 0.06 & 0.45 & 21.5 & 82.1 & 0.02 & 0.17& $\times$ & 89.5 & 31.5 & 0.14 & 0.68 & 118.0 & 37.5 & 0.17 & 0.61 & $\times$ \\
+    CASTOR & $\times$ & W & 22.0 & 66.2 & 0.03 & 0.33 & 17.0 & 84.4 & 0.01 & 0.15 & $\times$ & 104.0 & 23.4 & 0.19 & 0.76 & 133.5 & 34.8 & 0.24 & 0.64 & $\times$ \\
+    \midrule
+    RPCMCI & $\checkmark$ & W & - & - & - & - & - & - & - & - & - & - & - & - & - & - & - & - & - & - \\
+    CASTOR & $\checkmark$ & W & 47.0 & 34.8 & 0.05 & 0.65 & 59.5 & 39.4 & 0.07 & 0.60 & 51.6 & - & - & - & - & - & - & - & - & - \\
+    \rowcolor{gray!20} FANTOM & $\checkmark$  & W & \textbf{0.33} & \textbf{99.5} & \textbf{0.00} & \textbf{0.00}  & 12.5 & 89.1 & 0.01& 0.10& \textbf{99.4} & \textbf{5.67}& \textbf{93.3} & \textbf{0.006} & \textbf{0.06} & \textbf{12.3} & \textbf{90.9} & \textbf{0.012} & \textbf{0.08}  & \textbf{97.1} \\
+    \midrule
+      &   &  &\multicolumn{2}{c}{SHD$\downarrow$ } &\multicolumn{2}{c}{F1$\uparrow$} & \multicolumn{2}{c}{NHD$\downarrow$} & \multicolumn{2}{c|}{Ratio $\downarrow $} & Acc. & \multicolumn{2}{c}{SHD$\downarrow$ } &\multicolumn{2}{c}{F1$\uparrow$} & \multicolumn{2}{c}{NHD$\downarrow$} & \multicolumn{2}{c|}{Ratio $\downarrow$ } & Acc.\\
+    \midrule
+    CD-NOD & $\times$ & S & \multicolumn{2}{c}{42.5} &\multicolumn{2}{c}{31.8} & \multicolumn{2}{c}{0.42} & \multicolumn{2}{c|}{0.67} & $\times$ & \multicolumn{2}{c}{42} &\multicolumn{2}{c}{6.15} & \multicolumn{2}{c}{0.61} & \multicolumn{2}{c|}{0.93} & $\times$  \\
+    \rowcolor{gray!20} FANTOM & $\checkmark$ & S & \multicolumn{2}{c}{\textbf{4.5}} &\multicolumn{2}{c}{\textbf{95.6}} & \multicolumn{2}{c}{\textbf{0.04}} & \multicolumn{2}{c|}{\textbf{0.04}} & \textbf{96.6} &  \multicolumn{2}{c}{\textbf{4.5}} &\multicolumn{2}{c}{\textbf{96.5}} & \multicolumn{2}{c}{\textbf{0.04}} & \multicolumn{2}{c|}{\textbf{0.03}} & \textbf{96.8} \\
+    \bottomrule
+    \end{tabular}
+    }
+\label{lineartable}
+\end{table}
+\textbf{Results and discussion. }Table~\ref{lineartable} shows results on MTS with multiple regimes under heteroscedastic noise (right part of the table) and homoscedastic non-Gaussian noise (left part of the table). \textbf{In the homoscedastic, non-Gaussian scenario}, baselines generally perform better in the graph learning task, yet FANTOM still surpasses them on regime detection, with 99.4\% accuracy, and instantaneous links, 99.5\% F1. For the regime detection task, CASTOR succeeds to detect the regimes but with low accuracy (51.6\%) compared to FANTOM (99.4\%) and this due to the fact that CASTOR assumes equivariance normal noise with, however RPCMCI does not converge in this case too. For time-lagged connections, Rhino (95.2\% F1), that has access to the ground-truth regime labels by training it on pure regime separately, slightly outperforms FANTOM (89.1\% F1) that learns simultaneously the number of regimes, their indices and structures.  \textbf{In the heteroscedastic setting}, FANTOM consistently outperforms both multi-regime baselines (CASTOR, RPCMCI, CD-NOD) and stationary approaches. It achieves the top scores on all metrics: for instantaneous links, an F1 of 93.3\%, a 60\% improvement over the second-best, and a ratio of 0.06, 0.64 lower than the next-best DYNOTEARS. For time-lagged links, an F1 of 90.9\%, 25\% higher than Rhino, and a ratio of 0.08. FANTOM also detects the correct number of regimes and their indices with over 96\% accuracy. By contrast, RPCMCI struggles to converge due to its homoscedastic assumption and time-lag-only dependencies, CASTOR relies on Gaussian noise and cannot detect regime labels in the absence of ground truth, DYNOTEARS, PCMCI+, CD-NOD, and Rhino likewise fail in this heteroscedastic scenario, even when regime labels are given a priori.
+Although Rhino models history-dependent noise, it does not handle general heteroscedasticity. Overall, the table shows that FANTOM is the only method that remains robust across both noise scenarios, matching or surpassing specialised baselines while simultaneously discovering regimes and graphs.
+
+Appendices \ref{hetero} and \ref{nongauss} report additional results with standard deviations, confirming that FANTOM sustains its performance when scaled to graphs of 20 and 40 nodes. Ablation study in the Appendix \ref{ablation} further shows FANTOM's robustness towards the choice of initialized window and $\zeta$.
+\subsection{Real world data}
+\begin{wraptable}{r}{7.5cm}
+\caption{Performance on Wind Tunnel data evaluated on summary causal graph.}
+\begin{adjustbox}{center}
+{\fontsize{8pt}{7pt}\selectfont 
+\begin{tabular}{@{}c|c|ccc|c|@{}}
+\cmidrule(l){2-6}
+          & Split        & SHD$\downarrow$ & F1$\uparrow$   & Ratio$\downarrow$ & Reg Acc. \\ \midrule
+PCMCI+    & $\times$     & 37  & 22.9 & 0.77  & $\times$            \\ 
+DYNOTEARS & $\times$     & 34  & 0    & 1     & $\times$           \\ 
+CASTOR & $\times$     & 104  &   17.2  &  0.82    & $\times$            \\ 
+CD-NOD & $\times$     & 40  &  20.0   &  0.80    & $\times$            \\ 
+Rhino     & $\times$     & 47  & 32.0 & 0.68  & $\times$            \\ \midrule
+CASTOR & $\checkmark$     & 120  & 19.5    &  0.80   & 49.9           \\ 
+\rowcolor{gray!20} FANTOM    & $\checkmark$ & \textbf{29}  & \textbf{38.5} & \textbf{0,61}  & \textbf{99.9}         \\ \bottomrule
+\end{tabular}}
+\end{adjustbox}
+\label{table2}
+\end{wraptable}
+\textbf{Wind Tunnel. }We use the wind tunnel datasets from Gamella et al. \citep{gamella2025causal}, featuring two controllable fans pushing air through a chamber, barometers measuring air pressure at various locations, and a hatch controlling an external opening. The dataset comprises 16 variables across two regimes of 10,000 samples each: the first is observational, while the second involves soft interventions on five variables (see Appendix \ref{causal_chambers}). We compare FANTOM to the aforementioned baselines, with results in Table \ref{table2}. FANTOM is the only model that detects the regime with 99.9\% accuracy and outperforms all baselines on the causal graph learning task, achieving 38.5\% on F1 score. Notably, FANTOM surpasses all baselines even when they are given the ground-truth regime partitions.  
+
+\textbf{Epilepsy detection. }Huizenga et al. \citep{huizenga1995equivalent} show that scalp potential fields are contaminated by heteroscedastic noise in EEG measurements. We evaluate FANTOM’s performance in detecting epileptic regimes using EEG signals from 10 different patients in the Temple University Hospital EEG Seizure Corpus (TUSZ) dataset \citep{rahmani2023meta, tang2021self}. We treat this as an unsupervised regime detection problem, analyzing roughly 100 seconds of recordings at a 250 Hz sampling rate for each patient, capturing both normal and seizure states (see Appendix \ref{epilepsy_data}). The recordings consist of 19 electrodes, each considered a causal variable. FANTOM detects the correct regime partitions with an average 82.7\% accuracy across all patients. The seizure regime’s learned graph is denser and more connected than that of the normal state, which aligns with the generalized seizures affecting multiple brain regions. Full details and illustrations are provided in Appendix \ref{epilepsy_data}.

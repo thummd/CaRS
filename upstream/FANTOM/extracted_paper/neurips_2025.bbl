@@ -1,0 +1,308 @@
+\begin{thebibliography}{10}
+
+\bibitem{arlot2019kernel}
+Sylvain Arlot, Alain Celisse, and Zaid Harchaoui.
+\newblock A kernel multiple change-point algorithm via model selection.
+\newblock {\em Journal of machine learning research}, 2019.
+
+\bibitem{assaad2022survey}
+Charles~K Assaad, Emilie Devijver, and Eric Gaussier.
+\newblock Survey and evaluation of causal discovery methods for time series.
+\newblock {\em Journal of Artificial Intelligence Research}, 2022.
+
+\bibitem{assaad2021mixed}
+Karim Assaad, Emilie Devijver, Eric Gaussier, and Ali Ait-Bachir.
+\newblock A mixed noise and constraint-based approach to causal inference in time series.
+\newblock In {\em ECML PKDD}, 2021.
+
+\bibitem{balsells2023identifiability}
+Carles Balsells-Rodas, Yixin Wang, and Yingzhen Li.
+\newblock On the identifiability of switching dynamical systems.
+\newblock {\em arXiv preprint arXiv:2305.15925}, 2023.
+
+\bibitem{balsellsidentifiability}
+Carles Balsells-Rodas, Yixin Wang, and Yingzhen Li.
+\newblock On the identifiability of switching dynamical systems.
+\newblock In {\em Forty-first International Conference on Machine Learning}, 2024.
+
+\bibitem{barabasi1999emergence}
+Albert-L{\'a}szl{\'o} Barab{\'a}si and R{\'e}ka Albert.
+\newblock Emergence of scaling in random networks.
+\newblock {\em Science}, 1999.
+
+\bibitem{brouillard2020differentiable}
+Philippe Brouillard, S{\'e}bastien Lachapelle, Alexandre Lacoste, Simon Lacoste-Julien, and Alexandre Drouin.
+\newblock Differentiable causal discovery from interventional data.
+\newblock {\em In Advances in Neural Information Processing Systems}, 2020.
+
+\bibitem{bussmann2021neural}
+Bart Bussmann, Jannes Nys, and Steven Latr{\'e}.
+\newblock Neural additive vector autoregression models for causal discovery in time series.
+\newblock In {\em Discovery Science}, 2021.
+
+\bibitem{cheng2023causaltime}
+Yuxiao Cheng, Ziqian Wang, Tingxiong Xiao, Qin Zhong, Jinli Suo, and Kunlun He.
+\newblock Causaltime: Realistically generated time-series for benchmarking of causal discovery.
+\newblock {\em arXiv preprint arXiv:2310.01753}, 2023.
+
+\bibitem{durkan2019neural}
+Conor Durkan, Artur Bekasov, Iain Murray, and George Papamakarios.
+\newblock Neural spline flows.
+\newblock {\em Advances in neural information processing systems}, 2019.
+
+\bibitem{entner2010causal}
+Doris Entner and Patrik~O Hoyer.
+\newblock On causal discovery from time series data using fci.
+\newblock {\em Probabilistic graphical models}, 2010.
+
+\bibitem{friedman2013bayesian}
+Nir Friedman.
+\newblock The bayesian structural em algorithm.
+\newblock {\em arXiv preprint arXiv:1301.7373}, 2013.
+
+\bibitem{gamella2025causal}
+Juan~L Gamella, Jonas Peters, and Peter B{\"u}hlmann.
+\newblock Causal chambers as a real-world physical testbed for ai methodology.
+\newblock {\em Nature Machine Intelligence}, 7(1):107--118, 2025.
+
+\bibitem{geffner2022deep}
+Tomas Geffner, Javier Antoran, Adam Foster, Wenbo Gong, Chao Ma, Emre Kiciman, Amit Sharma, Angus Lamb, Martin Kukla, Nick Pawlowski, et~al.
+\newblock Deep end-to-end causal inference.
+\newblock {\em arXiv preprint arXiv:2202.02195}, 2022.
+
+\bibitem{gong2022rhino}
+Wenbo Gong, Joel Jennings, Cheng Zhang, and Nick Pawlowski.
+\newblock Rhino: Deep causal temporal relationship learning with history-dependent noise.
+\newblock {\em Preprint arXiv:2210.14706}, 2022.
+
+\bibitem{gunther2022conditional}
+Wiebke G{\"u}nther, Urmi Ninad, Jonas Wahl, and Jakob Runge.
+\newblock Conditional independence testing with heteroskedastic data and applications to causal discovery.
+\newblock {\em Advances in Neural Information Processing Systems}, 2022.
+
+\bibitem{gunther2024causal}
+Wiebke G{\"u}nther, Oana-Iuliana Popescu, Martin Rabel, Urmi Ninad, Andreas Gerhardus, and Jakob Runge.
+\newblock Causal discovery with endogenous context variables.
+\newblock {\em Advances in Neural Information Processing Systems}, pages 36243--36284, 2024.
+
+\bibitem{hamilton1994autoregressive}
+James~D Hamilton and Raul Susmel.
+\newblock Autoregressive conditional heteroskedasticity and changes in regime.
+\newblock {\em Journal of econometrics}, 1994.
+
+\bibitem{hasan2023survey}
+Uzma Hasan, Emam Hossain, and Md~Osman Gani.
+\newblock A survey on causal discovery methods for iid and time series data.
+\newblock {\em arXiv preprint arXiv:2303.15027}, 2023.
+
+\bibitem{haufe2010sparse}
+Stefan Haufe, Klaus-Robert M{\"u}ller, Guido Nolte, and Nicole Kr{\"a}mer.
+\newblock Sparse causal discovery in multivariate time series.
+\newblock In {\em causality: objectives and assessment}. PMLR, 2010.
+
+\bibitem{huang2020causal}
+Biwei Huang, Kun Zhang, Jiji Zhang, Joseph Ramsey, Ruben Sanchez-Romero, Clark Glymour, and Bernhard Sch{\"o}lkopf.
+\newblock Causal discovery from heterogeneous/nonstationary data.
+\newblock {\em In Journal of Machine Learning Research}, 2020.
+
+\bibitem{huizenga1995equivalent}
+Hilde~M Huizenga and Peter~CM Molenaar.
+\newblock Equivalent source estimation of scalp potential fields contaminated by heteroscedastic and correlated noise.
+\newblock {\em Brain topography}, 1995.
+
+\bibitem{hyttinen2014constraint}
+Antti Hyttinen, Frederick Eberhardt, and Matti J{\"a}rvisalo.
+\newblock Constraint-based causal discovery: Conflict resolution with answer set programming.
+\newblock In {\em UAI}, 2014.
+
+\bibitem{hyvarinen2010estimation}
+Aapo Hyv{\"a}rinen, Kun Zhang, Shohei Shimizu, and Patrik~O Hoyer.
+\newblock Estimation of a structural vector autoregression model using non-gaussianity.
+\newblock {\em Journal of Machine Learning Research}, 2010.
+
+\bibitem{immer2023identifiability}
+Alexander Immer, Christoph Schultheiss, Julia~E Vogt, Bernhard Sch{\"o}lkopf, Peter B{\"u}hlmann, and Alexander Marx.
+\newblock On the identifiability and estimation of causal location-scale noise models.
+\newblock In {\em International Conference on Machine Learning}. PMLR, 2023.
+
+\bibitem{jang2016categorical}
+Eric Jang, Shixiang Gu, and Ben Poole.
+\newblock Categorical reparameterization with gumbel-softmax.
+\newblock {\em arXiv preprint arXiv:1611.01144}, 2016.
+
+\bibitem{karmouche2023regime}
+Soufiane Karmouche, Evgenia Galytska, Jakob Runge, Gerald~A Meehl, Adam~S Phillips, Katja Weigel, and Veronika Eyring.
+\newblock Regime-oriented causal model evaluation of atlantic--pacific teleconnections in cmip6.
+\newblock {\em Earth System Dynamics}, 2023.
+
+\bibitem{ke2019learning}
+Nan~Rosemary Ke, Olexa Bilaniuk, Anirudh Goyal, Stefan Bauer, Hugo Larochelle, Bernhard Sch{\"o}lkopf, Michael~C Mozer, Chris Pal, and Yoshua Bengio.
+\newblock Learning neural causal models from unknown interventions.
+\newblock {\em Preprint arXiv:1910.01075}, 2019.
+
+\bibitem{khemakhem2021causal}
+Ilyes Khemakhem, Ricardo Monti, Robert Leech, and Aapo Hyvarinen.
+\newblock Causal autoregressive flows.
+\newblock In {\em International conference on artificial intelligence and statistics}. PMLR, 2021.
+
+\bibitem{kingma2014adam}
+Diederik~P Kingma and Jimmy Ba.
+\newblock Adam: A method for stochastic optimization.
+\newblock {\em arXiv preprint arXiv:1412.6980}, 2014.
+
+\bibitem{lorch2021dibs}
+Lars Lorch, Jonas Rothfuss, Bernhard Sch{\"o}lkopf, and Andreas Krause.
+\newblock Dibs: Differentiable bayesian structure learning.
+\newblock {\em In Advances in Neural Information Processing Systems}, 2021.
+
+\bibitem{lowe2022amortized}
+Sindy L{\"o}we, David Madras, Richard Zemel, and Max Welling.
+\newblock Amortized causal discovery: Learning to infer causal graphs from time-series data.
+\newblock In {\em Conference on Causal Learning and Reasoning}, 2022.
+
+\bibitem{mameche2025spacetime}
+Sarah Mameche, L{\'e}na{\"\i}g Cornanguer, Urmi Ninad, and Jilles Vreeken.
+\newblock Spacetime: Causal discovery from non-stationary time series.
+\newblock {\em arXiv preprint arXiv:2501.10235}, 2025.
+
+\bibitem{newman2018networks}
+Mark Newman.
+\newblock {\em Networks}.
+\newblock Oxford university press, 2018.
+
+\bibitem{pamfil2020dynotears}
+Roxana Pamfil, Nisara Sriwattanaworachai, Shaan Desai, Philip Pilgerstorfer, Konstantinos Georgatzis, Paul Beaumont, and Bryon Aragam.
+\newblock Dynotears: Structure learning from time-series data.
+\newblock In {\em International Conference on Artificial Intelligence and Statistics}, 2020.
+
+\bibitem{peters2013causal}
+Jonas Peters, Dominik Janzing, and Bernhard Sch{\"o}lkopf.
+\newblock Causal inference on time series using restricted structural equation models.
+\newblock {\em Advances in neural information processing systems}, 2013.
+
+\bibitem{peters2017elements}
+Jonas Peters, Dominik Janzing, and Bernhard Sch{\"o}lkopf.
+\newblock {\em Elements of causal inference: foundations and learning algorithms}.
+\newblock The MIT Press, 2017.
+
+\bibitem{peters2014causal}
+Jonas Peters, Joris~M Mooij, Dominik Janzing, and Bernhard Sch{\"o}lkopf.
+\newblock Causal discovery with continuous additive noise models.
+\newblock {\em The Journal of Machine Learning Research}, 2014.
+
+\bibitem{rahmanicausal}
+Abdellah Rahmani and Pascal Frossard.
+\newblock Causal temporal regime structure learning.
+\newblock In {\em The 28th International Conference on Artificial Intelligence and Statistics}, 2025.
+
+\bibitem{rahmani2023meta}
+Abdellah Rahmani, Arun Venkitaraman, and Pascal Frossard.
+\newblock A meta-gnn approach to personalized seizure detection and classification.
+\newblock In {\em IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 2023.
+
+\bibitem{runge2018causal}
+Jakob Runge.
+\newblock Causal network reconstruction from time series: From theoretical assumptions to practical estimation.
+\newblock {\em Chaos: An Interdisciplinary Journal of Nonlinear Science}, 2018.
+
+\bibitem{runge2020discovering}
+Jakob Runge.
+\newblock Discovering contemporaneous and lagged causal relations in autocorrelated nonlinear time series datasets.
+\newblock In {\em Conference on Uncertainty in Artificial Intelligence}. PMLR, 2020.
+
+\bibitem{runge2019detecting}
+Jakob Runge, Peer Nowack, Marlene Kretschmer, Seth Flaxman, and Dino Sejdinovic.
+\newblock Detecting and quantifying causal associations in large nonlinear time series datasets.
+\newblock {\em Science advances}, 2019.
+
+\bibitem{sachs2005causal}
+Karen Sachs, Omar Perez, Dana Pe'er, Douglas~A Lauffenburger, and Garry~P Nolan.
+\newblock Causal protein-signaling networks derived from multiparameter single-cell data.
+\newblock {\em Science}, 2005.
+
+\bibitem{saggioro2020reconstructing}
+Elena Saggioro, Jana de~Wiljes, Marlene Kretschmer, and Jakob Runge.
+\newblock Reconstructing regime-dependent causal relationships from observational time series.
+\newblock {\em Chaos: An Interdisciplinary Journal of Nonlinear Science}, 2020.
+
+\bibitem{seiler2017multivariate}
+Christof Seiler and Susan Holmes.
+\newblock Multivariate heteroscedasticity models for functional brain connectivity.
+\newblock {\em Frontiers in neuroscience}, 2017.
+
+\bibitem{shen2020challenges}
+Xinpeng Shen, Sisi Ma, Prashanthi Vemuri, and Gyorgy Simon.
+\newblock Challenges and opportunities with causal discovery algorithms: application to alzheimer’s pathophysiology.
+\newblock {\em Scientific reports}, 2020.
+
+\bibitem{song2009time}
+Le~Song, Mladen Kolar, and Eric Xing.
+\newblock Time-varying dynamic bayesian networks.
+\newblock {\em In Advances in Neural Information Processing Systems}, 2009.
+
+\bibitem{spirtes2000causation}
+Peter Spirtes, Clark~N Glymour, Richard Scheines, and David Heckerman.
+\newblock {\em Causation, prediction, and search}.
+\newblock MIT press, 2000.
+
+\bibitem{strobl2023identifying}
+Eric~V Strobl and Thomas~A Lasko.
+\newblock Identifying patient-specific root causes with the heteroscedastic noise model.
+\newblock {\em Journal of Computational Science}, 2023.
+
+\bibitem{sun2021nts}
+Xiangyu Sun, Oliver Schulte, Guiliang Liu, and Pascal Poupart.
+\newblock Nts-notears: Learning nonparametric dbns with prior knowledge.
+\newblock {\em arXiv preprint arXiv:2109.04286}, 2021.
+
+\bibitem{tang2021self}
+Siyi Tang, Jared~A Dunnmon, Khaled Saab, Xuan Zhang, Qianying Huang, Florian Dubost, Daniel~L Rubin, and Christopher Lee-Messer.
+\newblock Self-supervised graph neural networks for improved electroencephalographic seizure analysis.
+\newblock {\em arXiv preprint arXiv:2104.08336}, 2021.
+
+\bibitem{triantafillou2015constraint}
+Sofia Triantafillou and Ioannis Tsamardinos.
+\newblock Constraint-based causal discovery from multiple interventions over overlapping variable sets.
+\newblock {\em The Journal of Machine Learning Research}, 2015.
+
+\bibitem{varambally2023discovering}
+Sumanth Varambally, Yi-An Ma, and Rose Yu.
+\newblock Discovering mixtures of structural causal models from time series data.
+\newblock {\em arXiv preprint arXiv:2310.06312}, 2023.
+
+\bibitem{wang2023neural}
+Benjie Wang, Joel Jennings, and Wenbo Gong.
+\newblock Neural structure learning with stochastic differential equations.
+\newblock {\em arXiv preprint arXiv:2311.03309}, 2023.
+
+\bibitem{wang2024ictal}
+Xiaojia Wang, Yanchao Liu, and Chunfeng Yang.
+\newblock Ictal-onset localization through effective connectivity analysis based on rnn-gc with intracranial eeg signals in patients with epilepsy.
+\newblock {\em Brain Informatics}, 2024.
+
+\bibitem{wong2001logistic}
+Chun~S Wong and Wai~K Li.
+\newblock On a logistic mixture autoregressive model.
+\newblock {\em Biometrika}, 2001.
+
+\bibitem{yakowitz1968identifiability}
+Sidney~J Yakowitz and John~D Spragins.
+\newblock On the identifiability of finite mixtures.
+\newblock {\em The Annals of Mathematical Statistics}, 1968.
+
+\bibitem{zhang2020time}
+Shuguang Zhang, Minjing Tao, Xu-Feng Niu, and Fred Huffer.
+\newblock Time-varying gaussian-cauchy mixture models for financial risk management.
+\newblock {\em arXiv preprint arXiv:2002.06102}, 2020.
+
+\bibitem{zheng2018dags}
+Xun Zheng, Bryon Aragam, Pradeep~K Ravikumar, and Eric~P Xing.
+\newblock Dags with no tears: Continuous optimization for structure learning.
+\newblock {\em Advances in neural information processing systems}, 31, 2018.
+
+\bibitem{zhu2019causal}
+Shengyu Zhu, Ignavier Ng, and Zhitang Chen.
+\newblock Causal discovery with reinforcement learning.
+\newblock {\em Preprint arXiv:1906.04477}, 2019.
+
+\end{thebibliography}

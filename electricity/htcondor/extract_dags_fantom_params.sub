@@ -1,0 +1,37 @@
+# HTCondor submission file for DAG extraction with FANTOM-like parameters
+#
+# Key differences from previous runs:
+# 1. NO init_logits (default 0 -> P(edge)=0.5 at start)
+# 2. Higher lambda_sparse (50 like FANTOM)
+# 3. Lower tau_gumbel (0.25 like FANTOM)
+#
+# This should allow the model to learn differentiated lagged edge structures
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+# Args: dataset d_dim seed lambda_sparse init_logits tau_gumbel edge_threshold
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse) $(init_logits) $(tau_gumbel) $(edge_threshold)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_tau$(tau_gumbel).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_tau$(tau_gumbel).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_tau$(tau_gumbel).err
+
++MaxRuntime = 14400
++JobBatchName = "dag_fantom_params"
+
+# Test with FANTOM-like parameters
+# init_logits=0 means P(edge)=0.5 at start (optimal for gradient flow)
+# Format: dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold
+Queue dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold from (
+DE, 3, 42, 50.0, 0.0, 0.25, 0.3
+DE, 3, 42, 100.0, 0.0, 0.25, 0.3
+FR, 3, 42, 50.0, 0.0, 0.25, 0.3
+FR, 3, 42, 100.0, 0.0, 0.25, 0.3
+)

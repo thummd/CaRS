@@ -1,0 +1,32 @@
+{
+  "config": {
+    "country": "FR",
+    "lambda_sparse": 10.0,
+    "seed": 0,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.15141765128805051,
+    "mse": 46884.316474293075,
+    "mae": 216.52581695090151,
+    "r2": -53135.67193071642
+  },
+  "structure": {
+    "n_instantaneous_edges": 32,
+    "n_lagged_edges": 23,
+    "total_edges": 55,
+    "instantaneous_parents": 1,
+    "lagged_parents": 0
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "CARBON_RET",
+        0,
+        "-0.015344607"
+      ]
+    ],
+    "lagged": []
+  },
+  "timestamp": "2026-01-16T01:38:01.647277"
+}

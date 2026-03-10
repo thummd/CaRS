@@ -1,0 +1,11 @@
+# DS3M Univariate Spread (DE-FR) experiment parameters
+# Format: d_dim, seed
+2, 42
+2, 123
+2, 456
+3, 42
+3, 123
+3, 456
+4, 42
+4, 123
+4, 456

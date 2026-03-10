@@ -1,0 +1,40 @@
+# HTCondor submit file for Shared Backbone DAG experiments (ESTIMATION TASK)
+# Runs DS3M-Causal with shared_backbone mode on unified electricity data
+#
+# Total jobs: 30 (3 markets x 2 d_dims x 5 seeds)
+# Markets: DE, FR, DE_FR
+# d_dims: 2, 3
+# Seeds: 42, 123, 456, 789, 1011
+#
+# Submit with: condor_submit_bid 100 shared_backbone_estimation.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/FANTOM/shared_backbone/htcondor/run_shared_backbone_estimation_job.sh
+
+# Resource requirements
+request_cpus = 4
+request_memory = 32GB
+request_disk = 10GB
+request_gpus = 1
+
+# Standard GPU (20GB+ VRAM)
+requirements = (CUDAGlobalMemoryMb >= 20000)
+
+# Job priority
+priority = 100
+
+# Max runtime 4 hours
++MaxRuntime = 14400
+
+# Output and log files
+log = /lustre/home/dthumm/FANTOM/shared_backbone/logs_estimation/shared_backbone_$(market)_d$(d_dim)_s$(seed).log
+output = /lustre/home/dthumm/FANTOM/shared_backbone/logs_estimation/shared_backbone_$(market)_d$(d_dim)_s$(seed).out
+error = /lustre/home/dthumm/FANTOM/shared_backbone/logs_estimation/shared_backbone_$(market)_d$(d_dim)_s$(seed).err
+
+# Environment
+getenv = True
+
+# Job arguments: market d_dim seed sharing_mode
+arguments = $(market) $(d_dim) $(seed) $(sharing_mode)
+
+queue market,d_dim,seed,sharing_mode from /lustre/home/dthumm/FANTOM/shared_backbone/htcondor/shared_backbone_params.txt

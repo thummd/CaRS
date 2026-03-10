@@ -1,0 +1,44 @@
+# HTCondor submission file for sparse DAG architecture sweep
+# Tests different combinations of init_logits, tau_gumbel, and edge_threshold
+#
+# Key configurations:
+# 1. Baseline: init=-0.5, tau=1.0 (original, dense DAGs)
+# 2. Sparse init: init=-2.0, tau=1.0 (stronger prior toward no edges)
+# 3. Low temp: init=-0.5, tau=0.1 (sharper edge selection)
+# 4. Both sparse: init=-2.0, tau=0.1 (sparse init + sharp selection)
+# 5. Very sparse: init=-3.0, tau=0.1 (very strong sparse prior)
+# 6. Higher threshold: init=-2.0, tau=0.1, thresh=0.5 (harder edge selection)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+# Args: dataset d_dim seed lambda_sparse init_logits tau_gumbel edge_threshold
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse) $(init_logits) $(tau_gumbel) $(edge_threshold)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_sweep_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel)_th$(edge_threshold).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_sweep_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel)_th$(edge_threshold).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_sweep_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel)_th$(edge_threshold).err
+
++MaxRuntime = 14400
++JobBatchName = "sparse_dag_sweep"
+
+# Test configurations on DE d=3 and FR d=3
+# Format: dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold
+Queue dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold from (
+DE, 3, 42, 10.0, -2.0, 1.0, 0.3
+DE, 3, 42, 10.0, -0.5, 0.1, 0.3
+DE, 3, 42, 10.0, -2.0, 0.1, 0.3
+DE, 3, 42, 10.0, -3.0, 0.1, 0.3
+DE, 3, 42, 10.0, -2.0, 0.1, 0.5
+FR, 3, 42, 10.0, -2.0, 1.0, 0.3
+FR, 3, 42, 10.0, -0.5, 0.1, 0.3
+FR, 3, 42, 10.0, -2.0, 0.1, 0.3
+FR, 3, 42, 10.0, -3.0, 0.1, 0.3
+FR, 3, 42, 10.0, -2.0, 0.1, 0.5
+)

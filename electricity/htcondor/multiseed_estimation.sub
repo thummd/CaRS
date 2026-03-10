@@ -1,0 +1,63 @@
+# HTCondor submission file for ESTIMATION experiments
+# Task: Estimate Y[t] using X[0:t] and Y[0:t-1] (QRT challenge format)
+#
+# This is the autoregressive estimation task where:
+# - X[k] is at time t+k
+# - Y[k] is at time t+k (same time as X, but model only sees Y[0:k-1])
+#
+# Compare with multiseed_leakfix.sub which runs PREDICTION experiments
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim) estimation
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/estimation_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/estimation_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/estimation_$(model)_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 28800
++JobBatchName = "multiseed_estimation"
+
+# DS3M Univariate experiments (estimation mode)
+Queue model, dataset, d_dim from (
+ds3m_uv, DE, 4
+ds3m_uv, FR, 4
+ds3m_uv, DE_FR, 4
+)
+
+# DS3M Multivariate experiments (estimation mode)
+Queue model, dataset, d_dim from (
+ds3m_mv, DE, 4
+ds3m_mv, FR, 4
+ds3m_mv, DE_FR, 4
+)
+
+# DS3MCausal experiments (estimation mode)
+Queue model, dataset, d_dim from (
+ds3m_causal, DE, 2
+ds3m_causal, DE, 3
+ds3m_causal, DE, 4
+ds3m_causal, FR, 2
+ds3m_causal, FR, 3
+ds3m_causal, FR, 4
+ds3m_causal, DE_FR, 2
+ds3m_causal, DE_FR, 3
+ds3m_causal, DE_FR, 4
+)
+
+# FANTOM BEM experiments (estimation mode)
+Queue model, dataset, d_dim from (
+fantom_bem, DE, 3
+fantom_bem, FR, 3
+fantom_bem, DE_FR, 3
+)

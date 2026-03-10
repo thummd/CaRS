@@ -1,0 +1,26 @@
+# HTCondor submission for FANTOM Seasonal on ALL configuration
+# Runs the missing baseline experiment
+# Usage: condor_submit_bid 100 htcondor/fantom_seasonal_all.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_fantom_seasonal.sh
+
+Arguments = $(n_regimes)
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_seasonal_ALL_$(n_regimes)_regimes.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_seasonal_ALL_$(n_regimes)_regimes.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_seasonal_ALL_$(n_regimes)_regimes.err
+
+Request_CPUs = 2
+Request_Memory = 16GB
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 6000) && (TARGET.CUDACapability >= 6.0)
+
++MaxRuntime = 14400
+
+OnExitRemove = true
+
+Queue n_regimes from (
+2
+4
+)

@@ -1,0 +1,3 @@
+DE,4,seasonal,50,0
+FR,4,seasonal,50,0
+FR,4,seasonal,50,1

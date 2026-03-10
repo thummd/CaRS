@@ -1,0 +1,98 @@
+{
+  "config": {
+    "country": "DE",
+    "lambda_sparse": 0.1,
+    "seed": 1,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.38389260208752973,
+    "mse": 537204.9363736841,
+    "mae": 732.9421859230173,
+    "r2": -691996.1969755162
+  },
+  "structure": {
+    "n_instantaneous_edges": 41,
+    "n_lagged_edges": 193,
+    "total_edges": 234,
+    "instantaneous_parents": 6,
+    "lagged_parents": 8
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "DE_RESIDUAL_LOAD",
+        0,
+        "0.052437864"
+      ],
+      [
+        "DE_RAIN",
+        0,
+        "-0.042979755"
+      ],
+      [
+        "COAL_RET",
+        0,
+        "0.041650213"
+      ],
+      [
+        "DE_HYDRO",
+        0,
+        "0.034106497"
+      ],
+      [
+        "DE_NET_EXPORT",
+        0,
+        "0.024243247"
+      ],
+      [
+        "DE_GAS",
+        0,
+        "-0.021375032"
+      ]
+    ],
+    "lagged": [
+      [
+        "DE_NET_EXPORT",
+        1,
+        "-0.031561844"
+      ],
+      [
+        "DE_SOLAR",
+        1,
+        "-0.024307147"
+      ],
+      [
+        "DE_LIGNITE",
+        1,
+        "0.023904527"
+      ],
+      [
+        "DE_RESIDUAL_LOAD",
+        1,
+        "0.01757625"
+      ],
+      [
+        "COAL_RET",
+        1,
+        "0.011364606"
+      ],
+      [
+        "DE_RAIN",
+        1,
+        "-0.007473834"
+      ],
+      [
+        "DE_COAL",
+        1,
+        "-0.0033638517"
+      ],
+      [
+        "DE_TEMP",
+        1,
+        "0.0026053686"
+      ]
+    ]
+  },
+  "timestamp": "2026-01-16T01:37:57.942851"
+}

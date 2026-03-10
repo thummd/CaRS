@@ -1,0 +1,53 @@
+# HTCondor submit file for regime detection experiments
+# Runs multiple regime configurations in parallel
+#
+# Submit with: condor_submit regime_detection.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/condor/run_regime.sh
+
+# Resource requirements - increased for stability
+request_cpus = 4
+request_memory = 32GB
+request_disk = 10GB
+
+# Request GPU if available
+request_gpus = 1
+
+# Job priority
+priority = 100
+
+# Increase max runtime to 8 hours
++MaxRuntime = 28800
+
+# Output and log files
+log = /lustre/home/dthumm/CASTOR/electricity/condor/logs/regime_$(country)_$(n_regimes).log
+output = /lustre/home/dthumm/CASTOR/electricity/condor/logs/regime_$(country)_$(n_regimes).out
+error = /lustre/home/dthumm/CASTOR/electricity/condor/logs/regime_$(country)_$(n_regimes).err
+
+# Environment
+getenv = True
+
+# Job: Germany with 2 regimes
+country = DE
+n_regimes = 2
+arguments = DE 2
+queue 1
+
+# Job: Germany with 3 regimes
+country = DE
+n_regimes = 3
+arguments = DE 3
+queue 1
+
+# Job: France with 2 regimes
+country = FR
+n_regimes = 2
+arguments = FR 2
+queue 1
+
+# Job: France with 3 regimes
+country = FR
+n_regimes = 3
+arguments = FR 3
+queue 1

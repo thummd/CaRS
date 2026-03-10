@@ -1,0 +1,112 @@
+{
+  "DE_regime0": [
+    {
+      "feature": "commodity_brent_oil",
+      "importance": 0.22222478267212864
+    },
+    {
+      "feature": "Nuclear_Actual Aggregated",
+      "importance": 0.0013002208482551698
+    },
+    {
+      "feature": "commodity_natural_gas",
+      "importance": 0.000941280379871993
+    },
+    {
+      "feature": "Day_Ahead_Price",
+      "importance": 0.0009208552219206467
+    },
+    {
+      "feature": "Hydro Pumped Storage_Actual Aggregated",
+      "importance": 0.0009197914550895803
+    }
+  ],
+  "FR_regime0": [
+    {
+      "feature": "Hydro Pumped Storage_Actual Aggregated",
+      "importance": 0.0021717093914048746
+    },
+    {
+      "feature": "FR_temperature_2m",
+      "importance": 0.0021209815725645362
+    },
+    {
+      "feature": "FR_shortwave_radiation",
+      "importance": 0.0021001047886481197
+    },
+    {
+      "feature": "Wind Onshore_Actual Aggregated",
+      "importance": 0.002091493966872804
+    },
+    {
+      "feature": "Day_Ahead_Price",
+      "importance": 0.002080317547855278
+    }
+  ],
+  "FR_regime1": [
+    {
+      "feature": "commodity_brent_oil",
+      "importance": 0.0034251654675851264
+    },
+    {
+      "feature": "Hydro Pumped Storage_Actual Aggregated",
+      "importance": 0.002720939926803112
+    },
+    {
+      "feature": "FR_wind_speed_100m",
+      "importance": 0.002700305233399073
+    },
+    {
+      "feature": "FR_shortwave_radiation",
+      "importance": 0.0026922438216085234
+    },
+    {
+      "feature": "commodity_natural_gas",
+      "importance": 0.0026909903778384128
+    }
+  ],
+  "DE_FR_regime0": [
+    {
+      "feature": "DE_DE_wind_speed_10m",
+      "importance": 0.0018038865188524749
+    },
+    {
+      "feature": "FR_FR_cloud_cover",
+      "importance": 0.0018004353429811697
+    },
+    {
+      "feature": "FR_FR_temperature_2m",
+      "importance": 0.0017993866155544918
+    },
+    {
+      "feature": "FR_Fossil Hard coal_Actual Aggregated",
+      "importance": 0.001788264458203533
+    },
+    {
+      "feature": "DE_Biomass",
+      "importance": 0.0017851459851954132
+    }
+  ],
+  "DE_FR_regime1": [
+    {
+      "feature": "FR_Fossil Gas_Actual Aggregated",
+      "importance": 0.003532114904373884
+    },
+    {
+      "feature": "DE_Solar_Actual Aggregated",
+      "importance": 0.0035135189536958933
+    },
+    {
+      "feature": "DE_DE_wind_speed_100m",
+      "importance": 0.0035050909500569105
+    },
+    {
+      "feature": "DE_Fossil Brown coal/Lignite_Actual Aggregated",
+      "importance": 0.0035013246815651655
+    },
+    {
+      "feature": "DE_Fossil Hard coal_Actual Aggregated",
+      "importance": 0.0034570014104247093
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+# HTCondor submit file for FANTOM_BEM verification
+# Tests the fix for double-normalization bug (RMSE should now be consistent)
+#
+# Submit with: condor_submit fantom_bem_verify.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/condor/run_multiseed.sh
+
+# Resource requirements
+request_cpus = 4
+request_memory = 32GB
+request_disk = 10GB
+
+# Request GPU
+request_gpus = 1
+
+# Job priority
+priority = 100
+
+# Max runtime 4 hours
++MaxRuntime = 14400
+
+# Output and log files
+log = /lustre/home/dthumm/CASTOR/electricity/condor/logs/fantom_bem_$(dataset)_d$(d_dim)_$(task_type)_verify.log
+output = /lustre/home/dthumm/CASTOR/electricity/condor/logs/fantom_bem_$(dataset)_d$(d_dim)_$(task_type)_verify.out
+error = /lustre/home/dthumm/CASTOR/electricity/condor/logs/fantom_bem_$(dataset)_d$(d_dim)_$(task_type)_verify.err
+
+# Environment
+getenv = True
+
+# ========================================
+# FANTOM_BEM verification (all configs)
+# Tests the calibration fix
+# ========================================
+
+# DE d=2 prediction (key test - was varying 65x)
+dataset = DE
+d_dim = 2
+task_type = prediction
+arguments = fantom_bem DE 2 prediction 5
+queue 1
+
+# DE d=2 estimation
+dataset = DE
+d_dim = 2
+task_type = estimation
+arguments = fantom_bem DE 2 estimation 5
+queue 1
+
+# DE d=3 prediction
+dataset = DE
+d_dim = 3
+task_type = prediction
+arguments = fantom_bem DE 3 prediction 5
+queue 1
+
+# DE d=3 estimation
+dataset = DE
+d_dim = 3
+task_type = estimation
+arguments = fantom_bem DE 3 estimation 5
+queue 1
+
+# DE d=4 prediction
+dataset = DE
+d_dim = 4
+task_type = prediction
+arguments = fantom_bem DE 4 prediction 5
+queue 1
+
+# DE d=4 estimation
+dataset = DE
+d_dim = 4
+task_type = estimation
+arguments = fantom_bem DE 4 estimation 5
+queue 1
+
+# FR d=2 prediction
+dataset = FR
+d_dim = 2
+task_type = prediction
+arguments = fantom_bem FR 2 prediction 5
+queue 1
+
+# FR d=2 estimation
+dataset = FR
+d_dim = 2
+task_type = estimation
+arguments = fantom_bem FR 2 estimation 5
+queue 1
+
+# FR d=3 prediction
+dataset = FR
+d_dim = 3
+task_type = prediction
+arguments = fantom_bem FR 3 prediction 5
+queue 1
+
+# FR d=3 estimation
+dataset = FR
+d_dim = 3
+task_type = estimation
+arguments = fantom_bem FR 3 estimation 5
+queue 1
+
+# FR d=4 prediction
+dataset = FR
+d_dim = 4
+task_type = prediction
+arguments = fantom_bem FR 4 prediction 5
+queue 1
+
+# FR d=4 estimation
+dataset = FR
+d_dim = 4
+task_type = estimation
+arguments = fantom_bem FR 4 estimation 5
+queue 1
+
+# DE_FR d=2 prediction
+dataset = DE_FR
+d_dim = 2
+task_type = prediction
+arguments = fantom_bem DE_FR 2 prediction 5
+queue 1
+
+# DE_FR d=2 estimation
+dataset = DE_FR
+d_dim = 2
+task_type = estimation
+arguments = fantom_bem DE_FR 2 estimation 5
+queue 1
+
+# DE_FR d=3 prediction
+dataset = DE_FR
+d_dim = 3
+task_type = prediction
+arguments = fantom_bem DE_FR 3 prediction 5
+queue 1
+
+# DE_FR d=3 estimation
+dataset = DE_FR
+d_dim = 3
+task_type = estimation
+arguments = fantom_bem DE_FR 3 estimation 5
+queue 1
+
+# DE_FR d=4 prediction
+dataset = DE_FR
+d_dim = 4
+task_type = prediction
+arguments = fantom_bem DE_FR 4 prediction 5
+queue 1
+
+# DE_FR d=4 estimation
+dataset = DE_FR
+d_dim = 4
+task_type = estimation
+arguments = fantom_bem DE_FR 4 estimation 5
+queue 1

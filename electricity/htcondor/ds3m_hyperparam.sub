@@ -1,0 +1,30 @@
+# HTCondor submission file for DS3M hyperparameter sweep
+# Usage: condor_submit_bid 100 ds3m_hyperparam.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_hyperparam.sh
+
+# Arguments: COUNTRY D_DIM H_DIM Z_DIM TIMESTEP LR SEED
+Arguments = $(country) $(d_dim) $(h_dim) $(z_dim) $(timestep) $(lr) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_hp_$(country)_d$(d_dim)_h$(h_dim)_z$(z_dim)_t$(timestep)_lr$(lr)_s$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_hp_$(country)_d$(d_dim)_h$(h_dim)_z$(z_dim)_t$(timestep)_lr$(lr)_s$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_hp_$(country)_d$(d_dim)_h$(h_dim)_z$(z_dim)_t$(timestep)_lr$(lr)_s$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 3 hours per job
+MaxTime = 10800
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, d_dim, h_dim, z_dim, timestep, lr, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m_hyperparam.txt

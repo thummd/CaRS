@@ -1,0 +1,9 @@
+FR, shared_backbone, 2, 42, end_to_end
+DE, shared_backbone, 2, 42, end_to_end
+ALL, shared_backbone, 2, 42, end_to_end
+FR, independent, 2, 42, two_stage
+FR, shared_backbone, 2, 42, two_stage
+DE, independent, 2, 42, two_stage
+DE, shared_backbone, 2, 42, two_stage
+ALL, independent, 2, 42, two_stage
+ALL, shared_backbone, 2, 42, two_stage

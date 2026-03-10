@@ -1,0 +1,7 @@
+# Phase 2: Feature-conditioned DS3M experiments
+# country, d_dim, seed
+ALL, 2, 42
+ALL, 2, 43
+ALL, 2, 44
+FR, 2, 42
+DE, 2, 42

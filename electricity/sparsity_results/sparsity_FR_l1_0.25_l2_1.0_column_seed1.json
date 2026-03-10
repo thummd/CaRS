@@ -1,0 +1,90 @@
+{
+  "config": {
+    "country": "FR",
+    "lambda_sparse": 0.25,
+    "lambda_sparse_l2": 1.0,
+    "l2_group_mode": "column",
+    "seed": 1,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.04532095268163148,
+    "mse": 25059.068749788257,
+    "mae": 158.29774436932985,
+    "r2": -28399.872939607976
+  },
+  "structure": {
+    "n_instantaneous_edges": 40,
+    "n_lagged_edges": 236,
+    "total_edges": 276,
+    "instantaneous_parents": 2,
+    "lagged_parents": 18
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "GAS_RET",
+        0,
+        "0.05515003"
+      ],
+      [
+        "CARBON_RET",
+        0,
+        "-0.04061884"
+      ]
+    ],
+    "lagged": [
+      [
+        "COAL_RET",
+        1,
+        "-0.16208929"
+      ],
+      [
+        "FR_RESIDUAL_LOAD",
+        1,
+        "-0.08016127"
+      ],
+      [
+        "DE_FR_EXCHANGE",
+        1,
+        "-0.07675349"
+      ],
+      [
+        "CARBON_RET",
+        1,
+        "-0.07634536"
+      ],
+      [
+        "GAS_RET",
+        1,
+        "-0.074988216"
+      ],
+      [
+        "FR_RAIN",
+        1,
+        "-0.07437029"
+      ],
+      [
+        "FR_CONSUMPTION",
+        1,
+        "-0.073730044"
+      ],
+      [
+        "FR_HYDRO",
+        1,
+        "-0.073170364"
+      ],
+      [
+        "FR_WINDPOW",
+        1,
+        "-0.05525939"
+      ],
+      [
+        "FR_COAL",
+        1,
+        "-0.053771533"
+      ]
+    ]
+  },
+  "timestamp": "2026-01-17T14:10:26.380353"
+}

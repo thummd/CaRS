@@ -1,0 +1,86 @@
+\subsubsection{Impact of Heteroscedastic Modeling and Flow Architecture}
+To assess the contribution of heteroscedastic modelling and the flow architecture, we ran an ablation on MTS comparing three FANTOM variants: (i) Gaussian output (no flow, FANTOM-Gauss), (ii) a simple coupling‑spline flow (FANTOM-Spline), and (iii) the full model with a conditional normalizing flow (CNF, FANTOM). In the single‑regime setting, removing or simplifying the CNF consistently degrades performance. In the multi‑regime setting, only the CNF variant remains stable and converges to the two ground truth regimes; the alternatives collapse to one regime. Results are reported in the table below:
+\begin{table}[H]
+\centering
+\caption{Importance of heteroscedastic modelling and flow architecture for 10 nodes. - means the method collapses to 1 regime.}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\multicolumn{7}{c}{\textcolor{teal}{Heteroscedastic noise}}                                                                                                                         \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{K}} & \multicolumn{1}{c|}{\multirow{2}{*}{model}} & \multicolumn{2}{c|}{Inst}       & \multicolumn{2}{c|}{Lag}        & Regime   \\ \cmidrule(l){3-7} 
+\multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{}                       & SHD & \multicolumn{1}{c|}{F1}   & SHD & \multicolumn{1}{c|}{F1}   & Accuracy \\ \midrule
+\multicolumn{1}{c|}{\multirow{3}{*}{1}} & \multicolumn{1}{c|}{FANTOM-Gauss}           & 39  & \multicolumn{1}{c|}{0.0}  & 44  & \multicolumn{1}{c|}{42.5} & -        \\
+\multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{FANTOM-Spline}          & 17  & \multicolumn{1}{c|}{0.0}  & 18  & \multicolumn{1}{c|}{0}    & -        \\
+\multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{FANTOM}                 & \textbf{0}   & \multicolumn{1}{c|}{\textbf{100}}  & \textbf{0}   & \multicolumn{1}{c|}{\textbf{100}}  & -        \\ \midrule
+\multicolumn{1}{c|}{\multirow{3}{*}{2}} & \multicolumn{1}{c|}{FANTOM-Gauss}           & -   & \multicolumn{1}{c|}{-}    & -   & \multicolumn{1}{c|}{-}    & -        \\
+\multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{FANTOM-Spline}          & -   & \multicolumn{1}{c|}{-}    & -   & \multicolumn{1}{c|}{-}    & -        \\
+\multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{FANTOM}                 & \textbf{1}   & \multicolumn{1}{c|}{\textbf{97.8}} & \textbf{1}   & \multicolumn{1}{c|}{\textbf{98.9}} & \textbf{98.6}     \\ \bottomrule
+\end{tabular}
+\end{table}
+\subsubsection{Robustness to the pruning step, minimum regime duration, and regime initialization}
+We evaluated robustness to the pruning step, minimum regime duration ($\zeta$), and regime initialization. Across these variations, FANTOM’s predictive performance remains stable. We find that changing (window size, $\zeta$) primarily affects runtime, especially at long horizons, without materially impacting graph and regime learning performances. To show efficiency under long-horizon conditions, we used regimes with lengths [2000, 3000, 2000, 2500].
+\begin{table}[H]
+\centering
+\caption{Performance of FANTOM with varying hyperparameters (window size and $\zeta$) on 10 node graphs with 2, 3, and 4 regimes.}
+\begin{tabular}{@{}ccccccccc@{}}
+\toprule
+\multicolumn{9}{c}{\textcolor{teal}{Heteroscedastic noise}}                                                                                                                                                                                                     \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{(window, $\zeta$)}} & \multicolumn{1}{c}{\multirow{2}{*}{K}} & \multirow{2}{*}{Numb} & \multicolumn{1}{c|}{\multirow{2}{*}{Running}} & \multicolumn{2}{c|}{Inst.}      & \multicolumn{2}{c|}{Lag}        & Regime \\ \cmidrule(l){5-8} 
+\multicolumn{1}{c|}{}                                   & \multicolumn{1}{c}{}                   &                       & \multicolumn{1}{c|}{}                         & SHD & \multicolumn{1}{c|}{F1}   & SHD & \multicolumn{1}{c|}{F1}   & Acc.   \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & \multicolumn{1}{c}{2}                  & 4                     & \multicolumn{1}{c|}{17'8s}                    & 5   & \multicolumn{1}{c|}{91.2} & 13  & \multicolumn{1}{c|}{85.7} & 96.5   \\
+\multicolumn{1}{c|}{(1500,1200)}                        & \multicolumn{1}{c}{2}                  & 4                     & \multicolumn{1}{c|}{10'12s}                   & 1   & \multicolumn{1}{c|}{97.9} & 9   & \multicolumn{1}{c|}{89.8} & 95.1   \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & \multicolumn{1}{c}{3}                  & 4                     & \multicolumn{1}{c|}{30'33s}                   & 5   & \multicolumn{1}{c|}{94.2} & 8   & \multicolumn{1}{c|}{94.4} & 96.4   \\
+\multicolumn{1}{c|}{(1500,1200)}                        & \multicolumn{1}{c}{3}                  & 4                     & \multicolumn{1}{c|}{16'2s}                    & 3   & \multicolumn{1}{c|}{96.7} & 10  & \multicolumn{1}{c|}{91.9} & 91.8   \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & \multicolumn{1}{c}{4}                  & 4                     & \multicolumn{1}{c|}{40'2s}                    & 5   & \multicolumn{1}{c|}{95.8} & 12  & \multicolumn{1}{c|}{92.7} & 92.9   \\
+\multicolumn{1}{c|}{(1500,1200)}                        & \multicolumn{1}{c}{4}                  & 4                     & \multicolumn{1}{c|}{25'38s}                   & 3   & \multicolumn{1}{c|}{97.5} & 16  & \multicolumn{1}{c|}{90.5} & 91.5   \\ \bottomrule
+\end{tabular}
+\label{hetero_tab_time_10}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Performance of FANTOM with varying hyperparameters (window size and $\zeta$) on 40 node graphs with 2, 3, and 4 regimes.}
+\begin{tabular}{@{}ccccccccc@{}}
+\toprule
+\multicolumn{9}{c}{\textcolor{teal}{Heteroscedastic noise}}                                                                                                                                                                            \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{(window, $\zeta$)}} & \multirow{2}{*}{K} & \multirow{2}{*}{Numb} & \multicolumn{1}{c|}{\multirow{2}{*}{Running}} & \multicolumn{2}{c|}{Inst.}    & \multicolumn{2}{c|}{Lag}      & Regime \\ \cmidrule(lr){5-8}
+\multicolumn{1}{c|}{}                                   &                    &                       & \multicolumn{1}{c|}{}                         & SHD & \multicolumn{1}{c|}{F1} & SHD & \multicolumn{1}{c|}{F1} & Acc.   \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & 2                  & 4                     & \multicolumn{1}{c|}{22'15s}                   & 33  & 81.9                    & 27  & \multicolumn{1}{c|}{91.9 }                   & 100    \\
+\multicolumn{1}{c|}{(1500,1200)}                        & 2                  & 4                     & \multicolumn{1}{c|}{10'20s}                   & 35  & 83.8                    & 25  & \multicolumn{1}{c|}{91.7}                    & 100    \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & 3                  & 4                     & \multicolumn{1}{c|}{34'25s}                   & 49  & 85.6                    & 58  & \multicolumn{1}{c|}{88.6}                    & 99.8   \\
+\multicolumn{1}{c|}{(1500,1200)}                        & 3                  & 4                     & \multicolumn{1}{c|}{15'52s}                   & 43  & 87.3                    & 72  & \multicolumn{1}{c|}{87.3}                    & 99.9   \\ \midrule
+\multicolumn{1}{c|}{(1000,900)}                         & 4                  & 5                     & \multicolumn{1}{c|}{66'30s}                   & 34  & 86.5                    & 53  & \multicolumn{1}{c|}{91.9}                    & 99.7   \\ 
+
+\multicolumn{1}{c|}{(1500,1200)}                        & 4                  & 4                     & \multicolumn{1}{c|}{21'38s}                   & 32  & 87.1                    & 54  & \multicolumn{1}{c|}{91.8 }                   & 99.6   \\ \bottomrule
+\end{tabular}
+\label{hetero_tab_time_40}
+\end{table}
+From the table, FANTOM scales to 40 nodes and converges to four regimes under different initializations. With a window initialization of 1500 and $\zeta =1200$, it starts with six initial regimes and converges smoothly to four with 99.6\% accuracy in 21min38s. With a window initialization of 1000 and $\zeta = 900$, it starts with nine initial regimes and converges to four with 99.7\% accuracy in 66min30s. All rebuttal experiments were run on a Tesla V100‑SXM2 (26GB). These results indicate that FANTOM scales without requiring large GPU memory.
+
+To test scalability, we ran FANTOM on a 40 node dataset with four regimes and long horizons (lengths 2000, 3000, 2000, 2500). As expected, additional regimes and longer horizons increase runtime. With 40 nodes and two regimes, training finishes in 10 min 20 s, whereas the four regime setting requires 21 min 38 s.
+
+We showed in the table above (Table \ref{hetero_tab_time_10} and \ref{hetero_tab_time_40}) that FANTOM is robust to the initialization parameter (window size that impacts directly the initial regime count and the pruning threshold), e.g. in the case of 40 nodes with 4 regimes, with a window initialization of 1500 and $\zeta =1200$, it starts with six initial regimes and converges smoothly to four in 21min38s. With a window initialization of 1000 and $\zeta = 900$, it starts with nine initial regimes and converges to four with 99.6\% accuracy in 66 min 30s.
+\vspace{-20pt}
+\subsubsection{Robustness to data standardization}
+We investigated FANTOM's robustness to data standardization, a common challenge for most optimization-based causal discovery models. The results in Table \ref{data_std_exp} clearly demonstrate FANTOM's resilience. This robustness stems from its use of Bayesian structure learning to estimate a distribution over plausible graphs and conditional normalizing flows to effectively model complex data distributions. In contrast, models such as CASTOR are sensitive to standardization and even fail when provided with ground-truth regime labels.
+
+\begin{table}[H]
+\centering
+\caption{Robustness of FANTOM to data standardization (10 nodes). }
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+\multicolumn{8}{c}{\textcolor{teal}{Heteroscedastic noise}}                                                                                                                                                                       \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{model}} & \multicolumn{1}{c|}{\multirow{2}{*}{K}} & \multicolumn{1}{c|}{\multirow{2}{*}{data}} & \multicolumn{2}{c|}{Inst.}      & \multicolumn{2}{c}{Lag}         & Regime \\ \cmidrule(l){4-8} 
+\multicolumn{1}{c|}{}                       & \multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{}                      & SHD & \multicolumn{1}{c|}{F1}   & SHD & \multicolumn{1}{c|}{F1}   & Acc.   \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{CASTOR}}                     & \multicolumn{1}{c|}{\multirow{2}{*}{2}} & \multicolumn{1}{c|}{Raw}                   & 90  & \multicolumn{1}{c|}{26.9} & 28  & \multicolumn{1}{c|}{29.7} & x      \\
+                     \multicolumn{1}{c|}{}                        & \multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{standardized}          & 28  & \multicolumn{1}{c|}{0.0}  & 33  & \multicolumn{1}{c|}{0.0}  & x      \\
+\multicolumn{1}{c|}{\multirow{2}{*}{FANTOM}}                     & \multicolumn{1}{c|}{\multirow{2}{*}{2}} & \multicolumn{1}{c|}{Raw}                   & 4   & \multicolumn{1}{c|}{93.3} & 7   & \multicolumn{1}{c|}{90.9} & 97.1   \\
+                              \multicolumn{1}{c|}{}               & \multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{standardized}          & 5   & \multicolumn{1}{c|}{91.5} & 7   & \multicolumn{1}{c|}{90.9} & 91.1   \\ \midrule
+\multicolumn{1}{c|}{\multirow{2}{*}{CASTOR}}                     & \multicolumn{1}{c|}{\multirow{2}{*}{3}} & \multicolumn{1}{c|}{Raw}                   & 135 & \multicolumn{1}{c|}{24.1} & 135 & \multicolumn{1}{c|}{29.6} & x      \\
+                                 \multicolumn{1}{c|}{}            & \multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{standardized}          & 37  & \multicolumn{1}{c|}{0.0}  & 48  & \multicolumn{1}{c|}{0.0}  & x      \\
+\multicolumn{1}{c|}{\multirow{2}{*}{FANTOM}}                    & \multicolumn{1}{c|}{\multirow{2}{*}{3}} & \multicolumn{1}{c|}{Raw}                   & 3   & \multicolumn{1}{c|}{96.1} & 10  & \multicolumn{1}{c|}{91.5} & 92.2   \\
+                              \multicolumn{1}{c|}{}               & \multicolumn{1}{c|}{}                   & \multicolumn{1}{c|}{standardized}          & 2   & \multicolumn{1}{c|}{97.3} & 9   & \multicolumn{1}{c|}{92.3} & 92.2   \\ \bottomrule
+\end{tabular}
+\label{data_std_exp}
+\end{table}
+
+From the Table \ref{data_std_exp}, FANTOM achieves the same results on raw and standardized data while CASTOR fails in both cases even when we give it access to the ground truth regime labels. In the case of standardized data, CASTOR predicts adjacency matrices full of zeros due to its incapability of handling such scenarios.

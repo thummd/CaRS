@@ -1,0 +1,17 @@
+# Hybrid Spread (DE-FR) experiment parameters
+# Format: option, d_dim, seed
+tuned, 2, 42
+tuned, 2, 123
+tuned, 3, 42
+tuned, 3, 123
+tuned, 4, 42
+2stage, 2, 42
+2stage, 2, 123
+2stage, 3, 42
+2stage, 3, 123
+2stage, 4, 42
+lite, 2, 42
+lite, 2, 123
+lite, 3, 42
+lite, 3, 123
+lite, 4, 42

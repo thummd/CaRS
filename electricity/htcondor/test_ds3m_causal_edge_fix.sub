@@ -1,0 +1,26 @@
+# Test DS3MCausal edge learning fix
+# Tests that the reduced lambda_sparse and min_edge_penalty enable edge discovery
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 14400
++JobBatchName = "ds3m_causal_edge_fix"
+
+# Test on FR dataset with d=2 estimation (single run with 5 seeds)
+Arguments = ds3m_causal FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/edge_fix_ds3m_causal_FR_d2.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/edge_fix_ds3m_causal_FR_d2.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/edge_fix_ds3m_causal_FR_d2.err
+
+queue 1

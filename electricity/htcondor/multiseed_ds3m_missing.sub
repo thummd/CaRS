@@ -1,0 +1,69 @@
+# HTCondor submission file for MISSING DS3M experiments
+# Created: 2026-01-25
+#
+# Missing experiments identified:
+# - DS3M_UV: d=2 prediction (DE, FR), d=2/3 estimation (all datasets)
+# - DS3M_MV: d=2/3 estimation (all datasets)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 14400
++JobBatchName = "ds3m_missing"
+
+# ============================================================================
+# DS3M Univariate - Missing PREDICTION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim)
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.err
+
+Queue model, dataset, d_dim from (
+ds3m_uv, DE, 2
+ds3m_uv, FR, 2
+)
+
+# ============================================================================
+# DS3M Univariate - Missing ESTIMATION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.err
+
+Queue model, dataset, d_dim from (
+ds3m_uv, DE, 2
+ds3m_uv, DE, 3
+ds3m_uv, DE_FR, 2
+ds3m_uv, DE_FR, 3
+ds3m_uv, FR, 2
+ds3m_uv, FR, 3
+)
+
+# ============================================================================
+# DS3M Multivariate - Missing ESTIMATION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.err
+
+Queue model, dataset, d_dim from (
+ds3m_mv, DE, 2
+ds3m_mv, DE, 3
+ds3m_mv, DE_FR, 2
+ds3m_mv, DE_FR, 3
+ds3m_mv, FR, 2
+ds3m_mv, FR, 3
+)

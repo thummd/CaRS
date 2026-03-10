@@ -1,0 +1,78 @@
+# DS3M-Causal Hybrid Model - OPTION A: Tuned Hyperparameters
+# Addresses regime collapse by:
+# 1. Denser initial graphs (negative init_logits)
+# 2. Longer patience before early stopping
+# 3. Lower DAG penalty to not interfere with regime learning
+# 4. Added regime diversity encouragement
+
+# Model architecture
+model:
+  # DS3M parameters
+  h_dim: 32           # GRU hidden dimension
+  z_dim: 8            # Continuous latent dimension
+  d_dim: 3            # Number of regimes (3 works well for electricity)
+  n_layers: 1         # GRU layers
+
+  # FANTOM causal parameters
+  lag: 1              # Temporal lag for causal graph
+  embedding_size: 16  # ICGNN node embedding size
+  encoder_layers: [32, 32]  # ICGNN encoder
+  decoder_layers: [32, 32]  # ICGNN decoder
+  norm_layers: true   # Use layer normalization
+
+  # DAG sharing
+  sharing_mode: independent
+  tau_gumbel: 0.5     # Lower temperature = sharper regime assignments
+  # KEY FIX: Start with denser graphs (negative = more edges)
+  init_logits: [-0.5, -0.5]  # ~38% edges disabled (was 69% with [1.5, 1.5])
+
+# Training parameters
+training:
+  # Optimization
+  learning_rate: 0.0005   # Slightly lower for stability
+  weight_decay: 0.0
+  gradient_clip: 5.0      # Tighter clipping
+
+  # Augmented Lagrangian
+  alpha_init: 0.0
+  rho_init: 0.1           # Start with lower penalty (was 1.0)
+  rho_max: 1.0e+6         # Lower max (was 1e9)
+  alpha_max: 1.0e+6
+  progress_rate: 0.95     # More lenient progress requirement
+  tol_dag: 1.0e-4         # More relaxed DAG tolerance
+
+  # Epochs and patience - KEY FIX: much more patient
+  max_auglag_steps: 150   # More steps (was 100)
+  max_inner_epochs: 50    # More inner epochs (was 25)
+  patience_dag: 10        # More patience (was 5)
+  patience_rho: 5         # More patience (was 3)
+
+  # Early stopping - KEY FIX: much more patient
+  early_stopping_patience: 50   # Much more patient (was 20)
+  early_stopping_min_delta: 0.005
+
+  # Loss weights - KEY FIX: lower DAG penalty
+  lambda_kl: 0.5          # Lower KL weight (was 1.0)
+  lambda_dag: 10.0        # Much lower DAG penalty (was 100.0)
+  lambda_sparse: 1.0      # Lower sparsity (was 5.0)
+
+# Data parameters
+data:
+  timestep: 14
+  test_ratio: 0.2
+  val_ratio: 0.1
+  feature_groups:
+    - price
+    - load
+    - weather
+    - calendar
+
+# Experiments
+experiments:
+  - name: DE_tuned
+    country: DE
+    sharing_mode: independent
+
+  - name: FR_tuned
+    country: FR
+    sharing_mode: independent

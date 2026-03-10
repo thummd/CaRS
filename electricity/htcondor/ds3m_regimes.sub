@@ -1,0 +1,30 @@
+# HTCondor submission file for DS3M regime experiments
+# Usage: condor_submit_bid 100 ds3m_regimes.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_regimes.sh
+
+# Arguments: COUNTRY D_DIM SEED
+Arguments = $(country) $(d_dim) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_regime_$(country)_d$(d_dim)_s$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_regime_$(country)_d$(d_dim)_s$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_regime_$(country)_d$(d_dim)_s$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 3 hours per job
+MaxTime = 10800
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, d_dim, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m_regimes.txt

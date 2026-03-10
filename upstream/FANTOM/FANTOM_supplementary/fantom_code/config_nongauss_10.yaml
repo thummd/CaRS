@@ -1,0 +1,37 @@
+dataset_config:
+  dataset_format: temporal_causal_csv
+  use_predefined_dataset: true
+  test_fraction: 0.0
+  val_fraction: 0.0
+  random_seed: 0
+  negative_sample: false
+
+model_config:
+  tau_gumbel: 0.25
+  lambda_dag: 1.0
+  lambda_sparse: 5.0
+  spline_bins: 16
+  encoder_layer_sizes: [32, 32]
+  decoder_layer_sizes: [32, 32]
+  var_dist_A_mode: temporal_three
+  heteroscedastic: false
+  norm_layers: true
+  res_connection: true
+  base_distribution_type: spline
+
+training_params:
+  learning_rate: 0.005
+  batch_size: 256
+  stardardize_data_mean: false
+  stardardize_data_std: false
+  rho: 1.0
+  safety_rho: 10000000000000.0
+  alpha: 0.0
+  safety_alpha: 10000000000000.0
+  tol_dag: 1.0e-4
+  progress_rate: 0.65
+  max_steps_auglag: 2
+  max_auglag_inner_epochs: 2000
+  max_p_train_dropout: 0.0
+  reconstruction_loss_factor: 1.0
+  anneal_entropy: noanneal

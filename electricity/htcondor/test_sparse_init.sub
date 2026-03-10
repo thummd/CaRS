@@ -1,0 +1,25 @@
+# Test sparse initialization with init_logits=[1.0, 1.0] and lambda_sparse=0.1
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 7200
++JobBatchName = "sparse_init_test"
+
+# Test on FR dataset with d=2 estimation
+Arguments = ds3m_causal FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_init_test.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_init_test.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparse_init_test.err
+
+queue 1

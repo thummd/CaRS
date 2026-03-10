@@ -1,0 +1,30 @@
+# HTCondor submission file for FANTOM electricity sparsity sweep
+# Usage: condor_submit_bid 100 fantom_electricity_sparsity.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_sparsity_job.sh
+
+# Arguments: COUNTRY LAMBDA_SPARSE SEED
+Arguments = $(country) $(lambda_sparse) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparsity_$(country)_lambda$(lambda_sparse)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparsity_$(country)_lambda$(lambda_sparse)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/sparsity_$(country)_lambda$(lambda_sparse)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 4 hours per job
+MaxTime = 14400
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, lambda_sparse, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_sparsity.txt

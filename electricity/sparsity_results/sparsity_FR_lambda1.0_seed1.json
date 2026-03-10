@@ -1,0 +1,90 @@
+{
+  "config": {
+    "country": "FR",
+    "lambda_sparse": 1.0,
+    "lambda_sparse_l2": 0.0,
+    "l2_group_mode": "column",
+    "seed": 1,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.06014252477696155,
+    "mse": 61721.15816013283,
+    "mae": 248.4356158759647,
+    "r2": -69951.11147286519
+  },
+  "structure": {
+    "n_instantaneous_edges": 33,
+    "n_lagged_edges": 227,
+    "total_edges": 260,
+    "instantaneous_parents": 2,
+    "lagged_parents": 18
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "GAS_RET",
+        0,
+        "0.035404097"
+      ],
+      [
+        "CARBON_RET",
+        0,
+        "-0.03407738"
+      ]
+    ],
+    "lagged": [
+      [
+        "COAL_RET",
+        1,
+        "-0.15109864"
+      ],
+      [
+        "FR_CONSUMPTION",
+        1,
+        "-0.08459012"
+      ],
+      [
+        "CARBON_RET",
+        1,
+        "-0.083561175"
+      ],
+      [
+        "GAS_RET",
+        1,
+        "-0.08319818"
+      ],
+      [
+        "FR_NET_IMPORT",
+        1,
+        "-0.069653876"
+      ],
+      [
+        "FR_GAS",
+        1,
+        "-0.066899985"
+      ],
+      [
+        "FR_NET_EXPORT",
+        1,
+        "-0.066621706"
+      ],
+      [
+        "FR_NUCLEAR",
+        1,
+        "-0.06252998"
+      ],
+      [
+        "FR_WIND",
+        1,
+        "-0.053630445"
+      ],
+      [
+        "FR_WINDPOW",
+        1,
+        "-0.052217253"
+      ]
+    ]
+  },
+  "timestamp": "2026-01-17T14:10:10.348889"
+}

@@ -1,0 +1,30 @@
+# HTCondor submission file for extracting per-regime DAGs
+# Extracts and visualizes causal graphs for each regime
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+Arguments = $(dataset) $(d_dim) $(seed)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 14400
++JobBatchName = "extract_dags"
+
+# Best configurations based on results
+Queue dataset, d_dim, seed from (
+DE, 2, 42
+DE, 3, 42
+DE, 6, 42
+FR, 3, 42
+FR, 6, 42
+DE_FR, 3, 42
+)

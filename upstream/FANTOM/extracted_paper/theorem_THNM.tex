@@ -1,0 +1,288 @@
+In this section, we concentrate on establishing the identifiability of regimes and causal graphs within the FANTOM framework. Before diving into the details, let us set and clarify the required assumptions.
+\subsection{Assumptions}
+\label{app_assumptions}
+ \begin{definition}[Causal Stationarity, \citep{runge2018causal}]
+    A stationary time series process $(\boldsymbol{x}_t)_{t \in \mathcal{T}}$ with graph $\mathcal{G}$ is called causally stationary over a time index set $\mathcal{T}$ if and only if for all links $\boldsymbol{x}_{t-\tau}^i \rightarrow \boldsymbol{x}_t^j$ in the graph
+\begin{equation*}
+    x_{t-\tau}^i \not\!\perp\!\!\!\perp x_t^j \mid \boldsymbol{x}_{<t} \setminus \{x_{t-\tau}^i\}.
+ \vspace{-10pt}   
+\end{equation*}
+\label{def_caus_sta}
+\end{definition}
+This elucidates the inherent characteristics of the time-series data generation mechanism, thereby validating the choice of the auto-regressive model.
+\begin{assumption}[Causal Stationarity for MTS with multiple regime]
+A MTS $(\boldsymbol{x}_t)_{t \in \mathcal{T}}$ with $K$ regimes, graph set $(\mathcal{G}^u)_{u \in [|1:K|]}$, and regime partition $\mathcal{E} = (\mathcal{E}_u)_{u \in [|1:K|]}$ is \textbf{causally stationary} over the time index set $\mathcal{T}$ if, for each regime $u \in [|1:K|]$, the sub-series $(\boldsymbol{x}_t)_{t \in \mathcal{E}_u}$ is causally stationary with graph $\mathcal{G}^u$ as defined in definition \ref{def_caus_sta}.
+\label{mainass1}
+\end{assumption}
+\begin{definition} (Causal Markov Property, \cite{peters2017elements}). Given a DAG $\mathcal{G}$ and a joint distribution $p$, this distribution is said to satisfy causal Markov property w.r.t. the DAG $\mathcal{G}$ if each variable is independent of its non-descendants given its parents. 
+\label{markovprop}
+\end{definition}
+This is a common assumptions for the distribution induced by an SEM. With this assumption, one
+can deduce conditional independence between variables from the graph.
+\begin{assumption}[Causal Markov Property (CMP)]
+A set of joint distributions $(p(\cdot|\mathcal{G}^r))_{r \in [|1:K|]}$ satisfies the \textbf{CMP} with respect to the DAGs $(\mathcal{G}^r)_{r \in [|1:K|]}$ if, for each $r \in [|1:K|]$, the distribution $p(\cdot|\mathcal{G}^r)$ satisfies the CMP relative to the DAG $\mathcal{G}^r$. Specifically, in every regime $r$, each variable is independent of its non-descendants given its parents.
+\label{mainass2}
+\end{assumption}
+\vspace{-2pt}
+\begin{assumption}[Causal Minimality]
+ Given a set of DAGs $(\mathcal{G}^r)_{r \in [|1:K|]}$ and a set of joint distribution $(p(\cdot|\mathcal{G}^r))_{r \in [|1:K|]}$, we say that this set of distributions satisfies causal minimality w.r.t. the set of DAGs $(\mathcal{G}^r)_{r \in [|1:K|]}$  if for every $r$: $p(\cdot|\mathcal{G}^r)$ is Markovian w.r.t the DAG $\mathcal{G}^r$ but not to any proper subgraph of $\mathcal{G}^r$.
+\label{mainass3}
+\end{assumption}
+\vspace{-2pt}
+\begin{assumption}[Causal Sufficiency]
+A set of observed variables $\boldsymbol{V}$ is causally sufficient for a process $\boldsymbol{x}_t$ if and only if in the process every common cause of any two or more variables in $\boldsymbol{V}$ is in $\boldsymbol{V}$ or has the same value for all units in the population.  \label{mainass4}
+\end{assumption}
+This assumption implies there are no latent confounders present in the time-series data.
+\begin{table}[h]
+\begin{adjustbox}{width=\columnwidth,center}
+
+\begin{tabular}{c|cccccc|}
+\cline{2-7}
+                                & \begin{tabular}[c]{@{}c@{}}Causal \\
+                                  graph\end{tabular} & \begin{tabular}[c]{@{}c@{}}Causal \\
+                                  Markov\end{tabular} & \begin{tabular}[c]{@{}c@{}}Causal \\
+                                  sufficiency\end{tabular} & \begin{tabular}[c]{@{}c@{}}Faithfulness \\
+                                  / Minimality\end{tabular} & \begin{tabular}[c]{@{}c@{}}Heteroscedastic\\
+                                  noise\end{tabular} & \begin{tabular}[c]{@{}l@{}}Stationarity\\
+                                  per regime\end{tabular} \\ \hline
+\multicolumn{1}{|c|}{DYNOTEARS} & W                                                       & \checkmark                                               & \checkmark                                                    &                                                                      & $\boldsymbol{\times}$                                            &                                                            $\boldsymbol{\times}$       \\
+\multicolumn{1}{|c|}{PCMCI+}    & W                                                       & \checkmark                                               & \checkmark                                                    & F                                                                    & $\boldsymbol{\times}$                                  &                                                              $\boldsymbol{\times}$     \\
+\multicolumn{1}{|c|}{RPCMCI}    & W                                                       & \checkmark                                               & \checkmark                                                    & F                                                                    & $\boldsymbol{\times}$                                  & \checkmark                                                        \\
+\multicolumn{1}{|c|}{Rhino}     & W                                                       & \checkmark                                               & \checkmark                                                    & M                                                                    & $\boldsymbol{\times}$                                  &  $\boldsymbol{\times}$                                                                 \\
+\multicolumn{1}{|c|}{CD-NOD}    & S                                                       & \checkmark                                               & \checkmark                                                    & F                                                                    & $\boldsymbol{\times}$                                  & \checkmark                                                        \\
+\multicolumn{1}{|c|}{CASTOR}    & W                                                       & \checkmark                                               & \checkmark                                                    & M                                                                    & $\boldsymbol{\times}$                                & \checkmark                                                        \\ 
+\multicolumn{1}{|c|}{FANTOM} & W                                                       & \checkmark                                               & \checkmark                                                    &                                        M                              & \checkmark                                             &      \checkmark                                                             \\\hline
+\end{tabular}
+\end{adjustbox}
+\vspace{0.5em}
+\label{tab_assumption}
+\vspace{0.5em}
+\caption{Summary of the main assumptions of algorithms considered in the paper. For causal graphs, S means that the algorithm provides a summary causal graph and W means that the algorithm provides
+a window causal graph; F corresponds to faithfulness and M to minimality. An empty cell mean that the information given in the corresponding column was not discussed by the authors of the corresponding algorithm.}
+\label{tab_assumption}
+\end{table}
+
+The table \ref{tab_assumption} illustrates that most assumptions (causal sufficiency, causal Markov, faithfulness/minimality) are commonly shared among various state-of-the-art models in causal discovery.
+
+However, FANTOM, CASTOR, RPCMCI, and CD-NOD relax the assumption of stationarity and instead assume that the MTS (Multivariate Time Series) are composed of different regimes. While CD-NOD predicts only a summary causal graph, FANTOM, CASTOR and RPCMCI predict a window causal graph, which can subsequently be used to reconstruct a summary graph. FANTOM is the only model that can handle heteroscedastic noise.
+\subsection{Proof of theorem \ref{theo_THGNM}}
+We start first by proving theorem \ref{theo_THGNM}. To do so, we will prove identifiability in the case of bivariate time series, Lemma \ref{TGHNM_lemma}. Then we will prove identifiability in the case of MTS.
+\begin{mybox}\begin{lemma}
+Assume Causal Markov property, minimality, stationarity, sufficiency and $(x^1_t,x^2_t)_{t \in \mathcal{T}}$ be a bivariate time series such that $(x^1_t,x^2_t)_{t \in \mathcal{T}}$ following Eq(\ref{eq_multi_reg_hetero}) where $K=1$ and $\epsilon^i_t \sim \mathcal{N}(0,1)$. We have $x^1_t,x^2_t$ follow Gaussian distribution, if $f^1,f^2$ are non linear and $\frac{1}{g^1},\frac{1}{g^2}$ are not a polynomial of degree two then the bivariate Temporal heteroscedastic Gaussian noise (THGNM) model is identifiable.
+\label{TGHNM_lemma}
+\end{lemma}  
+\end{mybox}
+\textit{Proof of the Lemma. }Let's assume we have two temporal causal graph $\mathcal{G}$ and $ \mathcal{G}'$ for the bivariate TGHNM. 
+
+\textbf{Disagreement in time lagged relationships. } Assume that $\mathcal{G}$ and $\mathcal{G}^{\prime}$ do not differ in the instantaneous effects. $\forall i \in \{1,2\}$: $\mathbf{P a}_{\mathcal{G}}^i(t) = \mathbf{P a}_{\mathcal{G}'}^i(t)$. 
+Hence and Wlog, there is some $k>0$ and an edge $x_{t-k}^1 \rightarrow x_t^2$ in $\mathcal{G}$ but not in $\mathcal{G}^{\prime}$. From $\mathcal{G}^{\prime}$ and the Causal Markov property, we have that $x_{t-k}^1 \perp\!\!\!\perp x_t^2 \mid \mathcal{S}$, where $\mathcal{S}=(\{x_{t-l}^i, 1 \leq l \leq L,  i \in \{1,2\}\} \cup \mathbf{N D}_t) \backslash\left\{x_{t-k}^1, x_t^2\right\}$, and $\mathbf{N D}_t$ are all $X_t^i$ that are non-descendants (wrt instantaneous effects) of $x_t^2$. Applied to $\mathcal{G}$, causal minimality leads to a contradiction because $x_{t-k}^1 \not\!\perp\!\!\!\perp x_t^2 \mid \mathcal{S}$ in $\mathcal{G}$, and the above reasoning shows that it exists a subgraph $\mathcal{G}^{\prime}$ of $\mathcal{G}$ that is Markovian to the joint distribution of the data.
+
+\textbf{Disagreement on instantaneous parents. }Now, let's assume we have a forward model, $\forall t \in \mathcal{T}$:
+\begin{equation*}
+    x_t^1= f^1\left(\mathbf{P a}_{\mathcal{G}}^1(<t), x_t^2\right)+g^1\left(\mathbf{P a}_{\mathcal{G}}^1(<t), x_t^2\right)\cdot\epsilon_t^{1},
+\end{equation*} 
+We will prove by contradiction that a backward model $$x_t^2= f^2\left(\mathbf{P a}_{\mathcal{G}}^2(<t), x_t^1\right)+g^2\left(\mathbf{P a}_{\mathcal{G}}^2(<t), x_t^1\right)\cdot\epsilon_t^{2},$$ can not exists.\\
+We note $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}}^1(<t) \cup \mathbf{P a}_{\mathcal{G}}^2(<t)$. We know that $\epsilon_t^{2} \perp\!\!\!\perp (x_t^1, \mathbf{P a}_{\mathcal{G}}^1(<t), \mathbf{P a}_{\mathcal{G}}^2(<t))$ and $\epsilon_t^{1} \perp\!\!\!\perp (x_t^2, \mathbf{P a}_{\mathcal{G}}^1(<t), \mathbf{P a}_{\mathcal{G}}^2(<t))$, using Lemma 36 in Peters et al. \citep{peters2014causal}, we have:
+\begin{equation*}
+    x_t^1|_{\boldsymbol{h}_t}= f^1\left(pa^1_{<t}, x_t^2|_{\boldsymbol{h}_t}\right)+g^1\left(pa^1_{<t}, x_t^2|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{1},
+\end{equation*} 
+$$x_t^2|_{\boldsymbol{h}_t}= f^2\left(pa^2_{<t}, x_t^1|_{\boldsymbol{h}_t}\right)+g^2\left(pa^2_{<t}, x_t^1|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{2},$$
+where $x_t^i|_{\boldsymbol{h}_t}$ is $x_t^i$ conditioned on $\boldsymbol{h}_t$. This last result contradicts the theorem states by Khemakhem et al. \citep{khemakhem2021causal}. Hence, our bivariate TGHNM is identifiable.\\
+
+Let's prove this results in the case of MTS (Theorem \ref{theo_THGNM}). In the case of Disagreement in time lagged relationships, we can use the same proof for the bivariate case.
+
+\textbf{Disagreement on instantaneous parents. }Let's assume we have two temporal causal graph $\mathcal{G}$ and $ \mathcal{G}'$ such that $\mathcal{G} \neq \mathcal{G}'$. According to the Propostion 28 in Peters et al \citep{peters2014causal}, for $\mathcal{G}$ and $\mathcal{G}^{\prime}$ be two different DAGs over a set of variables $\boldsymbol{V}$, such that $\boldsymbol{x}_t$ is generated by our HNM and satisfies the Markov condition and causal minimality with respect to $\mathcal{G}$ and $\mathcal{G}^{\prime}$. Then there are variables $x_t^1, x_t^2 \in \boldsymbol{V}$ such that for the set $\boldsymbol{Q}:= \mathbf{P a}_{\mathcal{G}}^1(t) \backslash\{x_t^2\}, \boldsymbol{Y}:=\mathbf{P a}_{\mathcal{G}'}^2(t)  \backslash\{x_t^1\}$ and $\boldsymbol{S}:=\boldsymbol{Q} \cup \boldsymbol{Y}$, we have: 1) $ x_t^2\rightarrow x_t^1$ in $\mathcal{G}$ and $x_t^1 \rightarrow x_t^2$ in $\mathcal{G}^{\prime}$. 2) $\boldsymbol{S} \subseteq \mathbf{N D}_{x_t^1}^{\mathcal{G}} \backslash\{x_t^2\}$ and $\boldsymbol{S} \subseteq \mathbf{N D}_{x_t^2}^{\mathcal{G}^{\prime}} \backslash\{x_t^1\}$ . $\mathbf{P a}_{\mathcal{G}}^1(t)$ is the set of parent variables of $x_t^1$ in graph $\mathcal{G}$. $\mathbf{N D}{ }_{x_t^1}^{\mathcal{G}}$ is the set of non-descendant (wrt instantaneous
+effects) of $x_t^1$ in graph $\mathcal{G}$.
+
+We consider $\boldsymbol{S}=\boldsymbol{s}$ with $p(\boldsymbol{s})>0$. Denote $x_t^{1,*}:=x_t^1 \mid \boldsymbol{S}=\boldsymbol{s}$ and $x_t^{2,*}:=x_t^2 \mid \boldsymbol{S}=\boldsymbol{s}$. Lemma 37 in Peters et al. \citep{peters2014causal} states that if $p(\boldsymbol{x}_t)$ is generated according to the SEM models as follows:
+
+$$
+x^i_t=f_i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t), \epsilon^i_t\right), i\in \{1,2, \cdots, d\}, x^i_t \in \boldsymbol{V}
+$$
+
+with corresponding DAG $\mathcal{G}$, then for a variable $x^i_t \in \boldsymbol{V}$, if $\boldsymbol{S} \subseteq \mathbf{N D}_{x^i_t}^{\mathcal{G}}$ then $\epsilon^i_t \perp\!\!\!\perp \boldsymbol{S}$. Our TGHNM can be viewed one specific class of the SEM in the aforementioned equation. Hence, Lemma 37 holds under our TGHNM and renders $\epsilon_t^1 \perp\!\!\!\perp (x_t^2, \boldsymbol{S})$ and $\epsilon_t^2 \perp\!\!\!\perp (x_t^1, \boldsymbol{S})$, using Lemma 36 in Peters et al. \citep{peters2014causal}, we have:
+\begin{equation*}
+    x_t^{1,*}|_{\boldsymbol{h}_t}= f^1\left(\boldsymbol{q},pa^1_{<t}, x_t^{2,*}|_{\boldsymbol{h}_t}\right)+g^1\left(\boldsymbol{q},pa^1_{<t}, x_t^{2,*}|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{1},
+\end{equation*} 
+$$x_t^{2,*}|_{\boldsymbol{h}_t}= f^2\left(\boldsymbol{y},pa^2_{<t}, x_t^{1,*}|_{\boldsymbol{h}_t}\right)+g^2\left(\boldsymbol{y},pa^2_{<t}, x_t^{1,*}|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{2},$$
+where $x_t^i|_{\boldsymbol{h}_t}$ is $x_t^i$ conditioned on $\boldsymbol{h}_t$. This results contradict our previous proved Lemma, then THGNM is identifiable model under the conditions stated in the theorem.
+\begin{theorem}[Identifiability of Temporal Non Gaussian noise model (TNGNM)]
+Assume Causal Markov property, stationarity, minimality, sufficiency and let $(\boldsymbol{x}_t)_{t \in \mathcal{T}}$ be a MTS following a TNGNM, $\forall t \in \mathcal{T}$:
+\begin{equation}
+  x_t^i= f^i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t)\right)+\epsilon_t^{i},
+\label{eq_non_gaussian}
+\end{equation}  
+where $f^i$ is a differentiable function, and $\epsilon^{i}_t$ are mutually independent noises and follow a non Gaussian distribution. The TNGNM is identifiable.  \end{theorem}
+\textit{Proof. }The proof of this theorem could be concluded from theorem 1 in Rhino \citep{gong2022rhino}. Eq(\ref{eq_non_gaussian}) is a special case of Rhino SEMs.
+\subsection{Identifiability results in the case of Temporal General Heteroscedastic Noise Models}
+\label{sec_TGRHNM}
+In this section, we will present our identifiability results for the case of Temporal General Heteroscedastic Noise, where a MTS has the following SEM :$\forall t \in \mathcal{T}$:
+\begin{equation}
+  x_t^i= f^i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t)\right)+g^i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t)\right)\cdot\epsilon_t^{i},
+\label{eq_hetero_general_hetero}
+\end{equation}  
+where $f^i$ and $g^i$ are differentiable functions, with $g_i$ strictly positive and $\epsilon^{i}_t$ are mutually independent normal noises and can have any arbitrary density distribution. We assume $\mathbb{E}(\epsilon_t^{i}) = 0$ and $\mathbb{E}((\epsilon_t^{i})^2) = 1$ without loss of generality.
+
+We will start first by showing that if backward model, respects to instantaneous links, exists in the bivariate case then, the data generating mechanism must fulfill the
+a Partial Differential Equation (PDE). Then, following Peters et al. \citep{peters2014causal} and Strobl et al. \citep{strobl2023identifying} for defining Restricted SEM on iid, we will define a Temporal Restricted Heteroscedastic Noise model and show its identifiability.
+\begin{mybox}
+\begin{lemma}
+Assume Causal Markov property, minimality, stationarity, sufficiency and $(x^1_t,x^2_t)_{t \in \mathcal{T}}$ be a bivariate time series. Then we have time lagged parents are identifiable, and a backward model with respect to instantaneous links can be fit i.e. $\forall t \in \mathcal{T}$:
+\begin{equation}
+\left \{
+\begin{aligned}
+    \tilde{x}_t^1 = x_t^1|_{\boldsymbol{h}_t}&= f^1\left(\tilde{x}_t^2\right)+g^1\left(\tilde{x}_t^2\right)\cdot\epsilon_t^{1}\\
+     \tilde{x}_t^2 = x_t^2|_{\boldsymbol{h}_t}&= f^2\left(\tilde{x}_t^1\right)+g^2\left( \tilde{x}_t^1\right)\cdot\epsilon_t^{2}.
+\end{aligned}
+    \right.
+    \label{eq_restricted_bivariate}
+\end{equation} 
+We note $\boldsymbol{h}_t = \mathbf{P a}^1(<t) \cup \mathbf{P a}^2(<t)$, and let $\nu_1(\cdot)$ and $\nu_2(\cdot)$ be the twice differentiable log densities of $\tilde{X}_t^1$ and $\epsilon_t^{2}$ respectively. For compact notation, define
+% x_t^1 = Y, X = x_t^2
+$$
+\begin{aligned}
+\nu_{\tilde{X}_t^2 \mid \tilde{X}_t^1}(\tilde{x}_t^2 \mid \tilde{x}_t^1) & =\log \left(p_{\tilde{X}_t^2 \mid \tilde{X}_t^1}(\tilde{x}_t^2 \mid \tilde{x}_t^1)\right) \\
+& =\log \left(p_{\epsilon_t^{2}}\left(\frac{\tilde{x}_t^2-f^2(\tilde{x}_t^1)}{g^2(\tilde{x}_t^1)}\right) / g^2(\tilde{x}_t^1)\right) \\
+& =\nu_2\left(\frac{\tilde{x}_t^2-f^2(\tilde{x}_t^1)}{g^2(\tilde{x}_t^1)}\right)-\log (g^2(\tilde{x}_t^1)) \quad \text { and } \\
+G(\tilde{x}_t^2, \tilde{x}_t^1) & =g^1(\tilde{x}_t^2) (f^1)^{\prime}(\tilde{x}_t^2)+(g^1)^{\prime}(\tilde{x}_t^2)[\tilde{x}_t^1-f^1(\tilde{x}_t^2)] .
+\end{aligned}
+$$
+Assume that $f^1, g^1, f^2$, and $g^2$ are twice differentiable. Then, the data generating mechanism must fulfill the following PDE for all $(\tilde{x}_t^2, \tilde{x}_t^1) $ with $G(\tilde{x}_t^2, \tilde{x}_t^1) \neq 0$.
+\begin{equation}
+\begin{aligned}
+& 0=\nu_1^{\prime \prime}(\tilde{x}_t^1)+\frac{(g^1)^{\prime}(\tilde{x}_t^2)}{G(\tilde{x}_t^2, \tilde{x}_t^1)} \nu_1^{\prime}(\tilde{x}_t^1)+\frac{\partial^2}{\partial (\tilde{x}_t^1)^2} \nu_{\tilde{X}_t^2 \mid \tilde{X}_t^1}(\tilde{x}_t^2 \mid \tilde{x}_t^1)+ \\
+& \frac{g^1(\tilde{x}_t^2)}{G(\tilde{x}_t^2, \tilde{x}_t^1)} \frac{\partial^2}{\partial \tilde{x}_t^1 \partial \tilde{x}_t^2} \nu_{\tilde{X}_t^2 \mid \tilde{X}_t^1}(\tilde{x}_t^2 \mid \tilde{x}_t^1)+\frac{(g^1)^{\prime}(\tilde{x}_t^2)}{G(\tilde{x}_t^2, \tilde{x}_t^1)} \frac{\partial}{\partial \tilde{x}_t^1} \nu_{\tilde{X}_t^2 \mid \tilde{X}_t^1}(\tilde{x}_t^2 \mid \tilde{x}_t^1) .
+\end{aligned}
+\label{PDE_condition}  
+\end{equation}
+
+\label{TRHNM_lemma}
+\end{lemma} \end{mybox}
+We drop the time-lagged parent in Eq (\ref{eq_restricted_bivariate}) to simplify the notation, since conditioning on the history makes it redundant.
+
+\textit{Proof of the Lemma. } 
+Let's assume we have two temporal causal graph $\mathcal{G}$ and $ \mathcal{G}'$ for the bivariate temporal heteroscedastic causal models where the noise distribution could follow any arbitrary distribution. 
+
+\textbf{Disagreement in time lagged relationships. } Assume that $\mathcal{G}$ and $\mathcal{G}^{\prime}$ do not differ in the instantaneous effects. $\forall i \in \{1,2\}$: $\mathbf{P a}_{\mathcal{G}}^i(t) = \mathbf{P a}_{\mathcal{G}'}^i(t)$. 
+Hence and Wlog, there is some $k>0$ and an edge $x_{t-k}^1 \rightarrow x_t^2$ in $\mathcal{G}$ but not in $\mathcal{G}^{\prime}$. From $\mathcal{G}^{\prime}$ and the Causal Markov property, we have that $x_{t-k}^1 \perp\!\!\!\perp x_t^2 \mid \mathcal{S}$, where $\mathcal{S}=(\{x_{t-l}^i, 1 \leq l \leq L,  i \in \{1,2\}\} \cup \mathbf{N D}_t) \backslash\left\{x_{t-k}^1, x_t^2\right\}$, and $\mathbf{N D}_t$ are all $X_t^i$ that are non-descendants (wrt instantaneous effects) of $x_t^2$. Applied to $\mathcal{G}$, causal minimality leads to a contradiction because $x_{t-k}^1 \not\!\perp\!\!\!\perp x_t^2 \mid \mathcal{S}$ in $\mathcal{G}$, and the above reasoning shows that it exists a subgraph $\mathcal{G}^{\prime}$ of $\mathcal{G}$ that is Markovian to the joint distribution of the data.
+
+\textbf{Disagreement in instantaneous parents. }Now, let's assume we have a forward model, after conditioning on $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}}^1(<t) \cup \mathbf{P a}_{\mathcal{G}}^2(<t)$, $\forall t \in \mathcal{T}$:
+\begin{equation*}
+    \tilde{x}_t^1 = x_t^1|_{\boldsymbol{h}_t}= f^1\left(\tilde{x}_t^2\right)+g^1\left(\tilde{x}_t^2\right)\cdot\epsilon_t^{1}
+\end{equation*} 
+We want to prove that if a backward model $$\tilde{x}_t^2 = x_t^2|_{\boldsymbol{h}_t}= f^2\left(\tilde{x}_t^1\right)+g^2\left( \tilde{x}_t^1\right)\cdot\epsilon_t^{2}$$ exists then the PDE in Eq(\ref{PDE_condition}) is fulfilled.\\% x_t^1 = Y, X = x_t^2
+Our conditioning trick on time lagged parents makes the use of Immer et al. \citep{immer2023identifiability} theorem 1 feasible in our case. We employ the change of variables from $\left\{\tilde{x}_t^2, \epsilon_t^{1}\right\}$ to $\left\{\tilde{x}_t^1, \epsilon_t^{2}\right\}$ and the proof will be the same as Immer et al.. 
+Hence, we leverage Theorem 1 of Immer el al. and we conclude that if a backward model exists the PDE Eq(\ref{PDE_condition}) is verified.
+\begin{mybox}
+\begin{theorem}[Identifiability of Temporal Restricted Heteroscedastic noise model (TRHNM)] Assume Causal Markov property, minimality, sufficiency and let $\left(\boldsymbol{x}_t\right)_{t \in \mathcal{T}}$ be a MTS following $\operatorname{Eq}(1)$ where $K=1$. The graph $\mathcal{G}$ is uniquely identified if $\forall i \in[|1: d|], \forall j: x_t^j \in \mathbf{P a}_{\mathcal{G}}^i(t)$ and $\boldsymbol{S}$ such that $\left(\mathbf{P a}_{\mathcal{G}}^i(t) \backslash x_t^j\right) \subseteq \boldsymbol{S} \subseteq\left(\operatorname{Nd}\left(x_t^i\right) \backslash x_t^j\right)$, there exists $\boldsymbol{S}=\boldsymbol{s}$ where $p(\boldsymbol{s})>0$ $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}}^i(<t) \cup \mathbf{P a}_{\mathcal{G}}^j(<t)$ and $p\left(x_t^i, x_t^j \mid s, \boldsymbol{h}_t\right)$ do not satisfy PDE of Equation \ref{PDE_condition}, and we call the model that verify this condition, the Temporal Restricted Heteroscedastic noise model.
+\label{theo_TRHNM}
+\end{theorem}
+\end{mybox}
+\textit{Proof of the theorem. } We will follow the same steps in the proof of theorem \ref{theo_THGNM}. Let's assume we have two temporal causal graph $\mathcal{G}$ and $ \mathcal{G}'$ for the multivariate TRHNM. We assume also that $\forall i \in[|1: d|], \forall j: x_t^j \in \mathbf{P a}_{\mathcal{G}}^i(t)$ and $\boldsymbol{S}$ such that $\left(\mathbf{P a}_{\mathcal{G}}^i(t) \backslash x_t^j\right) \subseteq \boldsymbol{S} \subseteq\left(\operatorname{Nd}\left(x_t^i\right) \backslash x_t^j\right)$, there exists $\boldsymbol{S}=\boldsymbol{s}$ where $p(\boldsymbol{s})>0$ $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}}^i(<t) \cup \mathbf{P a}_{\mathcal{G}}^j(<t)$ and $p\left(x_t^i, x_t^j \mid s, \boldsymbol{h}_t\right)$ do not satisfy PDE of Equation \ref{PDE_condition}.
+
+We will start by showing that time lagged parents are identifiable. Same reasoning in the bivariate case.
+
+\textbf{Disagreement in time lagged relationships. } Assume that $\mathcal{G}$ and $\mathcal{G}^{\prime}$ do not differ in the instantaneous effects. $\forall i \in \{1,2\}$: $\mathbf{P a}_{\mathcal{G}}^i(t) = \mathbf{P a}_{\mathcal{G}'}^i(t)$. 
+Hence and Wlog, there is some $k>0$ and an edge $x_{t-k}^1 \rightarrow x_t^2$ in $\mathcal{G}$ but not in $\mathcal{G}^{\prime}$. From $\mathcal{G}^{\prime}$ and the Causal Markov property, we have that $x_{t-k}^1 \perp\!\!\!\perp x_t^2 \mid \mathcal{S}$, where $\mathcal{S}=(\{x_{t-l}^i, 1 \leq l \leq L,  i \in \{1,2\}\} \cup \mathbf{N D}_t) \backslash\left\{x_{t-k}^1, x_t^2\right\}$, and $\mathbf{N D}_t$ are all $X_t^i$ that are non-descendants (wrt instantaneous effects) of $x_t^2$. Applied to $\mathcal{G}$, causal minimality leads to a contradiction because $x_{t-k}^1 \not\!\perp\!\!\!\perp x_t^2 \mid \mathcal{S}$ in $\mathcal{G}$, and the above reasoning shows that it exists a subgraph $\mathcal{G}^{\prime}$ of $\mathcal{G}$ that is Markovian to the joint distribution of the data.
+
+\textbf{Disagreement on instantaneous parents. }Let's now assume we have two temporal causal graph $\mathcal{G}$ and $ \mathcal{G}'$ such that $\mathcal{G} \neq \mathcal{G}'$. According to the Propostion 29 in Peters et al \citep{peters2014causal}, for $\mathcal{G}$ and $\mathcal{G}^{\prime}$ be two different DAGs over a set of variables $\boldsymbol{V}$, such that $\boldsymbol{x}_t$ is generated by our TRHNM and satisfies the Markov condition and causal minimality with respect to $\mathcal{G}$ and $\mathcal{G}^{\prime}$. Then there are variables $x_t^1, x_t^2 \in \boldsymbol{V}$ such that for the set $\boldsymbol{Q}:= \mathbf{P a}_{\mathcal{G}}^1(t) \backslash\{x_t^2\}, \boldsymbol{Y}:=\mathbf{P a}_{\mathcal{G}'}^2(t)  \backslash\{x_t^1\}$ and $\boldsymbol{S}:=\boldsymbol{Q} \cup \boldsymbol{Y}$, we have: 1) $ x_t^2\rightarrow x_t^1$ in $\mathcal{G}$ and $x_t^1 \rightarrow x_t^2$ in $\mathcal{G}^{\prime}$. 2) $\boldsymbol{S} \subseteq \mathbf{N D}_{x_t^1}^{\mathcal{G}} \backslash\{x_t^2\}$ and $\boldsymbol{S} \subseteq \mathbf{N D}_{x_t^2}^{\mathcal{G}^{\prime}} \backslash\{x_t^1\}$ . $\mathbf{P a}_{\mathcal{G}}^1(t)$ is the set of parent variables of $x_t^1$ in graph $\mathcal{G}$. $\mathbf{N D}{ }_{x_t^1}^{\mathcal{G}}$ is the set of non-descendant (wrt instantaneous effects) of $x_t^1$ in graph $\mathcal{G}$.
+
+We consider $\boldsymbol{S}=\boldsymbol{s}$ with $p(\boldsymbol{s})>0$. Lemma 37 in Peters et al. \citep{peters2014causal} states that if $p(\boldsymbol{x}_t)$ is generated according to the SEM models as follows:
+
+$$
+x^i_t=f_i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t), \epsilon^i_t\right), i\in \{1,2, \cdots, d\}, x^i_t \in \boldsymbol{V}
+$$
+
+with corresponding DAG $\mathcal{G}$, then for a variable $x^i_t \in \boldsymbol{V}$, if $\boldsymbol{S} \subseteq \mathbf{N D}_{x^i_t}^{\mathcal{G}}$ then $\epsilon^i_t \perp\!\!\!\perp \boldsymbol{S}$. Our TRHNM can be viewed one specific class of the SEM in the aforementioned equation. Hence, Lemma 37 holds under our TRHNM and applying it to $x_t^1$ renders $\epsilon_t^1 \perp\!\!\!\perp (x_t^2, \boldsymbol{S})$ and $x_t^2$ $\epsilon_t^2 \perp\!\!\!\perp (x_t^1, \boldsymbol{S})$.
+
+Using now Lemma 36 in Peters et al. \citep{peters2014causal}, and we denote $x_t^{1,*}:=x_t^1 \mid \boldsymbol{S}=\boldsymbol{s}$ and $x_t^{2,*}:=x_t^2 \mid \boldsymbol{S}=\boldsymbol{s}$. We have:
+\begin{equation}
+\begin{aligned}
+    x_t^{1,*}|_{\boldsymbol{h}_t}&= f^1\left( x_t^{2,*}|_{\boldsymbol{h}_t}\right)+g^1\left( x_t^{2,*}|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{1}\\
+    x_t^{2,*}|_{\boldsymbol{h}_t}&= f^2\left( x_t^{1,*}|_{\boldsymbol{h}_t}\right)+g^2\left( x_t^{1,*}|_{\boldsymbol{h}_t}\right)\cdot\epsilon_t^{2},\\
+\end{aligned} 
+\label{eq_TRHNM_proof}
+\end{equation} 
+where $x_t^{i,*}|_{\boldsymbol{h}_t}$ is $x_t^i$ conditioned on $\boldsymbol{h}_t, \boldsymbol{S}$ and $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}}^1(<t) \cup \mathbf{P a}_{\mathcal{G}}^2(<t)$ in this case, which is also equal to $\boldsymbol{h}_t = \mathbf{P a}_{\mathcal{G}'}^1(<t) \cup \mathbf{P a}_{\mathcal{G}'}^2(<t)$, because we proved identifiability of time lagged parents.
+Eq(\ref{eq_TRHNM_proof}) raise a contradiction because, having these forward and backward models imply the verification of PDE \ref{PDE_condition}. But we chose $s$ such that this PDE is not verified hence contradiction. Then, the identifiability of our Temporal Restricted Heteroscedastic noise.
+\subsection{Proof of theorem \ref{theo_DyTCM}}
+In this section, we want to prove the identifiability of mixture of Temporal causal models either in the case of Temporal Heteroscedastic Gaussian noise, Temporal Restricted Heteroscedastic noise and Homoscedastic NonGaussian noise.
+
+\textit{Proof. }Let $\mathcal{F}$ be a family of identifiable temporal causal models either from TGHNM or TNGNM, $\mathcal{F}=$ $\left(p_{\theta^r}(\cdot| \cdot,\mathcal{G}^r)\right)_{r \in \mathbb{N}^*}$ that are linearly independent and let $\mathcal{M}_K$ be the family of all $K$-finite mixtures of elements from $\mathcal{F}$, i.e.
+\begin{equation*}
+ \scalebox{0.9}{$\mathcal{M}_K =
+\left\{p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) =  \sum_{r=1}^K\pi_t(\boldsymbol{\omega}^r)p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r), p_{\theta^r}(\cdot|\cdot, \mathcal{G}^r) \in \mathcal{F}, \forall t \in \mathcal{T}: \pi_t(\boldsymbol{\omega}^r)>0 \text{ and }\sum_{r=1}^K \pi_t(\boldsymbol{\omega}^r)=1\right\}
+$}   
+\end{equation*}
+First, we introduce a result from Yakowitz \& Spragins \citep{yakowitz1968identifiability} that established a necessary and sufficient condition for the identifiability of finite mixtures of multivariate distributions.
+\begin{theorem}[Identifiability of finite mixtures of distributions, Yakowitz \& Spragins \citep{yakowitz1968identifiability}]. Let $\mathcal{F}=$ $\left\{F(x ; \alpha), \alpha \in \mathbb{R}^m, x \in \mathbb{R}^n\right\}$ be a finite mixture of distributions. Then $\mathcal{F}$ is identifiable if and only if $\mathcal{F}$ is a linearly independent set over the field of real numbers.
+\label{theo_yako}
+\end{theorem}
+We will further assume that it exists two distribution such that $\forall (\boldsymbol{x}_t,\boldsymbol{x}_{<t})$ covering the space value of random variables $(\boldsymbol{X}_t,\boldsymbol{X}_{<t})$:
+\begin{equation}
+    \begin{aligned}
+        p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) &=  \sum_{r=1}^K\pi_t(\boldsymbol{\omega}^r)p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r)\\
+        p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) &=  \sum_{r=1}^{\tilde{K}}\pi_t(\boldsymbol{\tilde{\omega}}^r)\tilde{p}_{\tilde{\theta}^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\tilde{\mathcal{G}}^r)\\
+    \end{aligned}
+    \label{eq_2_dist_proof}
+\end{equation}
+Our objective is to show first that $K = \tilde{K}$, it exists a permutation $\sigma$ and a translation function $\varrho: \mathbb{R}^2 \rightarrow \mathbb{R}^2$: $(\theta^r, \mathcal{G}^r) = (\tilde{\theta}^{\sigma(r)}, \tilde{\mathcal{G}}^{\sigma(r)})$ and $\boldsymbol{\omega}^r = \varrho(\tilde{\boldsymbol{\omega}}^{\sigma(r)})$.
+
+Using that $\mathcal{F}=$ $\left(p_{\theta^r}(\cdot| \cdot,\mathcal{G}^r)\right)_{r=1}^K$ are linearly independent and fixing $t$: 
+\begin{equation*}
+\begin{aligned}
+      \sum_{r=1}^K \underbrace{\pi_t(\boldsymbol{\omega}^r)}_{a_r}p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r)&=
+     \sum_{r=1}^{\tilde{K}}\underbrace{\pi_t(\boldsymbol{\tilde{\omega}}^r)}_{b_r}\tilde{p}_{\tilde{\theta}^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\tilde{\mathcal{G}}^r)\\
+     \sum_{r=1}^K a_r p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r)&=
+     \sum_{r=1}^{\tilde{K}}b_r\tilde{p}_{\tilde{\theta}^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\tilde{\mathcal{G}}^r),\\
+      \end{aligned}
+\end{equation*}
+and this true $\forall (\boldsymbol{x}_t,\boldsymbol{x}_{<t})$ covering the space value of the random variable $\boldsymbol{Y} = (\boldsymbol{X}_t,\boldsymbol{X}_{<t})$. By using theorem \ref{theo_yako}, we can conclude that: $K = \tilde{K}$ and it exists a permutation $\sigma$ such that: $(\theta^r, \mathcal{G}^r) = (\tilde{\theta}^{\sigma(r)}, \tilde{\mathcal{G}}^{\sigma(r)})$ and $\forall t \in \mathcal{T}: \pi_t(\boldsymbol{\omega}^r) = \pi_t(\boldsymbol{\tilde{\omega}}^r)$.
+
+To proof our identifiability as defined in definition \ref{def_identifia}, we still need to prove that $\boldsymbol{\omega}^r = \varrho(\tilde{\boldsymbol{\omega}}^{\sigma(r)})$.
+We have $\forall t \in \mathcal{T}: \pi_t(\boldsymbol{\omega}^r) = \pi_t(\boldsymbol{\tilde{\omega}}^r)$, we take two indices $r,s \in [|1:K|]:$
+\begin{equation}
+\left\{ \begin{aligned}
+    \pi_t(\boldsymbol{\omega}^r) &= \pi_t(\boldsymbol{\tilde{\omega}}^{\sigma(r)})\\
+    \pi_t(\boldsymbol{\omega}^s) &= \pi_t(\boldsymbol{\tilde{\omega}}^{\sigma(s)})
+\end{aligned}
+    \right.
+    \label{equaltiy_time_varying}
+\end{equation}
+To handle time varying weights identifiability, we will consider ratios of mixture weights:
+\begin{equation*}
+\left\{
+\begin{aligned}
+      \frac{\pi_t(\boldsymbol{\omega}^r)}{\pi_t(\boldsymbol{\omega}^s)}&=\frac{\frac{\exp \left(\omega^r_{1} \cdot t+\omega^r_{ 0}\right)}{\sum_{j=1}^{K} \exp \left(\omega^j_{1} \cdot t+\omega^j_{0}\right)}}{\frac{\exp \left(\omega^s_{1} \cdot t+\omega^s_{ 0}\right)}{\sum_{j=1}^{K} \exp \left(\omega^j_{1} \cdot t+\omega^j_{0}\right)}}\\
+     \frac{\pi_t(\boldsymbol{\omega}^{\sigma(r)})}{\pi_t(\boldsymbol{\omega}^{\sigma(s)})}&=\frac{\frac{\exp \left(\omega^{\sigma(r)}_{1} \cdot t+\omega^{\sigma(r)}_{ 0}\right)}{\sum_{j=1}^{K} \exp \left(\omega^{\sigma(j)}_{1} \cdot t+\omega^{\sigma(j)}_{0}\right)}}{\frac{\exp \left(\omega^{\sigma(s)}_{1} \cdot t+\omega^{\sigma(s)}_{ 0}\right)}{\sum_{j=1}^{K} \exp \left(\omega^{\sigma(j)}_{1} \cdot t+\omega^{\sigma(j)}_{0}\right)}}\\
+     \end{aligned}
+    \right.
+\end{equation*}
+By Equation \ref{equaltiy_time_varying}:
+\begin{equation*}
+\begin{aligned}
+      &\frac{\pi_t(\boldsymbol{\omega}^r)}{\pi_t(\boldsymbol{\omega}^s)} =\frac{\pi_t(\boldsymbol{\omega}^{\sigma(r)})}{\pi_t(\boldsymbol{\omega}^{\sigma(s)})}\\
+     \Leftrightarrow& \exp \left[\left(\omega^r_{1}-\omega^s_{1}\right)t+\left(\omega^r_{ 0}-\omega^s_{ 0}\right) \right]=\exp \left[\left(\omega^{\sigma(r)}_{1}-\omega^{\sigma(s)}_{1}\right)t+\left(\omega^{\sigma(r)}_{0}-\omega^{\sigma(s)}_{0}\right) \right]\\
+     \Leftrightarrow& \forall t \in \mathcal{T}: \left(\omega^r_{1}-\omega^s_{1}\right)t+\left(\omega^r_{ 0}-\omega^s_{ 0}\right) = \left(\omega^{\sigma(r)}_{1}-\omega^{\sigma(s)}_{1}\right)t+\left(\omega^{\sigma(r)}_{0}-\omega^{\sigma(s)}_{0}\right) 
+     \end{aligned}
+\end{equation*}
+As a consequence of the last equation, we have for all the indices:
+\begin{equation*}
+\left\{
+\begin{aligned}
+\omega^r_{1}-\omega^s_{1} &= \omega^{\sigma(r)}_{1}-\omega^{\sigma(s)}_{1}\\
+\omega^r_{ 0}-\omega^s_{ 0} &= \omega^{\sigma(r)}_{0}-\omega^{\sigma(s)}_{0}
+     \end{aligned}
+     \right.
+\end{equation*}
+\begin{equation*}
+\left\{
+\begin{aligned}
+\omega^r_{1}-\omega^{\sigma(r)}_{1} &= \omega^s_{1}-\omega^{\sigma(s)}_{1} = \Delta_1\\
+\omega^r_{ 0}-\omega^{\sigma(r)}_{0} &= \omega^s_{ 0}-\omega^{\sigma(s)}_{0} = \Delta_0\\
+\end{aligned}
+     \right.
+ \end{equation*}
+Hence it exists a translation function $\varrho: \mathbb{R}^2 \rightarrow \mathbb{R}^2$, such that $\forall r \in [|1:K|]$:
+$$\boldsymbol{\omega}^r = \varrho(\tilde{\boldsymbol{\omega}}^{\sigma(r)}).$$
+Hence our mixture of temporal causal models is identifiable as defined in definition \ref{def_identifia}.

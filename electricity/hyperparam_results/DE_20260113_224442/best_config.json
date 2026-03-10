@@ -1,0 +1,49 @@
+{
+  "country": "DE",
+  "best_params": {
+    "lambda_sparse": 0.5,
+    "lambda_dag": 100.0,
+    "encoder_layer_sizes": [
+      32,
+      32
+    ],
+    "spline_bins": 8,
+    "learning_rate": 0.001,
+    "batch_size": 32
+  },
+  "best_model_config": {
+    "lambda_dag": 100.0,
+    "lambda_sparse": 0.5,
+    "tau_gumbel": 1.0,
+    "base_distribution_type": "spline",
+    "spline_bins": 8,
+    "norm_layers": true,
+    "res_connection": true,
+    "encoder_layer_sizes": [
+      32,
+      32
+    ],
+    "decoder_layer_sizes": [
+      32,
+      32
+    ],
+    "heteroscedastic": true,
+    "allow_instantaneous": true,
+    "constrain_target": true
+  },
+  "best_training_params": {
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "max_steps_auglag": 8,
+    "max_auglag_inner_epochs": 800,
+    "rho": 1.0,
+    "alpha": 0.0,
+    "progress_rate": 0.9,
+    "safety_rho": 1000000000.0,
+    "safety_alpha": 1000000000.0,
+    "tol_dag": 1e-06,
+    "anneal_entropy": "noanneal",
+    "reconstruction_loss_factor": 1.0
+  },
+  "best_spearman": 0.29045345754793267
+}

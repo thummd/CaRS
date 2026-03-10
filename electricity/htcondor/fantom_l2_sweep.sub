@@ -1,0 +1,30 @@
+# HTCondor submission file for FANTOM electricity L2 sparsity sweep
+# Usage: condor_submit_bid 100 fantom_l2_sweep.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_l2_job.sh
+
+# Arguments: COUNTRY LAMBDA_SPARSE LAMBDA_SPARSE_L2 L2_GROUP_MODE SEED
+Arguments = $(country) $(lambda_sparse) $(lambda_sparse_l2) $(l2_group_mode) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/l2_$(country)_l1_$(lambda_sparse)_l2_$(lambda_sparse_l2)_$(l2_group_mode)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/l2_$(country)_l1_$(lambda_sparse)_l2_$(lambda_sparse_l2)_$(l2_group_mode)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/l2_$(country)_l1_$(lambda_sparse)_l2_$(lambda_sparse_l2)_$(l2_group_mode)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 4 hours per job
+MaxTime = 14400
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, lambda_sparse, lambda_sparse_l2, l2_group_mode, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_l2_sweep.txt

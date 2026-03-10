@@ -1,0 +1,23 @@
+# HTCondor submission for DS3M Univariate Spread (DE-FR)
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_spread_univariate.sh
+
+# Arguments: d_dim, seed
+arguments = $(d_dim) $(seed)
+
+# Resource requirements
+request_cpus = 4
+request_memory = 16G
+request_gpus = 1
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+getenv = True
+
+# Output files
+output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_spread_uv_d$(d_dim)_s$(seed).out
+error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_spread_uv_d$(d_dim)_s$(seed).err
+log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_spread_uv_d$(d_dim)_s$(seed).log
+
+# Job parameters from file
+queue d_dim, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_spread_univariate.txt

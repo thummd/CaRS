@@ -1,0 +1,49 @@
+# country, d_dim, h_dim, z_dim, timestep, lr, seed
+# Germany experiments - varying d_dim (regimes)
+DE, 2, 30, 8, 14, 0.001, 42
+DE, 3, 30, 8, 14, 0.001, 42
+DE, 4, 30, 8, 14, 0.001, 42
+# Germany - varying h_dim (hidden)
+DE, 2, 20, 8, 14, 0.001, 42
+DE, 2, 40, 8, 14, 0.001, 42
+DE, 2, 50, 8, 14, 0.001, 42
+# Germany - varying z_dim (latent)
+DE, 2, 30, 4, 14, 0.001, 42
+DE, 2, 30, 12, 14, 0.001, 42
+DE, 2, 30, 16, 14, 0.001, 42
+# Germany - varying timestep (lookback)
+DE, 2, 30, 8, 7, 0.001, 42
+DE, 2, 30, 8, 21, 0.001, 42
+DE, 2, 30, 8, 28, 0.001, 42
+# Germany - varying learning rate
+DE, 2, 30, 8, 14, 0.0001, 42
+DE, 2, 30, 8, 14, 0.0005, 42
+DE, 2, 30, 8, 14, 0.002, 42
+# Germany - seed robustness
+DE, 2, 30, 8, 14, 0.001, 123
+DE, 2, 30, 8, 14, 0.001, 456
+DE, 2, 30, 8, 14, 0.001, 789
+# France experiments - varying d_dim (regimes)
+FR, 2, 30, 8, 14, 0.001, 42
+FR, 3, 30, 8, 14, 0.001, 42
+FR, 4, 30, 8, 14, 0.001, 42
+# France - varying h_dim (hidden)
+FR, 2, 20, 8, 14, 0.001, 42
+FR, 2, 40, 8, 14, 0.001, 42
+FR, 2, 50, 8, 14, 0.001, 42
+# France - varying z_dim (latent)
+FR, 2, 30, 4, 14, 0.001, 42
+FR, 2, 30, 12, 14, 0.001, 42
+FR, 2, 30, 16, 14, 0.001, 42
+# France - varying timestep (lookback)
+FR, 2, 30, 8, 7, 0.001, 42
+FR, 2, 30, 8, 21, 0.001, 42
+FR, 2, 30, 8, 28, 0.001, 42
+# France - varying learning rate
+FR, 2, 30, 8, 14, 0.0001, 42
+FR, 2, 30, 8, 14, 0.0005, 42
+FR, 2, 30, 8, 14, 0.002, 42
+# France - seed robustness
+FR, 2, 30, 8, 14, 0.001, 123
+FR, 2, 30, 8, 14, 0.001, 456
+FR, 2, 30, 8, 14, 0.001, 789

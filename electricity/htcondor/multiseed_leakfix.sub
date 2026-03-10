@@ -1,0 +1,59 @@
+# HTCondor submission file for PREDICTION experiments with data leakage fixes
+# Task: Predict Y[t+1] using X[0:t] and Y[0:t] (forecasting format)
+#
+# This is the prediction/forecasting task where:
+# - X[k] is at time t+k
+# - Y[k] is at time t+k+1 (one step ahead)
+#
+# Fixes applied:
+# 1. DS3M univariate/multivariate: Added ds3m_predict() function to avoid data leakage
+#    - Uses forward RNN + prior sampling instead of backward RNN conditioned on Y
+# 2. FANTOM BEM: Fixed regime collapse with:
+#    - K-means initialization instead of temporal windows
+#    - Soft probabilistic assignments instead of hard argmax
+#    - Entropy regularization to encourage diverse regime usage
+#    - Delayed pruning (only after iteration 2)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim) prediction
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_leakfix_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_leakfix_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_leakfix_$(model)_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 28800
++JobBatchName = "multiseed_leakfix"
+
+# DS3M Univariate experiments (data leakage fix)
+# These previously showed inflated results (FR: 0.984 Spearman)
+Queue model, dataset, d_dim from (
+ds3m_uv, DE, 4
+ds3m_uv, FR, 4
+ds3m_uv, DE_FR, 4
+)
+
+# DS3M Multivariate experiments (data leakage fix)
+Queue model, dataset, d_dim from (
+ds3m_mv, DE, 4
+ds3m_mv, FR, 4
+ds3m_mv, DE_FR, 4
+)
+
+# FANTOM BEM experiments (regime collapse fix)
+# Previously collapsed from 3 regimes to 1
+Queue model, dataset, d_dim from (
+fantom_bem, DE, 3
+fantom_bem, FR, 3
+fantom_bem, DE_FR, 3
+)

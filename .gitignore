@@ -1,0 +1,39 @@
+# Environment & secrets
+.env
+venv*/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Data (too large for git, transfer separately)
+data/
+
+# Experiment outputs & logs
+outputs/
+logs/
+electricity/condor/logs/
+electricity/htcondor/logs/
+electricity/slurm/logs/
+shared_backbone/htcondor/logs/
+shared_backbone/slurm/logs/
+shared_backbone/logs*/
+shared_backbone/results*/
+
+# Job scheduler logs
+*.log
+*.out
+*.err
+
+# Model checkpoints & binary results
+*.pt
+*.pth
+*.pkl
+*.npz
+
+# OS artifacts
+.DS_Store
+__MACOSX/
+Thumbs.db

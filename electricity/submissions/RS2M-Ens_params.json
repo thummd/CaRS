@@ -1,0 +1,18 @@
+{
+  "method": "RS2M-Ens",
+  "base_model": "DS3M (Deep Switching State Space Model)",
+  "mode": "univariate",
+  "input": "TARGET only (price difference)",
+  "d_dim": 2,
+  "h_dim": 30,
+  "z_dim": 8,
+  "n_layers": 1,
+  "timestep": 14,
+  "n_epochs": 200,
+  "learning_rate": 0.001,
+  "ensemble_method": "softmax",
+  "ensemble_temperature": 5.0,
+  "n_models": 5,
+  "min_spearman_threshold": 0.3,
+  "spearman_validation": 0.6667430743882451
+}

@@ -1,0 +1,30 @@
+# HTCondor submission file for DS3M on temporal epftoolbox data
+# Usage: condor_submit_bid 100 ds3m_temporal.sub
+#
+# Purpose: Train DS3M on properly temporally-ordered electricity data
+# from epftoolbox (DE/FR markets) - this is the correct use case for DS3M
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_temporal.sh
+
+# Arguments: DATASET MODE D_DIM SEED TIMESTEP
+Arguments = $(dataset) $(mode) $(d_dim) $(seed) $(timestep)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/temporal_$(dataset)_$(mode)_d$(d_dim)_t$(timestep)_s$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/temporal_$(dataset)_$(mode)_d$(d_dim)_t$(timestep)_s$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/temporal_$(dataset)_$(mode)_d$(d_dim)_t$(timestep)_s$(seed).err
+
+# Resource requirements
+Request_CPUs = 2
+Request_Memory = 8GB
+
+# GPU for faster training
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 4000) && (TARGET.CUDACapability >= 6.0)
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue dataset, mode, d_dim, seed, timestep from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_temporal.txt

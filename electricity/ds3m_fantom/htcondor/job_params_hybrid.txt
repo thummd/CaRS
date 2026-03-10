@@ -1,0 +1,6 @@
+FR, independent, 2, 42
+FR, shared_backbone, 2, 42
+DE, independent, 2, 42
+DE, shared_backbone, 2, 42
+ALL, independent, 2, 42
+ALL, shared_backbone, 2, 42

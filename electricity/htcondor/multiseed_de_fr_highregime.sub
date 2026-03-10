@@ -1,0 +1,30 @@
+# HTCondor submission file for DE and FR with d=5,6 regimes
+# Requires 80GB GPU for high-regime experiments
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim)
+
+# High memory GPU requirements (for d>=5)
+RequestCpus = 4
+RequestMemory = 32768
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 70000) && (TARGET.CUDACapability >= 8.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highreg_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highreg_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highreg_$(model)_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 43200
++JobBatchName = "multiseed_de_fr_highregime"
+
+Queue model, dataset, d_dim from (
+ds3m_causal, DE, 5
+ds3m_causal, DE, 6
+ds3m_causal, FR, 5
+ds3m_causal, FR, 6
+)

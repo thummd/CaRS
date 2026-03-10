@@ -1,0 +1,28 @@
+# HTCondor submission file for DAG extraction with W weight analysis
+# Tests the updated script that saves ICGNN W weights
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+# Args: dataset d_dim seed lambda_sparse init_logits tau_gumbel edge_threshold
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse) $(init_logits) $(tau_gumbel) $(edge_threshold)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/W_$(dataset)_d$(d_dim)_init$(init_logits).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/W_$(dataset)_d$(d_dim)_init$(init_logits).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/W_$(dataset)_d$(d_dim)_init$(init_logits).err
+
++MaxRuntime = 14400
++JobBatchName = "dag_W_analysis"
+
+# Test with different configurations
+# Format: dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold
+Queue dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold from (
+DE, 3, 42, 10.0, -2.0, 1.0, 0.3
+FR, 3, 42, 10.0, -2.0, 1.0, 0.3
+)

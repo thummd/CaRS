@@ -1,0 +1,29 @@
+{
+  "country": "FR",
+  "n_regimes": 1,
+  "spearman": 0.1913813090601338,
+  "samples_per_regime": [
+    850.0
+  ],
+  "structures": [
+    {
+      "regime": 0,
+      "parents": {
+        "instantaneous": [
+          [
+            "CARBON_RET",
+            0,
+            "-0.026544925"
+          ]
+        ],
+        "lagged": []
+      }
+    }
+  ],
+  "dags": [
+    {
+      "regime": 0,
+      "n_samples": 850
+    }
+  ]
+}

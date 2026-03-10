@@ -1,0 +1,125 @@
+{
+  "method_name": "RS2M-Ens-Opt",
+  "full_name": "Regime-Switching State Space Model Ensemble (Optimized)",
+  "description": "Deep Switching State Space Model (DS3M) with 2 latent regimes. Ensemble combines top-11 seeds with optimized softmax weighting (temp=7).",
+  "parameters": {
+    "method": "RS2M-Ens-Opt",
+    "base_model": "DS3M (Deep Switching State Space Model)",
+    "mode": "univariate",
+    "input": "TARGET only (price difference)",
+    "d_dim": 2,
+    "h_dim": 30,
+    "z_dim": 8,
+    "n_layers": 1,
+    "timestep": 14,
+    "n_epochs": 200,
+    "learning_rate": 0.001,
+    "ensemble_method": "softmax",
+    "ensemble_temperature": 7.0,
+    "n_models": 11,
+    "min_spearman_threshold": 0.4409888655584599,
+    "spearman_validation": 0.7126094733331383
+  },
+  "models": [
+    {
+      "seed": "43",
+      "spearman": 0.6044147792032238,
+      "weight": 0.18310138316529087,
+      "regime_distribution": {
+        "0": 40,
+        "1": 258
+      }
+    },
+    {
+      "seed": "71",
+      "spearman": 0.555904718437546,
+      "weight": 0.13038212742105237,
+      "regime_distribution": {
+        "0": 172,
+        "1": 126
+      }
+    },
+    {
+      "seed": "80",
+      "spearman": 0.5208591946263379,
+      "weight": 0.10201816786694705,
+      "regime_distribution": {
+        "0": 266,
+        "1": 32
+      }
+    },
+    {
+      "seed": "16",
+      "spearman": 0.517090956250571,
+      "weight": 0.09936234760153691,
+      "regime_distribution": {
+        "0": 18,
+        "1": 280
+      }
+    },
+    {
+      "seed": "64",
+      "spearman": 0.4936503369535175,
+      "weight": 0.08432588787175693,
+      "regime_distribution": {
+        "0": 281,
+        "1": 17
+      }
+    },
+    {
+      "seed": "59",
+      "spearman": 0.4876696755891387,
+      "weight": 0.08086849206334973,
+      "regime_distribution": {
+        "0": 14,
+        "1": 284
+      }
+    },
+    {
+      "seed": "47",
+      "spearman": 0.4670921919244067,
+      "weight": 0.07002006857244143,
+      "regime_distribution": {
+        "0": 49,
+        "1": 249
+      }
+    },
+    {
+      "seed": "22",
+      "spearman": 0.4590759563038524,
+      "weight": 0.06619919121078974,
+      "regime_distribution": {
+        "0": 16,
+        "1": 282
+      }
+    },
+    {
+      "seed": "84",
+      "spearman": 0.45698324630335135,
+      "weight": 0.06523650960673531,
+      "regime_distribution": {
+        "0": 284,
+        "1": 14
+      }
+    },
+    {
+      "seed": "0",
+      "spearman": 0.4454082700362245,
+      "weight": 0.06015920360681106,
+      "regime_distribution": {
+        "0": 251,
+        "1": 47
+      }
+    },
+    {
+      "seed": "51",
+      "spearman": 0.4409888655584599,
+      "weight": 0.058326621013288615,
+      "regime_distribution": {
+        "0": 166,
+        "1": 132
+      }
+    }
+  ],
+  "validation_spearman": 0.7126094733331383
+}

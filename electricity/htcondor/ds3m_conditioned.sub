@@ -1,0 +1,27 @@
+# HTCondor submission file for feature-conditioned DS3M experiments
+# Usage: condor_submit_bid 100 ds3m_conditioned.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_conditioned_job.sh
+
+# Arguments: COUNTRY D_DIM SEED
+Arguments = $(country) $(d_dim) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_cond_$(country)_d$(d_dim)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_cond_$(country)_d$(d_dim)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_cond_$(country)_d$(d_dim)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 2
+Request_Memory = 8GB
+
+# GPU for faster training
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 4000) && (TARGET.CUDACapability >= 6.0)
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, d_dim, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m_conditioned.txt

@@ -1,0 +1,34 @@
+# HTCondor submission file for DS3M electricity experiments
+# Usage: condor_submit_bid 100 ds3m_electricity.sub
+#
+# Experiments:
+# - France, Germany, Combined with TARGET (price change prediction)
+# - France, Germany with consumption (load forecasting, original DS3M comparison)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_job.sh
+
+# Arguments: COUNTRY TARGET SEED
+Arguments = $(country) $(target) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(target)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(target)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(target)_seed$(seed).err
+
+# Resource requirements (DS3M is lighter than FANTOM)
+Request_CPUs = 2
+Request_Memory = 8GB
+
+# GPU optional but recommended for faster training
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 4000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 2 hours per job (200 epochs should complete well within this)
+MaxTime = 7200
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, target, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m.txt

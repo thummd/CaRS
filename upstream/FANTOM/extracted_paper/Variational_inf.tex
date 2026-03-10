@@ -1,0 +1,44 @@
+\subsection{Mathematical Derivation: Equation (\ref{elbo_eq}) to (\ref{Mstep_eq_colored})}
+We perform the maximization of ELBO presented in proposition \ref{prop_3.1}, using a BEM procedure, where we alternate between E-step (updating posterior probabilities while fixing all the parameters $\Theta=\left\{\theta^r, \phi^r, \omega^r\right\}_{r=1}^{N_w}$) and M step (Updating the parameters while using the posteriors learned in the E-step), we can summarize the process as follows:
+\begin{itemize}
+    \item In the Estep: we learn $\beta_t^r=p\left(z_t \mid x_t, x_{<t}, \Theta_{\text {old }}\right)$, where $\Theta_{\text {old }}$ is $\Theta$ of the previous iteration.
+    \item In the M-step: we fix the learned posterior probabilities to the values $\beta_t^r$ and we update $\Theta$.
+    \item By fixing the posterior probabilities in the M-step, the entropy of these probabilities $H\left(p\left(z_t \mid x_t, x_{<t}, \Theta_{\text {old }}\right)\right)$ is a constant, which allow us to discard it.
+\end{itemize}
+The detail derivation from Eq.(\ref{elbo_eq}) to Eq.(\ref{Mstep_eq_colored}) is the following:
+\begin{equation}
+\begin{aligned}
+ \operatorname{ELBO}(\Theta)=&\sum_{t=1}^{|T|} \mathbb{E}_{q_\phi(\mathcal{G})}\left[\mathbb{E}_{p\left(z_t \mid x_t, x_{<t}\right)}\left(\log p_{\theta_{z_t}}\left(x_t \mid x_{<t}, \mathcal{G}^{z_t}\right)+\log p\left(z_t\right)\right)+H\left(p\left(z_t \mid x_t, x_{<t}\right)\right)\right]\\
+ &+\sum_{r=1}^{N_w} \mathbb{E}_{q_{\phi_r}\left(\mathcal{G}^r\right)}\left[\log p\left(\mathcal{G}^r\right)\right]+H\left(q_{\phi_r}\left(\mathcal{G}^r\right)\right) \\
+& =\sum_{t=1}^{|T|} \mathbb{E}_{q_\phi(\mathcal{G})}\left[\sum_{z_t} p\left(z_t \mid x_t, x_{<t}, \Theta_{\text {old }}\right)\left(\log p_{\theta_{z_t}}\left(x_t \mid x_{<t}, \mathcal{G}^{z_t}\right)+\log p\left(z_t\right)\right)\right]\\
+&+\underbrace{H\left(p\left(z_t \mid x_t, x_{<t}, \Theta_{\text {old }}\right)\right)}_{Cte}+\sum_{r=1}^{N_w} \mathbb{E}_{q_{\phi_r}\left(\mathcal{G}^r\right)}\left[\log p\left(\mathcal{G}^r\right)\right]+H\left(q_{\phi_r}\left(\mathcal{G}^r\right)\right)
+\end{aligned}
+\end{equation}
+We replace $p\left(z_t \mid x_t, x_{<t}, \Theta_{\text {old }}\right)$ by $\beta_t^r, p\left(z_t\right)$ by our prior choice $\pi_t\left(\omega^r\right)$, and we discard the entropy of the posterior because it is a constant in these steps. Hence, we got the Eq.(\ref{Mstep_eq_colored}):
+\begin{equation}
+\begin{aligned}
+\operatorname{ELBO}(\Theta)=&=\mathbb{E}_{q_\phi(\mathcal{G})}\left[\sum_{t=1}^{|T|} \sum_{r=1}^{N_w} \beta_t^r\left(\log p_{\theta_r}\left(x_t \mid x_{<t}, \mathcal{G}^r\right)+\log \pi_t\left(\omega^r\right)\right)\right]\\
+&+\sum_{r=1}^{N_w} \mathbb{E}_{q_{\phi_r}\left(\mathcal{G}^r\right)}\left[\log p\left(\mathcal{G}^r\right)\right]+H\left(q_{\phi_r}\left(\mathcal{G}^r\right)\right).
+\end{aligned}
+\end{equation}
+
+
+After the maximization of Eq.(\ref{Mstep_eq_colored}), FANTOM update the posteriors $p\left(z_t \mid x_t, x_{<t}, \theta_{\text {old }}\right)$ following Eq.(\ref{10}).
+
+
+
+
+\subsection{Variational Inference Details}
+We provide the detailed formulations for $q_{\phi^r}(\mathcal{G}^r)$. In order to model the temporal adjacency matrices $\boldsymbol{G}_{\tau}^r$ where $\tau \in [|1:K|]$, we use two learnable matrices $\boldsymbol{U}_{\tau}, \boldsymbol{Q}_{\tau} \in \mathbf{R}^{d\times d}$ such that:
+\begin{equation}
+p_{k, i j}=\frac{\exp \left(u_{k, i j}\right)}{\exp \left(u_{k, i j}\right)+\exp \left(q_{k, i j}\right)}
+\end{equation}
+For instantaneous graphs $\boldsymbol{G}_0^r$, we used the same trick as in \cite{gong2022rhino, varambally2023discovering}, in which we employ three lower triangular learnable matrices $\boldsymbol{U}_{0}, \boldsymbol{Q}_{0}, \boldsymbol{E}_{0} \in \mathbf{R}^{d\times d}$ to characterise three scenarios: (1) $i \rightarrow j$; (2) $j \rightarrow i$; (3) no edge between them. For node $i>j$:
+\begin{equation}
+\begin{aligned}
+p(i \rightarrow j) & =\frac{\exp \left(u_{i j}\right)}{\exp \left(u_{i j}\right)+\exp \left(q_{i j}\right)+\exp \left(e_{i j}\right)} \\
+p(j \rightarrow i) & =\frac{\exp \left(q_{i j}\right)}{\exp \left(u_{i j}\right)+\exp \left(q_{i j}\right)+\exp \left(e_{i j}\right)} \\
+p(\text { no edge }) & =\frac{\exp \left(e_{i j}\right)}{\exp \left(u_{i j}\right)+\exp \left(q_{i j}\right)+\exp \left(e_{i j}\right)} .
+\end{aligned}
+\end{equation}
+With this formulation, the instantaneous adjacency matrix is free of self-loops, eliminating any length-1 cycles.

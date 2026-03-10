@@ -1,0 +1,38 @@
+# HTCondor submit file for full model training
+# Runs final training for DE and FR models
+#
+# Submit with: condor_submit full_training.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/condor/run_training.sh
+
+# Resource requirements
+request_cpus = 4
+request_memory = 16GB
+request_disk = 5GB
+
+# Job priority
+priority = 100
+
+# Output and log files
+log = /lustre/home/dthumm/CASTOR/electricity/condor/logs/training_$(experiment).log
+output = /lustre/home/dthumm/CASTOR/electricity/condor/logs/training_$(experiment).out
+error = /lustre/home/dthumm/CASTOR/electricity/condor/logs/training_$(experiment).err
+
+# Environment
+getenv = True
+
+# Job: Germany full training
+experiment = germany
+arguments = germany
+queue 1
+
+# Job: France full training
+experiment = france
+arguments = france
+queue 1
+
+# Job: Joint model training
+experiment = joint
+arguments = joint
+queue 1

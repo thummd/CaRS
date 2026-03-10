@@ -1,0 +1,13 @@
+\beamer@endinputifotherversion {3.24pt}
+\beamer@sectionintoc {1}{Motivation}{3}{0}{1}
+\beamer@sectionintoc {2}{Technical Challenges}{6}{0}{2}
+\beamer@sectionintoc {3}{Economic Relevance}{8}{0}{3}
+\beamer@sectionintoc {4}{Data}{10}{0}{4}
+\beamer@sectionintoc {5}{Literature Review}{14}{0}{5}
+\beamer@sectionintoc {6}{Methodology}{15}{0}{6}
+\beamer@sectionintoc {7}{Numerical Results}{32}{0}{7}
+\beamer@subsectionintoc {7}{1}{Shared Backbone Experiments}{42}{0}{7}
+\beamer@subsectionintoc {7}{2}{Shared Backbone Estimation Experiments}{44}{0}{7}
+\beamer@sectionintoc {8}{Discussion}{54}{0}{8}
+\beamer@sectionintoc {9}{Outlook}{58}{0}{9}
+\beamer@sectionintoc {10}{Appendix}{61}{1}{10}

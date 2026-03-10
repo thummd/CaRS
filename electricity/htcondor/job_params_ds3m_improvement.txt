@@ -1,0 +1,17 @@
+# Phase 1: Univariate ALL comparison (missing baseline)
+ALL, univariate, 2, 42
+ALL, univariate, 2, 43
+ALL, univariate, 2, 44
+# Phase 3: d_dim sweep for ALL multivariate
+ALL, multivariate, 1, 42
+ALL, multivariate, 1, 43
+ALL, multivariate, 1, 44
+ALL, multivariate, 3, 42
+ALL, multivariate, 3, 43
+ALL, multivariate, 3, 44
+ALL, multivariate, 4, 42
+ALL, multivariate, 4, 43
+ALL, multivariate, 4, 44
+# Additional seeds for d_dim=2 (already have seed 42)
+ALL, multivariate, 2, 43
+ALL, multivariate, 2, 44

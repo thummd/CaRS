@@ -1,0 +1,78 @@
+# HTCondor submission file for MISSING prediction experiments
+# Created: 2026-01-26
+#
+# Missing results identified:
+# - DS3M_UV d=4: DE, FR, DE_FR (prediction)
+# - DS3M_MV d=4: DE, FR, DE_FR (prediction)
+# - FANTOM_BEM d=3: DE, FR, DE_FR (prediction)
+# - FANTOM_BEM d=3 DE_FR (estimation - also missing)
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 28800
++JobBatchName = "missing_predictions"
+
+# ============================================================================
+# DS3M_UV d=4 PREDICTION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.err
+
+Queue model, dataset, d_dim from (
+ds3m_uv, DE, 4
+ds3m_uv, FR, 4
+ds3m_uv, DE_FR, 4
+)
+
+# ============================================================================
+# DS3M_MV d=4 PREDICTION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.err
+
+Queue model, dataset, d_dim from (
+ds3m_mv, DE, 4
+ds3m_mv, FR, 4
+ds3m_mv, DE_FR, 4
+)
+
+# ============================================================================
+# FANTOM_BEM d=3 PREDICTION experiments
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_pred.err
+
+Queue model, dataset, d_dim from (
+fantom_bem, DE, 3
+fantom_bem, FR, 3
+fantom_bem, DE_FR, 3
+)
+
+# ============================================================================
+# FANTOM_BEM d=3 DE_FR ESTIMATION (also missing)
+# ============================================================================
+Arguments = $(model) $(dataset) $(d_dim) estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_$(model)_$(dataset)_d$(d_dim)_est.err
+
+Queue model, dataset, d_dim from (
+fantom_bem, DE_FR, 3
+)

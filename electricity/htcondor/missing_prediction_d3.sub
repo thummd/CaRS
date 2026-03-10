@@ -1,0 +1,78 @@
+# Missing multiseed prediction experiments for d=2,3 configurations
+# Fill gaps in results table for DS3M_UV, DS3M_MV, and FANTOM_BEM
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 14400
++JobBatchName = "missing_prediction_d3"
+
+# ==== DS3M_UV Prediction (d=3) ====
+
+Arguments = ds3m_uv DE 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_d3_pred.err
+queue 1
+
+Arguments = ds3m_uv FR 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_FR_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_FR_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_FR_d3_pred.err
+queue 1
+
+Arguments = ds3m_uv DE_FR 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d2_pred.err
+queue 1
+
+Arguments = ds3m_uv DE_FR 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_uv_DE_FR_d3_pred.err
+queue 1
+
+# ==== DS3M_MV Prediction (d=3) ====
+
+Arguments = ds3m_mv DE 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d3_pred.err
+queue 1
+
+Arguments = ds3m_mv FR 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d3_pred.err
+queue 1
+
+Arguments = ds3m_mv DE_FR 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d2_pred.err
+queue 1
+
+Arguments = ds3m_mv DE_FR 3 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d3_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d3_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_FR_d3_pred.err
+queue 1
+
+# ==== FANTOM_BEM Prediction (d=2 for DE_FR) ====
+
+Arguments = fantom_bem DE_FR 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_FR_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_FR_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_FR_d2_pred.err
+queue 1

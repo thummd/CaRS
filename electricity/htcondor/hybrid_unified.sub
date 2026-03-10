@@ -1,0 +1,30 @@
+# HTCondor submission file for DS3M-FANTOM Hybrid on unified electricity data
+# Usage: condor_submit_bid 100 hybrid_unified.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_hybrid_unified.sh
+
+# Arguments: COUNTRY DATA_SOURCE SHARING_MODE SEED
+Arguments = $(country) $(data_source) $(sharing_mode) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_$(country)_$(data_source)_$(sharing_mode)_$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_$(country)_$(data_source)_$(sharing_mode)_$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/hybrid_$(country)_$(data_source)_$(sharing_mode)_$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 24GB
+Request_GPUs = 1
+
+# GPU requirements (81GB for full feature set with 105 variables)
+Requirements = (CUDAGlobalMemoryMb >= 80000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 4 hours per job (hybrid takes longer)
+MaxTime = 14400
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, data_source, sharing_mode, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_hybrid_unified.txt

@@ -1,0 +1,29 @@
+In this section, we are going to provide the entire proof of our proposition \ref{prop_3.1}. As we state before, we note $\mathcal{G}=(\mathcal{G}^r)_{r \in [|1:N_w|]}$.
+
+\textit{Proof.} we have:
+\begin{equation*}
+  \begin{aligned}
+\log p_\Theta\left(\boldsymbol{x}_{t \in \mathcal{T}}\right) 
+& = \sum_{t=1}^{|\mathcal{T}|}\log p_\Theta\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}\right)\\ 
+& = \sum_{t=1}^{|\mathcal{T}|}\log \sum_{\mathcal{G}} p_\Theta\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}\right)p(\mathcal{G}) \frac{q_{\phi}(\mathcal{G})}{q_{\phi}(\mathcal{G})}\\ 
+& \geq \sum_{t=1}^{|\mathcal{T}|} \mathbb{E}_{q_\phi\left(\mathcal{G}\right)} \left[\log p_\Theta\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}\right)+ \log p(\mathcal{G}) - \log q_{\phi}(\mathcal{G})\right]\\ 
+\end{aligned} 
+\end{equation*}
+Let's focus on the first term of our last inequality $\log p_\Theta\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}\right)$, we have:
+\begin{equation*}
+    \begin{aligned}
+        \log p_\Theta\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}\right) &= \log \sum_{z_t} p_{\theta^{z_t}}\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}, z_t\right) p(z_t) \frac{p(z_t|\boldsymbol{x}_t, \boldsymbol{x}_{<t})}{p(z_t|\boldsymbol{x}_t, \boldsymbol{x}_{<t})}\\
+        &\geq \mathbb { E } _ { p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t}) }\left[ \log p_{\theta^{z_t}}\left(\boldsymbol{x}_{t}|\boldsymbol{x}_{<t}, \mathcal{G}^{z_t}\right) + \log p(z_t) - \log p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t}) \right]\\
+        & \geq \mathbb { E } _ { p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t}) } \left[\log p_{\theta^{z_t}}\left(\boldsymbol{x}_t\mid \boldsymbol{x}_{<t}, \mathcal{G}^{z_t}\right)+\log p\left(z_t\right)\right] + H\left(p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t})\right)\
+    \end{aligned}
+\end{equation*}
+Including this result in the previous equation gives us the following:
+\begin{equation*}
+    \begin{aligned}
+    \log p_\Theta\left(\boldsymbol{x}_{t \in \mathcal{T}}\right)& \geq
+\sum_{t=1}^{|\mathcal{T}|}\mathbb{E}_{q_\phi\left(\mathcal{G}\right)}\left[\mathbb { E } _ { p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t}) } \left[\log p_{\theta^{z_t}}\left(\boldsymbol{x}_t\mid \boldsymbol{x}_{<t}, \mathcal{G}^{z_t}\right)+\log p\left(z_t\right)\right] + H\left(p( z_t  | \boldsymbol{x}_t, \boldsymbol{x}_{<t})\right)\right] \\
+ &+\sum_{r=1}^{N_w} \mathbb{E}_{q_{\phi^r}\left(\mathcal{G}^r\right)}\left[\log p\left(\mathcal{G}^r\right)\right]+H\left(q_{\phi^r}\left(\mathcal{G}^r\right)\right) \\
+ &\equiv \operatorname{ELBO}(\Theta),
+     \end{aligned}
+\end{equation*}
+we note that the priors $p(\mathcal{G}^r)$ and the variational estimations $q_{\phi^r}(\mathcal{G}^r)$ are independents.  

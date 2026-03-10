@@ -1,0 +1,6 @@
+# FANTOM Spread (DE-FR) experiment parameters
+# Format: seed
+42
+123
+456
+789

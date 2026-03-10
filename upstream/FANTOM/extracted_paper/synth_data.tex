@@ -1,0 +1,15 @@
+We employ the Erdos–Rényi (ER) \citep{newman2018networks} model with mean degrees of 1 or 2 to generate lagged graphs, and the Barabasi–Albert (BA) \citep{barabasi1999emergence} model with mean degrees 4 for instantaneous graphs. The maximum number of lags, $L$, is set at 1. We experiment with varying numbers of nodes $\{10,20,40\}$ and different numbers of regimes $\{2,3\}$, each representing diverse causal graphs or mixing functions. The length of each regime is randomly sampled from the set $\{1000,1500,2000,2500, 3000\}$.
+\begin{itemize}
+    \item \textbf{Heteroscedastic case. }In heteroscedastic settings, noise variance shifts across both variables and observations, making the underlying DAG much harder to recover from data. Given a random set if directed acyclic graphs $\boldsymbol{\mathcal{G}} = (\mathcal{G}^r)_{r\in [|1:K|]}$, we generate observations from the SEMs in Eq \ref{eq_multi_reg_hetero} as follows:
+    \begin{equation*}  
+    \scalebox{0.9}{$
+\forall r \in \{1,...,K\}, \forall t \in \mathcal{I}_r: x_t^i= f^{i,r}\left(\mathbf{P a}_{\mathcal{G}^r}^i(<t), \mathbf{P a}_{\mathcal{G}^r}^i(t)\right)+exp(g^{i,r}\left(\mathbf{P a}_{\mathcal{G}^r}^i(<t), \mathbf{P a}_{\mathcal{G}^r}^i(t)\right))\cdot\epsilon_t^{i,r},
+$}
+    \end{equation*}
+
+where $f^{i,r}$, $g^{i,r}$ are chosen to be randomly initialized MLPs with one hidden layer of size number of nodes and \texttt{tanh} activation functions. $\epsilon_t^{i,r}$ follows either a normal distribution $\mathcal{N}(0,1)$ or a more complex one obtained by transforming samples from a standard Gaussian with an MLP with random weights and \texttt{sin} activation function.
+\item \textbf{Homoscedastic non-Gaussian case. } The formulation used to generated the data is:$$
+\forall r \in \{1,...,K\}, \forall t \in \mathcal{I}_r: x_t^i= f^{i,r}\left(\mathbf{P a}_{\mathcal{G}^r}^i(<t), \mathbf{P a}_{\mathcal{G}^r}^i(t)\right)+\epsilon_t^{i,r},
+$$
+where $f^{i,r}$ is a general differentiable non-linear function. The function $f^{i,r}$ is a random combination between a linear transformation and a randomly chosen function from the set: $\{\texttt{Tanh, Exp}\}$. $\epsilon_t^{i,r}$ follows either a Triangular distribution or a more complex one obtained by transforming samples from a standard Gaussian with an MLP with random weights and \texttt{sin} activation function.
+\end{itemize}

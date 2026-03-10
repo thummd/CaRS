@@ -1,0 +1,6 @@
+[submodule "upstream/CASTOR"]
+	path = upstream/CASTOR
+	url = https://github.com/arahmani1/CASTOR.git
+[submodule "upstream/DS3M"]
+	path = upstream/DS3M
+	url = https://github.com/Sherry-Xu/Deep-Switching-State-Space-Model.git

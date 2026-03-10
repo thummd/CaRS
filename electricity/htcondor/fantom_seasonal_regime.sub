@@ -1,0 +1,30 @@
+# HTCondor submission file for FANTOM seasonal regime detection
+# Usage: condor_submit_bid 100 fantom_seasonal_regime.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_seasonal_regime_job.sh
+
+# Arguments: COUNTRY N_REGIMES INIT_MODE MIN_REGIME_SIZE SEED
+Arguments = $(country) $(n_regimes) $(init_mode) $(min_regime_size) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/seasonal_$(country)_k$(n_regimes)_$(init_mode)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/seasonal_$(country)_k$(n_regimes)_$(init_mode)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/seasonal_$(country)_k$(n_regimes)_$(init_mode)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 6 hours per job (regime detection takes longer)
++MaxTime = 21600
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, n_regimes, init_mode, min_regime_size, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_seasonal_regime.txt

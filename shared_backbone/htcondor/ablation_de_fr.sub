@@ -1,0 +1,36 @@
+# HTCondor submit file for DE_FR Ablation experiments (multi-seed)
+# Tests different approaches for regime differentiation on combined DE-FR market
+# 4 experiments x 5 seeds = 20 jobs
+#
+# Submit with: condor_submit_bid 100 ablation_de_fr.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/FANTOM/shared_backbone/htcondor/run_ablation_job.sh
+
+# Resource requirements
+request_cpus = 4
+request_memory = 32GB
+request_disk = 10GB
+request_gpus = 1
+
+# Standard GPU (20GB+ VRAM)
+requirements = (CUDAGlobalMemoryMb >= 20000)
+
+# Job priority
+priority = 100
+
+# Max runtime 10 hours
++MaxRuntime = 36000
+
+# Output and log files
+log = /lustre/home/dthumm/FANTOM/shared_backbone/logs/ablation_$(experiment)_$(market)_d$(d_dim)_s$(seed).log
+output = /lustre/home/dthumm/FANTOM/shared_backbone/logs/ablation_$(experiment)_$(market)_d$(d_dim)_s$(seed).out
+error = /lustre/home/dthumm/FANTOM/shared_backbone/logs/ablation_$(experiment)_$(market)_d$(d_dim)_s$(seed).err
+
+# Environment
+getenv = True
+
+# Job arguments: market d_dim seed experiment_type
+arguments = $(market) $(d_dim) $(seed) $(experiment)
+
+queue market,d_dim,seed,experiment from /lustre/home/dthumm/FANTOM/shared_backbone/htcondor/ablation_de_fr_params.txt

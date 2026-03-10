@@ -1,0 +1,75 @@
+# Comprehensive DS3MCausal tests with sparse DAG learning fixes
+# Tests: DE, FR, DE_FR datasets x d=2,3,4 regimes x estimation task
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 14400
++JobBatchName = "ds3m_causal_final"
+
+# ==== DE Dataset ====
+Arguments = ds3m_causal DE 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d2.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d2.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d2.err
+queue 1
+
+Arguments = ds3m_causal DE 3 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d3.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d3.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d3.err
+queue 1
+
+Arguments = ds3m_causal DE 4 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d4.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d4.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_d4.err
+queue 1
+
+# ==== FR Dataset ====
+Arguments = ds3m_causal FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d2.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d2.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d2.err
+queue 1
+
+Arguments = ds3m_causal FR 3 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d3.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d3.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d3.err
+queue 1
+
+Arguments = ds3m_causal FR 4 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d4.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d4.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_FR_d4.err
+queue 1
+
+# ==== DE_FR Dataset (Joint) ====
+Arguments = ds3m_causal DE_FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d2.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d2.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d2.err
+queue 1
+
+Arguments = ds3m_causal DE_FR 3 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d3.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d3.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d3.err
+queue 1
+
+Arguments = ds3m_causal DE_FR 4 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d4.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d4.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/final_ds3m_causal_DE_FR_d4.err
+queue 1

@@ -1,0 +1,30 @@
+# HTCondor submission file for DS3M Univariate on unified electricity data
+# Usage: condor_submit_bid 100 ds3m_univariate.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_univariate.sh
+
+# Arguments: COUNTRY SEED
+Arguments = $(country) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_univariate_$(country)_$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_univariate_$(country)_$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_univariate_$(country)_$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 2 hours per job
+MaxTime = 7200
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m_univariate.txt

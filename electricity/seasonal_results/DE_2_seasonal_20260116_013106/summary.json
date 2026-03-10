@@ -1,0 +1,82 @@
+{
+  "country": "DE",
+  "n_regimes": 1,
+  "init_mode": "seasonal",
+  "min_regime_size": 50,
+  "seed": 0,
+  "spearman": 0.40797405726375546,
+  "samples_per_regime": [
+    636.0
+  ],
+  "structures": [
+    {
+      "regime": 0,
+      "parents": {
+        "instantaneous": [
+          [
+            "DE_RAIN",
+            0,
+            "0.12847444"
+          ],
+          [
+            "DE_RESIDUAL_LOAD",
+            0,
+            "0.10361227"
+          ],
+          [
+            "DE_WINDPOW",
+            0,
+            "0.088099"
+          ],
+          [
+            "DE_WIND",
+            0,
+            "0.02883501"
+          ]
+        ],
+        "lagged": [
+          [
+            "DE_TEMP",
+            1,
+            "-0.10960149"
+          ],
+          [
+            "DE_RAIN",
+            1,
+            "0.10797488"
+          ],
+          [
+            "DE_SOLAR",
+            1,
+            "0.059852783"
+          ],
+          [
+            "CARBON_RET",
+            1,
+            "0.05378719"
+          ],
+          [
+            "DE_HYDRO",
+            1,
+            "-0.037321184"
+          ],
+          [
+            "DE_NUCLEAR",
+            1,
+            "-0.03274204"
+          ],
+          [
+            "DE_WINDPOW",
+            1,
+            "-0.024939654"
+          ],
+          [
+            "FR_DE_EXCHANGE",
+            1,
+            "-0.017452728"
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+# HTCondor submission file for d=6 DAG extraction on 80GB GPUs
+# Requires high-memory GPU due to model size with 6 regimes
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse)
+
+RequestCpus = 4
+RequestMemory = 32768
+RequestGPUs = 1
+# Request 80GB GPU (A100-80GB or similar)
+Requirements = (CUDAGlobalMemoryMb >= 70000) && (TARGET.CUDACapability >= 8.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_highmem.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_highmem.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/extract_dags_$(dataset)_d$(d_dim)_sparse$(lambda_sparse)_highmem.err
+
++MaxRuntime = 28800
++JobBatchName = "extract_dags_d6"
+
+# d=6 experiments with different sparsity levels
+Queue dataset, d_dim, seed, lambda_sparse from (
+DE, 6, 42, 10
+DE, 6, 42, 50
+DE, 6, 42, 100
+FR, 6, 42, 10
+FR, 6, 42, 50
+FR, 6, 42, 100
+)

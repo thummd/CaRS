@@ -1,0 +1,95 @@
+# HTCondor submit file for DS3M-Causal d=4 experiments
+# Requires 80GB GPU (A100-80GB or H100)
+#
+# Submit with: condor_submit ds3m_causal_80gb.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/condor/run_multiseed.sh
+
+# Resource requirements - need high-memory GPU
+request_cpus = 4
+request_memory = 64GB
+request_disk = 20GB
+
+# Request GPU with at least 80GB memory
+request_gpus = 1
+# Constraint for 80GB GPUs (A100-80GB, H100)
+requirements = (CUDAGlobalMemoryMb >= 75000)
+
+# Job priority
+priority = 100
+
+# Max runtime 12 hours (these are long experiments)
++MaxRuntime = 43200
+
+# Output and log files
+log = /lustre/home/dthumm/CASTOR/electricity/condor/logs/ds3m_causal_$(dataset)_d$(d_dim)_$(task_type).log
+output = /lustre/home/dthumm/CASTOR/electricity/condor/logs/ds3m_causal_$(dataset)_d$(d_dim)_$(task_type).out
+error = /lustre/home/dthumm/CASTOR/electricity/condor/logs/ds3m_causal_$(dataset)_d$(d_dim)_$(task_type).err
+
+# Environment
+getenv = True
+
+# ========================================
+# DS3M-Causal d=4 experiments (OOM on 24GB)
+# ========================================
+
+# DE d=4 prediction
+dataset = DE
+d_dim = 4
+task_type = prediction
+arguments = ds3m_causal DE 4 prediction 5
+queue 1
+
+# DE d=4 estimation
+dataset = DE
+d_dim = 4
+task_type = estimation
+arguments = ds3m_causal DE 4 estimation 5
+queue 1
+
+# FR d=4 prediction
+dataset = FR
+d_dim = 4
+task_type = prediction
+arguments = ds3m_causal FR 4 prediction 5
+queue 1
+
+# FR d=4 estimation
+dataset = FR
+d_dim = 4
+task_type = estimation
+arguments = ds3m_causal FR 4 estimation 5
+queue 1
+
+# DE_FR d=4 prediction
+dataset = DE_FR
+d_dim = 4
+task_type = prediction
+arguments = ds3m_causal DE_FR 4 prediction 5
+queue 1
+
+# DE_FR d=4 estimation
+dataset = DE_FR
+d_dim = 4
+task_type = estimation
+arguments = ds3m_causal DE_FR 4 estimation 5
+queue 1
+
+# ========================================
+# DS3M-Causal DE_FR d=3 (also OOM on 24GB)
+# ========================================
+
+# DE_FR d=3 prediction
+dataset = DE_FR
+d_dim = 3
+task_type = prediction
+arguments = ds3m_causal DE_FR 3 prediction 5
+queue 1
+
+# DE_FR d=3 estimation
+dataset = DE_FR
+d_dim = 3
+task_type = estimation
+arguments = ds3m_causal DE_FR 3 estimation 5
+queue 1

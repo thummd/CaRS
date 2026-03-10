@@ -1,0 +1,27 @@
+# HTCondor submission file for FANTOM on unified electricity data
+# Usage: condor_submit_bid 100 fantom_unified.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_fantom_unified.sh
+
+# Arguments: COUNTRY FEATURE_GROUPS SEED
+Arguments = $(country) $(feature_groups) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(country)_$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(country)_$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fantom_$(country)_$(seed).err
+
+# Resource requirements
+Request_CPUs = 4
+Request_Memory = 16GB
+Request_GPUs = 1
+
+# GPU requirements
+Requirements = (CUDAGlobalMemoryMb >= 8000) && (TARGET.CUDACapability >= 6.0)
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, feature_groups, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_fantom_unified.txt

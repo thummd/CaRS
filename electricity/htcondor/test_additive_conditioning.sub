@@ -1,0 +1,26 @@
+# Test additive conditioning with balanced init and low sparsity
+# Settings: init_logits=[0.0, 0.0], lambda_sparse=0.01, additive condition_net
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 7200
++JobBatchName = "additive_cond_test"
+
+# Test on FR dataset with d=2 estimation
+Arguments = ds3m_causal FR 2 estimation
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/additive_cond_test.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/additive_cond_test.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/additive_cond_test.err
+
+queue 1

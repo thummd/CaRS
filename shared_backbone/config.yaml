@@ -1,0 +1,76 @@
+# Shared Backbone Configuration for Electricity Price Forecasting
+# Uses unified data from CASTOR with DS3M-Causal model
+
+# Data configuration
+data:
+  base_path: ../data/unified  # Relative to shared_backbone/, or set via --data_dir CLI arg
+  markets: [DE, FR, DE_FR]
+  timestep: 14  # 2-week lookback
+  test_ratio: 0.2
+  val_ratio: 0.1
+  # Feature groups to use (for memory efficiency, ~25 features)
+  feature_groups:
+    - price
+    - generation
+    - load
+    - weather
+    - calendar
+
+# Model configuration
+model:
+  # Core DS3M parameters
+  h_dim: 32     # GRU hidden dimension
+  z_dim: 8      # Continuous latent dimension
+  d_dim: 2      # Number of regimes (2 or 3)
+  n_layers: 1   # GRU layers
+  bidirection: false
+
+  # Causal graph parameters
+  lag: 1        # Temporal lag for causal structure
+  sharing_mode: shared_backbone  # 'independent' or 'shared_backbone'
+  tau_gumbel: 1.0              # Gumbel-Softmax temperature
+  init_logits: [-0.5, -0.5]    # Initial logits (negative = encourage sparsity)
+
+  # Loss weights
+  lambda_dag: 100.0      # DAG constraint weight
+  lambda_sparse: 0.01    # Sparsity penalty weight (lower = denser graphs)
+  lambda_kl: 1.0         # KL divergence weight
+
+# Training configuration
+training:
+  learning_rate: 0.001
+  weight_decay: 0.0
+
+  # Augmented Lagrangian parameters
+  alpha_init: 0.0        # Initial Lagrangian multiplier
+  rho_init: 1.0          # Initial penalty weight
+  rho_max: 1.0e+9        # Maximum penalty weight
+  progress_rate: 0.9     # Convergence threshold
+  tol_dag: 1.0e-6        # DAG tolerance
+
+  # Training loop parameters
+  max_auglag_steps: 50   # Outer loop iterations
+  max_inner_epochs: 50   # Inner loop epochs per step
+
+  # Early stopping
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.001
+
+  # Reproducibility
+  seeds: [42, 123, 456, 789, 1011]
+
+# Output configuration
+output:
+  base_dir: ./results  # Relative to shared_backbone/
+  save_checkpoints: true
+  save_graphs: true
+  verbose: true
+
+# Experiment variations
+experiments:
+  # Run both sharing modes for comparison
+  sharing_modes: [shared_backbone, independent]
+  # Test different regime counts
+  d_dims: [2, 3]
+  # Test different sparsity levels
+  lambda_sparse_values: [0.01, 0.1, 1.0]

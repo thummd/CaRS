@@ -1,0 +1,9 @@
+\beamer@endinputifotherversion {3.24pt}
+\beamer@sectionintoc {1}{Reproduction}{3}{0}{1}
+\beamer@sectionintoc {2}{Introduction}{9}{0}{2}
+\beamer@sectionintoc {3}{Methodology}{14}{0}{3}
+\beamer@sectionintoc {4}{Results}{25}{0}{4}
+\beamer@sectionintoc {5}{Computing Causal Effects}{34}{0}{5}
+\beamer@sectionintoc {6}{Methodological Contributions}{36}{0}{6}
+\beamer@sectionintoc {7}{Future Work}{38}{0}{7}
+\beamer@sectionintoc {8}{Appendix}{42}{1}{8}

@@ -1,0 +1,36 @@
+# HTCondor submission file for DS3M-Causal hybrid experiments v2
+#
+# Fixes:
+# - Fixed shared_backbone DAG combination bug (was sigmoid(A+B), now 1-(1-A)(1-B))
+# - Added early stopping based on validation Spearman
+# - Added two-stage training option
+#
+# Usage: condor_submit_bid 100 hybrid_experiments_v2.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/ds3m_fantom/htcondor/run_hybrid_job.sh
+
+# Arguments: COUNTRY SHARING_MODE D_DIM SEED TRAINING_MODE
+Arguments = $(country) $(sharing_mode) $(d_dim) $(seed) $(training_mode)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/ds3m_fantom/htcondor/logs/hybrid_v2_$(country)_$(sharing_mode)_$(training_mode)_d$(d_dim)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/ds3m_fantom/htcondor/logs/hybrid_v2_$(country)_$(sharing_mode)_$(training_mode)_d$(d_dim)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/ds3m_fantom/htcondor/logs/hybrid_v2_$(country)_$(sharing_mode)_$(training_mode)_d$(d_dim)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 2
+Request_Memory = 16GB
+
+# GPU required for FANTOM causal discovery
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 6000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 4 hours per job (with early stopping should be faster)
++MaxRuntime = 14400
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, sharing_mode, d_dim, seed, training_mode from /lustre/home/dthumm/CASTOR/electricity/ds3m_fantom/htcondor/job_params_hybrid_v2.txt

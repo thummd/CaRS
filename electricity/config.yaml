@@ -1,0 +1,76 @@
+# Configuration for FANTOM electricity price model
+
+# Model configuration
+model_config:
+  lambda_dag: 100.0          # DAG enforcement strength
+  lambda_sparse: 1.0          # L1 sparsity penalty (element-wise)
+  lambda_sparse_l2: 0.0       # L2 group sparsity penalty (0 = disabled)
+  l2_group_mode: "column"     # Options: column, row, lag, frobenius
+  tau_gumbel: 1.0             # Gumbel softmax temperature
+  base_distribution_type: "spline"  # Options: spline, gaussian, fixed_gaussian
+  spline_bins: 8              # Number of spline bins
+  norm_layers: true           # Use layer normalization
+  res_connection: true        # Use residual connections
+  encoder_layer_sizes: [32, 32]
+  decoder_layer_sizes: [32, 32]
+  heteroscedastic: true       # Different noise variance per variable
+  allow_instantaneous: true   # Same-day causal effects
+  constrain_target: true      # TARGET has no outgoing edges
+
+# Training parameters
+training_params:
+  batch_size: 32
+  learning_rate: 0.001
+  max_steps_auglag: 15        # Number of augmented Lagrangian steps
+  max_auglag_inner_epochs: 1500
+  rho: 1.0                    # Initial rho
+  alpha: 0.0                  # Initial alpha
+  progress_rate: 0.9          # Progress threshold for rho updates
+  safety_rho: 1000000000.0    # Maximum rho
+  safety_alpha: 1000000000.0  # Maximum alpha
+  tol_dag: 0.000001           # DAG tolerance
+  anneal_entropy: "noanneal"  # Options: noanneal, linear
+  reconstruction_loss_factor: 1.0
+  # Training stability fixes
+  gradient_clip_norm: 1.0     # Max gradient norm for clipping
+  warmup_steps: 500           # Learning rate warmup steps
+  early_stopping_patience: 100  # Early stopping epochs without improvement
+  min_lr: 0.000001            # Minimum learning rate
+
+# Dataset configuration
+dataset_config:
+  lag: 1                      # Temporal lag (1 = use previous day)
+  imputation: "mean"          # Missing value handling: mean, median, ffill, drop, zero
+  use_temporal: true          # Use temporal structure
+  standardize: true           # Standardize features
+  test_ratio: 0.2             # Validation split ratio
+
+# Experiment configurations
+experiments:
+  # Joint model (both countries)
+  joint:
+    country: null
+    lag: 1
+
+  # Separate models per country
+  germany:
+    country: "DE"
+    lag: 1
+
+  france:
+    country: "FR"
+    lag: 1
+
+  # Instantaneous (no temporal dependencies)
+  joint_instantaneous:
+    country: null
+    lag: 0
+    use_temporal: false
+
+# Output settings
+output:
+  save_dir: "./outputs"
+  save_model: true
+  save_predictions: true
+  save_adjacency: true
+  visualize: true

@@ -1,0 +1,88 @@
+{
+  "config": {
+    "country": "FR",
+    "lambda_sparse": 5.0,
+    "seed": 1,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.19825000961771738,
+    "mse": 34456.98714869049,
+    "mae": 185.62354994363477,
+    "r2": -39051.070276950435
+  },
+  "structure": {
+    "n_instantaneous_edges": 29,
+    "n_lagged_edges": 151,
+    "total_edges": 180,
+    "instantaneous_parents": 2,
+    "lagged_parents": 10
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "GAS_RET",
+        0,
+        "-0.09284858"
+      ],
+      [
+        "CARBON_RET",
+        0,
+        "-0.03415731"
+      ]
+    ],
+    "lagged": [
+      [
+        "FR_CONSUMPTION",
+        1,
+        "-0.11231429"
+      ],
+      [
+        "FR_RAIN",
+        1,
+        "-0.09998841"
+      ],
+      [
+        "CARBON_RET",
+        1,
+        "-0.08817053"
+      ],
+      [
+        "FR_WINDPOW",
+        1,
+        "-0.08731131"
+      ],
+      [
+        "COAL_RET",
+        1,
+        "-0.084316455"
+      ],
+      [
+        "GAS_RET",
+        1,
+        "-0.07307955"
+      ],
+      [
+        "FR_GAS",
+        1,
+        "-0.06852548"
+      ],
+      [
+        "FR_TEMP",
+        1,
+        "-0.059381202"
+      ],
+      [
+        "FR_HYDRO",
+        1,
+        "-0.05874914"
+      ],
+      [
+        "FR_WIND",
+        1,
+        "-0.041729763"
+      ]
+    ]
+  },
+  "timestamp": "2026-01-16T01:38:21.472067"
+}

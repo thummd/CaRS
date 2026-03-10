@@ -1,0 +1,38 @@
+# HTCondor submission file for high-memory multi-seed experiments
+# Requires ~80GB GPU for d>=4 regime experiments
+#
+# This file runs:
+# - FR d=4 (previously failed with OOM on 24GB GPU)
+# - DE d=4
+# - DE_FR d=4, d=5, d=6
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim)
+
+# High memory GPU requirements (for d>=4)
+RequestCpus = 4
+RequestMemory = 32768
+RequestGPUs = 1
+# Request 80GB GPU (A100-80GB or similar)
+Requirements = (CUDAGlobalMemoryMb >= 70000) && (TARGET.CUDACapability >= 8.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highmem_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highmem_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_highmem_$(model)_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 43200
++JobBatchName = "multiseed_highmem"
+
+# High-regime experiments (d>=4, need 80GB GPU)
+Queue model, dataset, d_dim from (
+ds3m_causal, DE, 4
+ds3m_causal, FR, 4
+ds3m_causal, DE_FR, 4
+ds3m_causal, DE_FR, 5
+ds3m_causal, DE_FR, 6
+)

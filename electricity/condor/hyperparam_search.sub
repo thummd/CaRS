@@ -1,0 +1,33 @@
+# HTCondor submit file for hyperparameter search
+# Runs DE and FR hyperparameter searches in parallel
+#
+# Submit with: condor_submit hyperparam_search.sub
+
+universe = vanilla
+executable = /lustre/home/dthumm/CASTOR/electricity/condor/run_hyperparam.sh
+
+# Resource requirements
+request_cpus = 4
+request_memory = 16GB
+request_disk = 5GB
+
+# Job priority
+priority = 100
+
+# Output and log files
+log = /lustre/home/dthumm/CASTOR/electricity/condor/logs/hyperparam_$(country).log
+output = /lustre/home/dthumm/CASTOR/electricity/condor/logs/hyperparam_$(country).out
+error = /lustre/home/dthumm/CASTOR/electricity/condor/logs/hyperparam_$(country).err
+
+# Environment
+getenv = True
+
+# Job: Germany hyperparameter search
+country = DE
+arguments = DE 30
+queue 1
+
+# Job: France hyperparameter search
+country = FR
+arguments = FR 30
+queue 1

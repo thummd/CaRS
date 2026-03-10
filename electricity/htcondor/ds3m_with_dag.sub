@@ -1,0 +1,29 @@
+# HTCondor submission for DS3M + Per-Regime DAG Discovery
+# Two-stage pipeline: uses pretrained DS3M then fits per-regime FANTOM DAGs
+# Usage: condor_submit_bid 100 htcondor/ds3m_with_dag.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_dag.sh
+
+Arguments = $(country) $(d_dim) $(seed)
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_dag_$(country)_d$(d_dim)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_dag_$(country)_d$(d_dim)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_dag_$(country)_d$(d_dim)_seed$(seed).err
+
+Request_CPUs = 2
+Request_Memory = 16GB
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 6000) && (TARGET.CUDACapability >= 6.0)
+
++MaxRuntime = 14400
+
+OnExitRemove = true
+
+Queue country, d_dim, seed from (
+ALL, 2, 42
+ALL, 2, 43
+ALL, 2, 44
+FR, 2, 42
+DE, 2, 42
+)

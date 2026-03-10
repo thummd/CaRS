@@ -1,0 +1,97 @@
+# DS3M Configuration for QRT Electricity Data
+# =============================================
+#
+# Hyperparameters tuned for the smaller QRT dataset (~750 samples per country)
+# compared to original DS3M electricity dataset (~146K samples).
+
+# Model configuration
+model_config:
+  timestep: 14              # Lookback window (matches FANTOM lag)
+  predict_dim: 1            # Univariate prediction
+  h_dim: 20                 # Hidden dimension (GRU)
+  z_dim: 5                  # Continuous latent dimension
+  d_dim: 2                  # Discrete states (regimes)
+  n_layers: 1               # GRU layers
+  bidirection: false        # Bidirectional RNN
+
+# Training parameters
+training_params:
+  batch_size: 32
+  learning_rate: 0.001
+  n_epochs: 200
+  clip: 10                  # Gradient clipping
+  seed: 42
+
+# Early stopping
+early_stopping:
+  patience: 20
+  delta: 0.0
+
+# Learning rate scheduler
+lr_scheduler:
+  factor: 0.1
+  patience: 10
+
+# Experiment configurations
+experiments:
+  # Primary experiments (TARGET prediction)
+  france_target:
+    country: "FR"
+    target: "TARGET"
+    description: "French electricity price change prediction"
+
+  germany_target:
+    country: "DE"
+    target: "TARGET"
+    description: "German electricity price change prediction"
+
+  combined_target:
+    country: null           # null = ALL countries
+    target: "TARGET"
+    description: "Joint model for both markets"
+
+  # Secondary experiments (consumption - comparable to original DS3M)
+  france_consumption:
+    country: "FR"
+    target: "FR_CONSUMPTION"
+    description: "French load forecasting"
+
+  germany_consumption:
+    country: "DE"
+    target: "DE_CONSUMPTION"
+    description: "German load forecasting"
+
+# Country-specific overrides (optional)
+country_configs:
+  FR:
+    h_dim: 20
+    z_dim: 5
+
+  DE:
+    h_dim: 20
+    z_dim: 5
+
+  ALL:
+    h_dim: 30               # Larger for combined dataset
+    z_dim: 8
+    batch_size: 64
+
+# Evaluation settings
+evaluation:
+  mc_samples: 200           # Monte Carlo samples for forecasting
+  confidence_level: 0.90    # Confidence interval
+
+# Output settings
+output:
+  save_dir: "./outputs/ds3m"
+  save_model: true
+  save_predictions: true
+  save_regime_assignments: true
+  generate_plots: true
+
+# Data paths
+data:
+  train_x: "../data/qrt/X_train_NHkHMNU.csv"
+  train_y: "../data/qrt/y_train_ZAN5mwg.csv"
+  test_x: "../data/qrt/X_test_final.csv"
+  test_y: "../data/qrt/y_test_random_final.csv"

@@ -1,0 +1,35 @@
+# country, lambda_sparse (L1), lambda_sparse_l2, l2_group_mode, seed
+# Baseline (L1 only) - for comparison
+DE,1.0,0.0,column,0
+DE,1.0,0.0,column,1
+FR,1.0,0.0,column,0
+FR,1.0,0.0,column,1
+# Column mode (incoming edges per node)
+DE,0.5,0.5,column,0
+DE,0.5,0.5,column,1
+FR,0.5,0.5,column,0
+FR,0.5,0.5,column,1
+# Row mode (outgoing edges per node)
+DE,0.5,0.5,row,0
+DE,0.5,0.5,row,1
+FR,0.5,0.5,row,0
+FR,0.5,0.5,row,1
+# Lag mode (edges per temporal lag)
+DE,0.5,0.5,lag,0
+DE,0.5,0.5,lag,1
+FR,0.5,0.5,lag,0
+FR,0.5,0.5,lag,1
+# Frobenius mode (uniform shrinkage)
+DE,0.5,0.5,frobenius,0
+DE,0.5,0.5,frobenius,1
+FR,0.5,0.5,frobenius,0
+FR,0.5,0.5,frobenius,1
+# Strong L2 experiments (prioritize group sparsity)
+DE,0.25,1.0,column,0
+DE,0.25,1.0,column,1
+FR,0.25,1.0,column,0
+FR,0.25,1.0,column,1
+DE,0.25,1.0,row,0
+DE,0.25,1.0,row,1
+FR,0.25,1.0,row,0
+FR,0.25,1.0,row,1

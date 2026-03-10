@@ -1,0 +1,54 @@
+# HTCondor submission file for MISSING d=2 prediction experiments
+# Created: 2026-01-26
+#
+# Missing results:
+# - ds3m_mv DE d=2 prediction
+# - ds3m_mv FR d=2 prediction
+# - fantom_bem DE d=2 prediction
+# - fantom_bem FR d=2 prediction
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Job configuration
++MaxRuntime = 14400
++JobBatchName = "missing_d2_predictions"
+
+# ============================================================================
+# DS3M_MV d=2 PREDICTION experiments
+# ============================================================================
+Arguments = ds3m_mv DE 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_DE_d2_pred.err
+queue 1
+
+Arguments = ds3m_mv FR 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_ds3m_mv_FR_d2_pred.err
+queue 1
+
+# ============================================================================
+# FANTOM_BEM d=2 PREDICTION experiments
+# ============================================================================
+Arguments = fantom_bem DE 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_DE_d2_pred.err
+queue 1
+
+Arguments = fantom_bem FR 2 prediction
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_FR_d2_pred.log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_FR_d2_pred.out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/missing_fantom_bem_FR_d2_pred.err
+queue 1

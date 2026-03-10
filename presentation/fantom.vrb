@@ -1,0 +1,52 @@
+\frametitle{L2 Penalty Implementation}
+\textbf{Core Implementation} (in \texttt{deci.py}):
+
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\scriptsize
+\begin{verbatim}
+def _log_prior_A(self, A):
+    eps = 1e-8
+    # L1: element-wise sparsity
+    l1_term = -self.lambda_sparse * A.abs().sum()
+
+    # L2: group sparsity
+    if self.lambda_sparse_l2 > 0:
+        if self.l2_group_mode == "column":
+            # Incoming edges per node
+            norms = torch.sqrt(
+                (A**2).sum(dim=-2) + eps)
+        elif self.l2_group_mode == "row":
+            # Outgoing edges per node
+            norms = torch.sqrt(
+                (A**2).sum(dim=-1) + eps)
+        # ... lag, frobenius modes
+        l2_term = -self.lambda_sparse_l2 * norms.sum()
+    return l1_term + l2_term
+\end{verbatim}
+\end{column}
+
+\begin{column}{0.45\textwidth}
+\textbf{New Parameters:}
+\begin{itemize}
+    \item \texttt{lambda\_sparse\_l2}: L2 penalty strength (default: 0.0)
+    \item \texttt{l2\_group\_mode}: Grouping strategy
+\end{itemize}
+
+\vspace{0.1cm}
+\textbf{Backward Compatible:}
+\begin{itemize}
+    \item $\lambda_{\text{L2}} = 0$ reproduces original L1-only behavior
+    \item No changes to training loop
+\end{itemize}
+
+\vspace{0.1cm}
+\textbf{Files Modified:}
+\begin{itemize}
+    \item \texttt{deci.py}
+    \item \texttt{fantom.py}
+    \item \texttt{fantom\_electricity.py}
+    \item \texttt{train\_sparsity\_sweep.py}
+\end{itemize}
+\end{column}
+\end{columns}

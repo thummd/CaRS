@@ -1,0 +1,63 @@
+# HTCondor submission file for multi-seed experiments
+# Runs 5 seeds for each model/dataset combination and reports mean ± std
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim)
+
+# Resource requirements
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_$(model)_$(dataset)_d$(d_dim).err
+
+# Job configuration
++MaxRuntime = 28800
++JobBatchName = "multiseed_experiments"
+
+Queue model, dataset, d_dim from (
+ds3m_uv, DE_FR, 2
+ds3m_uv, DE_FR, 3
+ds3m_uv, DE_FR, 4
+ds3m_uv, DE, 2
+ds3m_uv, DE, 3
+ds3m_uv, DE, 4
+ds3m_uv, FR, 2
+ds3m_uv, FR, 3
+ds3m_uv, FR, 4
+ds3m_mv, DE_FR, 2
+ds3m_mv, DE_FR, 3
+ds3m_mv, DE_FR, 4
+ds3m_mv, DE, 2
+ds3m_mv, DE, 3
+ds3m_mv, DE, 4
+ds3m_mv, FR, 2
+ds3m_mv, FR, 3
+ds3m_mv, FR, 4
+fantom_bem, DE_FR, 2
+fantom_bem, DE_FR, 3
+fantom_bem, DE_FR, 4
+fantom_bem, DE, 2
+fantom_bem, DE, 3
+fantom_bem, DE, 4
+fantom_bem, FR, 2
+fantom_bem, FR, 3
+fantom_bem, FR, 4
+ds3m_causal, DE_FR, 2
+ds3m_causal, DE_FR, 3
+ds3m_causal, DE_FR, 4
+ds3m_causal, DE, 2
+ds3m_causal, DE, 3
+ds3m_causal, DE, 4
+ds3m_causal, FR, 2
+ds3m_causal, FR, 3
+ds3m_causal, FR, 4
+)

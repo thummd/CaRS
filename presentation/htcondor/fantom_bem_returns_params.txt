@@ -1,0 +1,71 @@
+# Parameters for FANTOM_BEM with returns target experiments
+# Format: market d_dim seed task_type
+# Total: 60 jobs (3 markets x 2 d_dims x 5 seeds x 2 task_types)
+#
+# Markets: DE, FR, DE_FR
+# d_dims: 2, 3
+# Seeds: 42, 123, 456, 789, 1011
+# Task types: estimation, prediction
+#
+# Estimation task (30 jobs)
+DE 2 42 estimation
+DE 2 123 estimation
+DE 2 456 estimation
+DE 2 789 estimation
+DE 2 1011 estimation
+DE 3 42 estimation
+DE 3 123 estimation
+DE 3 456 estimation
+DE 3 789 estimation
+DE 3 1011 estimation
+FR 2 42 estimation
+FR 2 123 estimation
+FR 2 456 estimation
+FR 2 789 estimation
+FR 2 1011 estimation
+FR 3 42 estimation
+FR 3 123 estimation
+FR 3 456 estimation
+FR 3 789 estimation
+FR 3 1011 estimation
+DE_FR 2 42 estimation
+DE_FR 2 123 estimation
+DE_FR 2 456 estimation
+DE_FR 2 789 estimation
+DE_FR 2 1011 estimation
+DE_FR 3 42 estimation
+DE_FR 3 123 estimation
+DE_FR 3 456 estimation
+DE_FR 3 789 estimation
+DE_FR 3 1011 estimation
+# Prediction task (30 jobs)
+DE 2 42 prediction
+DE 2 123 prediction
+DE 2 456 prediction
+DE 2 789 prediction
+DE 2 1011 prediction
+DE 3 42 prediction
+DE 3 123 prediction
+DE 3 456 prediction
+DE 3 789 prediction
+DE 3 1011 prediction
+FR 2 42 prediction
+FR 2 123 prediction
+FR 2 456 prediction
+FR 2 789 prediction
+FR 2 1011 prediction
+FR 3 42 prediction
+FR 3 123 prediction
+FR 3 456 prediction
+FR 3 789 prediction
+FR 3 1011 prediction
+DE_FR 2 42 prediction
+DE_FR 2 123 prediction
+DE_FR 2 456 prediction
+DE_FR 2 789 prediction
+DE_FR 2 1011 prediction
+DE_FR 3 42 prediction
+DE_FR 3 123 prediction
+DE_FR 3 456 prediction
+DE_FR 3 789 prediction
+DE_FR 3 1011 prediction

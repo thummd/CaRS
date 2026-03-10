@@ -1,0 +1,31 @@
+# HTCondor submission file for DS3M validation experiments
+# Compares univariate vs multivariate, d_dim=1 vs d_dim=2
+# Usage: condor_submit_bid 100 ds3m_validation.sub
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_ds3m_multivariate_job.sh
+
+# Arguments: COUNTRY MODE D_DIM SEED
+Arguments = $(country) $(mode) $(d_dim) $(seed)
+
+# Logs
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(mode)_d$(d_dim)_seed$(seed).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(mode)_d$(d_dim)_seed$(seed).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/ds3m_$(country)_$(mode)_d$(d_dim)_seed$(seed).err
+
+# Resource requirements
+Request_CPUs = 2
+Request_Memory = 8GB
+
+# GPU optional but recommended
+Request_GPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 4000) && (TARGET.CUDACapability >= 6.0)
+
+# Time limit: 3 hours per job (200 epochs multivariate needs more time)
+MaxTime = 10800
+
+# Don't restart on preemption
+OnExitRemove = true
+
+# Queue jobs from params file
+Queue country, mode, d_dim, seed from /lustre/home/dthumm/CASTOR/electricity/htcondor/job_params_ds3m_validation.txt

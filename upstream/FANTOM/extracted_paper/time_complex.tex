@@ -1,0 +1,14 @@
+We start first by computing the time complexity of our Temporal Graph Neural network illustrated in Figure \ref{archi_fantom_tgnn}. We note $d$ the input size, $e$ the embedding size used for $e_{ij}$ and $h$ hidden layer size. After the first NN block, $$
+T_{\mathrm{NN}-1}=\mathcal{O}((d+e) h+h d)+\mathcal{O}(d)=\mathcal{O}(h(d+e))
+$$
+then after the matrix multiplication block and the second NN block, we have :
+$$
+T_{\text {forward }}=\mathcal{O}\left(L d^2+2 h(d+e)\right),
+$$
+where $L$ is the maximum lag.
+
+Using the same architecture for a Conditional normalizing flow has a time complexity of :
+$$
+T_{\text {CNF }}=\mathcal{O}\left(L d^2+h\left(e+d K\right)\right).
+$$
+The complexity of FANTOM per iteration is $\mathcal{O}\left(N_w|\mathcal{T}|(2L d^2+h\left(e+d K\right)\right),$ where $K$ is the number of bins, $N_w$ is the number of regimes, and $|\mathcal{T}|$ is the number of samples.

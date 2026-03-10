@@ -1,0 +1,41 @@
+\section{Identifiability results}
+Identifiability is an important statistical property to ensure that the causal discovery problem is meaningful. In causal analysis, the whole point is to find out which variable causes others; if the model is not identifiable, the analysis is not possible at all. This section proves that causal discovery from multi-regime MTS is identifiable in the FANTOM framework namely, when (i) the noise is non-Gaussian or heteroscedastic and (ii) the latent variable $z_t$ has a time-varying-parent prior. We first formalize identifiability for this setting, then state three theorems covering both stationary and multi-regime MTS under the two noise assumptions. 
+\begin{mybox}
+\begin{definition}
+The conditional distribution of multi-regime MTS with a time varying prior is: $p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) =  \sum_{r=1}^K\pi_t(\boldsymbol{\omega}^r)p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r)$. We say this model is identifiable up to permutation and translation, if:\\
+- $\forall r \in [|1:K|]$ the causal model $(\theta^r,\mathcal{G}^r)$ is identifiable.\\
+- For any two models with parameters $(\boldsymbol{\omega}^r,\theta^r,\mathcal{G}^r)_{r=1}^K$ and $(\tilde{\boldsymbol{\omega}}^r,\tilde{\theta}^r,\tilde{\mathcal{G}}^r)_{r=1}^{\tilde{K}}$, such that for any $t \in \mathcal{T}$: $p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) = \tilde{p}(\boldsymbol{x}_t|\boldsymbol{x}_{<t})$, we have $K=\tilde{K}$ and it exists a permutation $\sigma$ and translation function $\varrho: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ such that $\theta^r =\tilde{\theta}^{\sigma(r)}$ and $\boldsymbol{\omega}^r = \varrho(\tilde{\boldsymbol{\omega}}^{\sigma(r)})$
+\label{def_identifia}
+\end{definition}
+\end{mybox}
+Following \citep{gong2022rhino, rahmanicausal, brouillard2020differentiable}, we use the common assumptions of causal discovery settings (Causal Markov property \ref{mainass1}, stationarity \ref{mainass1}, minimality \ref{mainass1}, sufficiency \ref{mainass1}), see Appendix \ref{app_assumptions} for precise statements. We present our first theoretical results, Theorem \ref{theo_THGNM}, states that for any stationary MTS, composed of $K=1$ regime and following Eq.(\ref{eq_multi_reg_hetero}) with $\epsilon^{i}_t \sim \mathcal{N}(0,1)$ the ground truth solution $\mathcal{G}^*$ is uniquely identifiable, the detailed proof can be found in Appendix \ref{theorems proof}.
+\begin{mybox}
+\begin{theorem}[Identifiability of Temporal Heteroscedastic Gaussian noise model (THGNM)]
+Assume Causal Markov property, stationarity, minimality, sufficiency and let $(\boldsymbol{x}_t)_{t \in \mathcal{T}}$ be a MTS following a THGNM, $\forall t \in \mathcal{T}$:
+\begin{equation}
+  x_t^i= f^i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t)\right)+g^i\left(\mathbf{P a}_{\mathcal{G}}^i(<t), \mathbf{P a}_{\mathcal{G}}^i(t)\right)\cdot\epsilon_t^{i},
+\label{eq_hetero_gaussian}
+\end{equation}  
+where $f^i$ and $g^i$ are differentiable functions, with $g_i$ strictly positive and $\epsilon^{i}_t \sim \mathcal{N}(0,1)$ are mutually independent normal noises. The THGNM is identifiable if $\frac{1}{g^i}$ is not a polynomial of degree two. 
+\label{theo_THGNM}
+\end{theorem}
+\end{mybox}
+\textbf{Identifiability of Temporal Restricted Heteroscedastic noise model (TRHNM).} We present and prove
+in Appendix \ref{sec_TGRHNM} our second identifiability results of a TRHNM (Theorem \ref{theo_TRHNM}), where $\epsilon^{i}_t$ can follow any arbitrary density distribution. We states the results for bivariate time series, in which we show that, if a backward model exists, a differential equation will always hold. Then inspired from Peters et al. \citep{peters2014causal}, Immer et al. \citep{immer2023identifiability}, and Strobl et al. \citep{strobl2023identifying}, we define TRHNM and show its identifiability.
+
+Our last theoretical result states that the mixture of identifiable temporal causal models with either non-Gaussian or heteroscedastic noises is also identifiable as defined in definition \ref{def_identifia}.
+\begin{mybox}
+\begin{theorem}[Identifiability of the mixture of identifiable temporal causal models] Let $\mathcal{F}$ be a family of $K$ identifiable temporal causal models, $\mathcal{F}=$ $\left(p_{\theta^r}(\cdot| \cdot,\mathcal{G}^r)\right)_{r \in \mathbb{N}^*}$ that are linearly independent and let $\mathcal{M}_K$ be the family of all $K$-finite mixtures of elements from $\mathcal{F}$, i.e.,
+\begin{equation*}
+ \scalebox{0.87}{$
+\left\{p(\boldsymbol{x}_t|\boldsymbol{x}_{<t}) =  \sum_{r=1}^K\pi_t(\boldsymbol{\omega}^r)p_{\theta^r}(\boldsymbol{x}_t|\boldsymbol{x}_{<t},\mathcal{G}^r), p_{\theta^r}(\cdot|\cdot, \mathcal{G}^r) \in \mathcal{F}, \forall t \in \mathcal{T}: \pi_t(\boldsymbol{\omega}^r)>0 \text{ and }\sum_{r=1}^K \pi_t(\boldsymbol{\omega}^r)=1\right\}
+.$}   
+\end{equation*}
+Then the family $\mathcal{M}_K$ is identifiable as defined in definition \ref{def_identifia}.
+\label{theo_DyTCM}
+\end{theorem}
+\end{mybox}
+Identifiability is important in causal discovery as shown in several papers \citep{brouillard2020differentiable, 
+gong2022rhino, pamfil2020dynotears,balsellsidentifiability}. We extend these guarantees to FANTOM's settings by proving identifiability for stationary temporal models with heteroscedastic noise, showing that weaker assumptions suffice when the noise $\epsilon_t^i$ is simplified, recovering identifiability under explicit restrictions for arbitrary noise, and covering multi-regime MTS scenarios in both cases. Although convergence rates or finite-sample bounds remain elusive because the BEM objective is non-convex, our experiments demonstrate that FANTOM still converges in non-Gaussian and heteroscedastic settings. Further convergence 
+rates or finite-data bounds are however extremely challenging due 
+to the non-convexity of the acyclicity constraint in a BEM procedure. Yet, we empirically demonstrate, in the experiments section, that FANTOM converges in both non-Gaussian and heteroscedastic cases.

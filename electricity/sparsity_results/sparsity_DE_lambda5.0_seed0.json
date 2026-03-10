@@ -1,0 +1,98 @@
+{
+  "config": {
+    "country": "DE",
+    "lambda_sparse": 5.0,
+    "seed": 0,
+    "rho": 1.0
+  },
+  "metrics": {
+    "spearman": 0.1531429585113018,
+    "mse": 39765.4696873159,
+    "mae": 199.41090802804354,
+    "r2": -51222.64240691935
+  },
+  "structure": {
+    "n_instantaneous_edges": 31,
+    "n_lagged_edges": 52,
+    "total_edges": 83,
+    "instantaneous_parents": 4,
+    "lagged_parents": 14
+  },
+  "causal_structure": {
+    "instantaneous": [
+      [
+        "DE_RESIDUAL_LOAD",
+        0,
+        "0.18290111"
+      ],
+      [
+        "COAL_RET",
+        0,
+        "0.098069"
+      ],
+      [
+        "DE_NET_EXPORT",
+        0,
+        "0.085612684"
+      ],
+      [
+        "DE_GAS",
+        0,
+        "0.073715545"
+      ]
+    ],
+    "lagged": [
+      [
+        "CARBON_RET",
+        1,
+        "0.20361662"
+      ],
+      [
+        "DE_RAIN",
+        1,
+        "0.19582684"
+      ],
+      [
+        "DE_TEMP",
+        1,
+        "0.16872214"
+      ],
+      [
+        "COAL_RET",
+        1,
+        "0.16866058"
+      ],
+      [
+        "GAS_RET",
+        1,
+        "0.11166515"
+      ],
+      [
+        "DE_NET_IMPORT",
+        1,
+        "0.10928776"
+      ],
+      [
+        "DE_SOLAR",
+        1,
+        "0.10632784"
+      ],
+      [
+        "FR_DE_EXCHANGE",
+        1,
+        "0.104751825"
+      ],
+      [
+        "DE_COAL",
+        1,
+        "0.10091911"
+      ],
+      [
+        "DE_CONSUMPTION",
+        1,
+        "0.09709828"
+      ]
+    ]
+  },
+  "timestamp": "2026-01-16T01:39:03.306753"
+}

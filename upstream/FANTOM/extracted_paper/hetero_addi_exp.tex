@@ -1,0 +1,143 @@
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=10$} nodes and $K=2$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_10_2}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cccccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=2$ and $d=10$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & \multicolumn{1}{c|}{$\times$}   & 34.3$_{\pm3.7}$ & 14.2$_{\pm2.5}$ & 0.09$_{\pm0.0}$ & 0.85$_{\pm0.1}$ & 26.0$_{\pm4.3}$ & 25.6$_{\pm4.8}$ & 0.07$_{\pm0.0}$ & 0.74$_{\pm0.0}$ & $\times$ \\
+    Rhino & \multicolumn{1}{c|}{$\times$}  & 28.0$_{\pm5.6}$ & 8.56$_{\pm4.9}$ & 0.09$_{\pm0.0}$ & 0.92$_{\pm0.0}$ & 38.5$_{\pm6.3}$ & 58.4$_{\pm11.7}$ & 0.13$_{\pm0.0}$ & 0.43$_{\pm0.0}$ & $\times$ \\
+    DYNOTEARS & \multicolumn{1}{c|}{$\times$} & 58.5$_{\pm4.9}$ & 31.2$_{\pm2.8}$ & 0.22$_{\pm0.0}$ & 0.68$_{\pm0.0}$ & 79.5$_{\pm3.5}$ & 33.9$_{\pm4.4}$ & 0.27$_{\pm0.0}$ & 0.66$_{\pm0.0}$ & $\times$  \\
+    CASTOR & \multicolumn{1}{c|}{$\times$} &  90.0$_{\pm0.0}$ & 28.1$_{\pm2.9}$ & 0.38$_{\pm0.0}$ & 0.74$_{\pm0.0}$ & 90.5$_{\pm3.2}$ & 35.6$_{\pm3.4}$ & 0.42$_{\pm0.0}$ & 0.64$_{\pm0.0}$ & $\times$  \\
+    \midrule
+    RPCMCI & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+    CASTOR & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+\rowcolor{gray!20} FANTOM                 & \multicolumn{1}{c|}{$\checkmark$}           & \textbf{4.67}$_{\pm1.5}$ & \textbf{91.7}$_{\pm3.2}$                                   & \textbf{0.005}$_{\pm0.0}$                                                 & \textbf{0.04}$_{\pm0.0}$                                                   & \textbf{11.6}$_{\pm1.1}$ & \textbf{88.2}$_{\pm2.1}$                                   & \textbf{0.02}$_{\pm0.0}$                                                 & \multicolumn{1}{c|}{\textbf{0.08}$_{\pm0.0}$}                                                   & \textbf{96.6}$_{\pm1.1}$ \\ \bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=10$} nodes and $K=3$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_10_3}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cc|cccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=3$ and $d=10$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & $\times$ & 46.1$_{\pm4.7}$ & 11.1$_{\pm2.1}$ & 0.05$_{\pm0.0}$ & 0.88$_{\pm0.0}$ & 46.0$_{\pm0.8}$ & 19.0$_{\pm3.3}$ & 0.05$_{\pm0.0}$ & 0.80$_{\pm0.0}$ & $\times$ \\
+    Rhino & $\times$ &  44.5$_{\pm6.5}$ & 5.11$_{\pm1.9}$ & 0.06$_{\pm0.0}$ & 0.94$_{\pm0.0}$ & 53.5$_{\pm1.5}$ & 64.7$_{\pm4.6}$ & 0.07$_{\pm0.0}$ & 0.35$_{\pm0.0}$ & $\times$ \\
+    DYNOTEARS & $\times$ &  89.5$_{\pm3.5}$ & 31.5$_{\pm0.4}$ & 0.14$_{\pm0.0}$ & 0.68$_{\pm0.0}$ & 118.0$_{\pm4.0}$ & 37.5$_{\pm1.2}$ & 0.17$_{\pm0.0}$ & 0.61$_{\pm0.0}$ & $\times$ \\
+    CASTOR & $\times$ &  104.$_{\pm3.7}$ & 23.4$_{\pm0.9}$ & 0.19$_{\pm0.0}$ & 0.76$_{\pm0.0}$ & 133.5$_{\pm2.8}$ & 34.8$_{\pm1.2}$ & 0.24$_{\pm0.0}$ & 0.64$_{\pm0.0}$ & $\times$ \\
+    \midrule
+    RPCMCI & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    CASTOR & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    \rowcolor{gray!20} FANTOM & $\checkmark$  & \textbf{5.67}$_{\pm3.3}$& \textbf{93.3}$_{\pm4.2}$ & \textbf{0.006}$_{\pm0.0}$ & \textbf{0.06}$_{\pm0.0}$ & \textbf{12.3}$_{\pm6.3}$ & \textbf{90.9}$_{\pm1.0}$ & \textbf{0.012}$_{\pm0.0}$ & \textbf{0.08}$_{\pm0.0}$  & \textbf{97.1}$_{\pm0.0}$ \\\bottomrule
+\end{tabular}}
+\end{table}
+Under heteroscedastic conditions, \textcolor{teal}{$d=10$} node graphs with either two or three regimes, FANTOM outperforms every baseline. Among methods explicitly designed for multi-regime MTS, it is the only one that converges to the true regime partitions, attaining 97.1\% (Table \ref{tab_hetero_10_3}) in regime detection accuracy. CASTOR and RPCMCI break down in heteroscedastic settings.
+
+To give stationary MTS baselines the best possible chance, we supply them with the ground truth regime partitions. This is done by training the aforementioned models on each pure regime separately (regime governed by the same causal model). Yet, FANTOM still dominates the structure learning task, while learning the number of regime and their indices as well, achieving an F1 of 93.3 \% and an NHD of 0.006 (Table \ref{tab_hetero_10_3}). Because NHD penalizes every missing, extra, or mis-oriented edge, a value of 0.006 implies that FANTOM not only recovers the graph skeleton but orients edges with high precision.
+
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=20$} nodes and $K=2$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_20_2}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cccccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=2$ and $d=20$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & \multicolumn{1}{c|}{$\times$}   & 84.0$_{\pm17.}$ & 39.7$_{\pm2.6}$ & 0.03$_{\pm0.0}$ & 0.6$_{\pm0.0}$ & 42.5$_{\pm12.}$ & 76.9$_{\pm1.0}$ & 0.14$_{\pm0.0}$ & 0.22$_{\pm0.0}$ & $\times$ \\
+    Rhino & \multicolumn{1}{c|}{$\times$}  & 70.0$_{\pm6.0}$ & 1.26$_{\pm1.2}$ & 0.04$_{\pm0.0}$ & 0.98$_{\pm0.0}$ & 188.0$_{\pm30.}$ & 26.3$_{\pm9.8}$ & 0.14$_{\pm0.0}$ & 0.73$_{\pm0.0}$ & $\times$ \\
+    DYNOTEARS & \multicolumn{1}{c|}{$\times$} & 221.5$_{\pm9.5}$ & 26.9$_{\pm1.2}$ & 0.22$_{\pm0.0}$ & 0.72$_{\pm0.0}$ & 45.0$_{\pm7.0}$ & 61.5$_{\pm3.9}$ & 0.02$_{\pm0.0}$ & 0.38$_{\pm0.0}$ & $\times$  \\
+    CASTOR & \multicolumn{1}{c|}{$\times$} &  377.5$_{\pm1.5}$ & 14.9$_{\pm0.1}$ & 0.41$_{\pm0.0}$ & 0.84$_{\pm0.0}$ & 379.5$_{\pm1.5}$ & 19.1$_{\pm1.0}$ & 0.41$_{\pm0.0}$ & 0.80$_{\pm0.0}$ & $\times$  \\
+    \midrule
+    RPCMCI & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+    CASTOR & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+\rowcolor{gray!20} FANTOM                 & \multicolumn{1}{c|}{$\checkmark$}           & \textbf{9.00}$_{\pm3.0}$ & \textbf{89.1}$_{\pm5.7}$                                   & \textbf{0.006}$_{\pm0.0}$                                                 & \textbf{0.10}$_{\pm0.0}$                                                   & \textbf{26.0}$_{\pm5.0}$ & \textbf{85.4}$_{\pm1.3}$                                   & \textbf{0.01}$_{\pm0.0}$                                                 & \multicolumn{1}{c|}{\textbf{0.14}$_{\pm0.0}$}                                                   & \textbf{97.8}$_{\pm0.2}$ \\ \bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=20$} nodes and $K=3$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_20_3}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cc|cccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=3$ and $d=20$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & $\times$ & 83.5$_{\pm15.}$ & 39.9$_{\pm1.6}$ & 0.03$_{\pm0.0}$ & 0.59$_{\pm0.0}$ & 38.0$_{\pm2.0}$ & 77.8$_{\pm0.9}$ & 0.01$_{\pm0.0}$ & 0.22$_{\pm0.0}$ & $\times$ \\
+    Rhino & $\times$ &  108.5$_{\pm11.}$ & 1.6$_{\pm1.2}$ & 0.02$_{\pm0.0}$ & 0.98$_{\pm0.0}$ & 292.0$_{\pm62.}$ & 25.8$_{\pm8.9}$ & 0.09$_{\pm0.0}$ & 0.74$_{\pm0.0}$ & $\times$ \\
+    DYNOTEARS & $\times$ &  325.$_{\pm14.}$ & 27.6$_{\pm1.0}$ & 0.14$_{\pm0.0}$ & 0.72$_{\pm0.0}$ & 55.5$_{\pm0.5}$ & 69.8$_{\pm7.6}$ & 0.01$_{\pm0.0}$ & 0.29$_{\pm0.0}$ & $\times$ \\
+    CASTOR & $\times$ &  412.3$_{\pm2.5}$ & 13.8$_{\pm0.0}$ & 0.20$_{\pm0.0}$ & 0.86$_{\pm0.0}$ & 570.$_{\pm2.0}$ & 17.5$_{\pm0.4}$ & 0.28$_{\pm0.0}$ & 0.81$_{\pm0.0}$ & $\times$ \\
+    \midrule
+    RPCMCI & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    CASTOR & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    \rowcolor{gray!20} FANTOM & $\checkmark$  & \textbf{13.5}$_{\pm6.5}$& \textbf{88.2}$_{\pm6.2}$ & \textbf{0.05}$_{\pm0.0}$ & \textbf{0.11}$_{\pm0.0}$ & \textbf{46.5}$_{\pm9.5}$ & \textbf{84.6}$_{\pm2.5}$ & \textbf{0.01}$_{\pm0.0}$ & \textbf{0.14}$_{\pm0.0}$  & \textbf{97.8}$_{\pm1.4}$ \\\bottomrule
+\end{tabular}}
+\end{table}
+
+Under heteroscedastic conditions, \textcolor{teal}{$d=20$} node graphs with either two or three regimes, FANTOM outperforms all the baselines. Among methods explicitly designed for multi-regime MTS, it is the only one that converges to the true regime partitions, attaining 97.8\% in regime detection accuracy (Table \ref{tab_hetero_20_2}). CASTOR and RPCMCI break down in heteroscedastic settings, also in the case of 20 nodes.
+
+To give stationary MTS baselines the best possible chance, we supply them with the ground truth regime partitions. This is done by training the aforementioned models on each pure regime separately (regime governed by the same causal model). Yet, FANTOM still dominates the structure learning task, while learning the number of regime and their indices as well, achieving an F1 of 89.1 \% and an NHD of 0.006 for instantaneous links and an F1 of 85.4\% and and an NHD 0.01\% for time lagged (Table \ref{tab_hetero_20_2}). 
+
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=40$} nodes and $K=2$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_40_2}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cccccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=2$ and $d=40$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & \multicolumn{1}{c|}{$\times$}   & 146.5$_{\pm5.0}$  & 25.8$_{\pm0.1}$ & 0.02$_{\pm0.0}$ & 0.74$_{\pm0.0}$ &
+             109.0$_{\pm15.}$ & 58.0$_{\pm4.5}$ & 0.01$_{\pm0.0}$ & 0.42$_{\pm0.0}$ & $\times$ \\
+    Rhino & \multicolumn{1}{c|}{$\times$}  & 137.0$_{\pm7.1}$  & 0.0$_{\pm0.0}$  & 0.02$_{\pm0.0}$ & 1.00$_{\pm0.0}$ &
+             700.0$_{\pm87.}$ & 28.2$_{\pm5.7}$ & 0.12$_{\pm0.0}$ & 0.71$_{\pm0.0}$& $\times$ \\
+    DYNOTEARS & \multicolumn{1}{c|}{$\times$} & 137.5$_{\pm9.2}$  & 17.1$_{\pm1.4}$ & 0.020$_{\pm0.0}$ & 0.82$_{\pm0.0}$ &
+             129.0$_{\pm15.}$ & 36.6$_{\pm4.9}$ & 0.01$_{\pm0.0}$ & 0.63$_{\pm0.0}$& $\times$  \\
+    CASTOR & \multicolumn{1}{c|}{$\times$} &  151.0$_{\pm\text{11.}}$ & 0.0$_{\pm\text{0.0}}$  & 0.03$_{\pm0.0}$ & 1.00$_{\pm0.0}$ &
+             333.0$_{\pm9.3}$ & 19.6$_{\pm5.6}$ & 0.050$_{\pm0.0}$ & 0.80$_{\pm0.0}$  & $\times$  \\
+    \midrule
+    RPCMCI & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+    CASTOR & \multicolumn{1}{c|}{$\checkmark$} &  - & - & - & - & - & - & - & - & -  \\
+\rowcolor{gray!20} FANTOM                 & \multicolumn{1}{c|}{$\checkmark$}           & \textbf{27.00}$_{\pm6.0}$ & \textbf{85.6}$_{\pm3.7}$                                   & \textbf{0.005}$_{\pm0.0}$                                                 & \textbf{0.14}$_{\pm0.0}$                                                   & \textbf{26.5}$_{\pm0.5}$ & \textbf{91.9}$_{\pm1.0}$                                   & \textbf{0.004}$_{\pm0.0}$                                                 & \multicolumn{1}{c|}{\textbf{0.08}$_{\pm0.0}$}                                                   & \textbf{99.9}$_{\pm0.1}$ \\ \bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Average SHD, F1 scores, NHD and Ratio for different models with \textcolor{teal}{$d=40$} nodes and $K=3$ regimes. \textit{Split} denotes whether regime separation is automatic ($\checkmark$) or manual ($\times$). \textit{Inst.} refers to instantaneous links, and \textit{Lag} to time-lagged edges.}
+\label{tab_hetero_40_3}
+\resizebox{\columnwidth}{!}{\fontsize{18pt}{15pt}\selectfont
+\begin{tabular}{@{}cc|cccccccc|c@{}}
+\toprule
+\multicolumn{11}{c}{\textcolor{teal}{Heteroscedastic noise}, $K=3$ and $d=40$}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\ \midrule
+\multirow{2}{*}{Model} & \multicolumn{1}{c|}{\multirow{2}{*}{Split}} & \multicolumn{4}{c}{Inst.}                                                                                                                                                                                               & \multicolumn{4}{c|}{Lag}                                                                                                                                                                                                                     & Regime        \\ \cmidrule(l){3-11} 
+                       & \multicolumn{1}{c|}{}                       & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$ \downarrow $\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ratio$ \downarrow $\end{tabular} & SHD$\downarrow$          & \begin{tabular}[c]{@{}c@{}}F1$\uparrow$\end{tabular} & \begin{tabular}[c]{@{}c@{}}NHD$\downarrow$\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Ratio$\downarrow$\end{tabular}} & Acc.          \\ \midrule
+PCMCI+ & $\times$ & 222.0$_{\pm1.4}$   & 25.2$_{\pm0.4}$  & 0.01$_{\pm0.0}$   & 0.75$_{\pm0.0}$     &
+           142.0$_{\pm17.}$   & 62.4$_{\pm1.0}$    & 0.01$_{\pm0.0}$    & 0.37$_{\pm0.0}$ & $\times$ \\
+    Rhino & $\times$ &  210.5$_{\pm9.2}$   & 0.0$_{\pm0.0}$   & 0.01$_{\pm0.0}$   & 1.00$_{\pm0.0}$     &
+           1005.$_{\pm146.}$ & 29.3$_{\pm5.4}$    & 0.08$_{\pm0.0}$    & 0.7$_{\pm0.0}$  & $\times$ \\
+    DYNOTEARS & $\times$ &  203.0$_{\pm14.}$  & 15.2$_{\pm2.2}$  & 0.01$_{\pm0.0}$   & 0.85$_{\pm0.0}$     &
+           161.0$_{\pm1.4}$    & 51.3$_{\pm15.}$   & 0.01$_{\pm0.0}$    & 0.49$_{\pm0.1}$  & $\times$ \\
+    CASTOR & $\times$ &  224.0$_{\pm10.2}$ & 0.00$_{\pm0.0}$ & 0.01$_{\pm0.0}$ & 1.00$_{\pm0.0}$ &
+           501.0$_{\pm21.}$ & 23.1$_{\pm1.2}$ & 0.03$_{\pm0.0}$ & 0.76$_{\pm0.0}$  & $\times$ \\
+    \midrule
+    RPCMCI & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    CASTOR & $\checkmark$ &  - & - & - & - & - & - & - & - & - \\
+    \rowcolor{gray!20} FANTOM & $\checkmark$  & \textbf{52.0}$_{\pm9.0}$& \textbf{82.2}$_{\pm5.1}$ & \textbf{0.004}$_{\pm0.0}$ & \textbf{0.19}$_{\pm0.0}$ & \textbf{65.0}$_{\pm7.0}$ & \textbf{87.9}$_{\pm0.6}$ & \textbf{0.004}$_{\pm0.0}$ & \textbf{0.11}$_{\pm0.0}$  & \textbf{99.8}$_{\pm0.0}$ \\\bottomrule
+\end{tabular}}
+\end{table}
+Under heteroscedastic conditions, \textcolor{teal}{$d=40$} node graphs with either two or three regimes, FANTOM outperforms every baselineand shows that it can scale to large graphs even in this complex setting. Among methods explicitly designed for multi-regime MTS, it is the only one that converges to the true regime partitions, attaining 99.9\% in regime detection accuracy. CASTOR and RPCMCI break down in heteroscedastic settings (Table \ref{tab_hetero_40_2}). Large scale graphs helps FANTOM to differentiate between the different regimes and increases the regime detection accuracy by 2\% compared to 20 node graphs settings.
+
+To give stationary MTS baselines the best possible chance, we supply them with the ground truth regime partitions. This is done by training the aforementioned models on each pure regime separately (regime governed by the same causal model). Yet, FANTOM still dominates the structure learning task, while learning the number of regime and their indices as well, achieving an F1 of 85.6 \% and an NHD of 0.14 (Table \ref{tab_hetero_40_2}). 

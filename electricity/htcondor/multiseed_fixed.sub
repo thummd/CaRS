@@ -1,0 +1,39 @@
+# HTCondor submission file for fixed multi-seed experiments
+# Fixes: data leakage, increased sparsity, larger GPU for high-regime experiments
+#
+# Changes from original:
+# 1. Data leakage fixed - uses model.predict() instead of model.forward() for evaluation
+# 2. DAG sparsity penalty increased from 1.0 to 10.0
+# 3. Added d=5 and d=6 for DE_FR experiments
+# 4. High-regime experiments (d>=4) request 80GB GPU
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_multiseed_job.sh
+Arguments = $(model) $(dataset) $(d_dim)
+
+# Resource requirements (default for d<=3)
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 12000) && (TARGET.CUDACapability >= 6.0)
+
+# Environment
+GetEnv = True
+
+# Logging
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_fixed_$(model)_$(dataset)_d$(d_dim).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_fixed_$(model)_$(dataset)_d$(d_dim).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/multiseed_fixed_$(model)_$(dataset)_d$(d_dim).err
+
++MaxRuntime = 28800
++JobBatchName = "multiseed_fixed"
+
+# Standard experiments (d<=3, 12GB GPU sufficient)
+Queue model, dataset, d_dim from (
+ds3m_causal, DE, 2
+ds3m_causal, DE, 3
+ds3m_causal, FR, 2
+ds3m_causal, FR, 3
+ds3m_causal, DE_FR, 2
+ds3m_causal, DE_FR, 3
+)

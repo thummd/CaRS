@@ -1,0 +1,16 @@
+n_regimes: 2
+funcs: [tanh, tanh, tanh]
+n_nodes: 10
+reg: [2500,2000]   # replace with your choice for regime length value
+lag: 1
+graph_ord_lag: 4
+graph_ord_inst: 2
+w_max_inter: 1
+w_min_inter: 0
+w_max_intra: 1
+w_min_intra: 0
+graph_type_intra: barabasi-albert
+graph_type_inter: erdos-renyi
+noise_scale: [1, 1, 1]
+max_data_gen_trials: 1000
+sem_type: linear-gauss

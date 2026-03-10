@@ -1,0 +1,39 @@
+# HTCondor submission file for DAG extraction with FIXED lagged edge initialization
+# Tests different init_logits values that now correctly produce sparse lagged edges
+#
+# After the fix:
+# - init=-0.5 -> lagged edge prob ~0.38
+# - init=-2.0 -> lagged edge prob ~0.12
+# - init=-3.0 -> lagged edge prob ~0.05
+
+Universe = vanilla
+Executable = /lustre/home/dthumm/CASTOR/electricity/htcondor/run_extract_dags.sh
+# Args: dataset d_dim seed lambda_sparse init_logits tau_gumbel edge_threshold
+Arguments = $(dataset) $(d_dim) $(seed) $(lambda_sparse) $(init_logits) $(tau_gumbel) $(edge_threshold)
+
+RequestCpus = 2
+RequestMemory = 16384
+RequestGPUs = 1
+Requirements = (CUDAGlobalMemoryMb >= 20000) && (TARGET.CUDACapability >= 7.0)
+
+GetEnv = True
+
+Log = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel).log
+Output = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel).out
+Error = /lustre/home/dthumm/CASTOR/electricity/htcondor/logs/fixed_$(dataset)_d$(d_dim)_init$(init_logits)_tau$(tau_gumbel).err
+
++MaxRuntime = 14400
++JobBatchName = "dag_extract_fixed"
+
+# Test configurations with the fixed initialization
+# Format: dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold
+Queue dataset, d_dim, seed, lambda_sparse, init_logits, tau_gumbel, edge_threshold from (
+DE, 3, 42, 10.0, -0.5, 1.0, 0.3
+DE, 3, 42, 10.0, -2.0, 1.0, 0.3
+DE, 3, 42, 10.0, -3.0, 1.0, 0.3
+DE, 3, 42, 10.0, -2.0, 0.1, 0.3
+FR, 3, 42, 10.0, -0.5, 1.0, 0.3
+FR, 3, 42, 10.0, -2.0, 1.0, 0.3
+FR, 3, 42, 10.0, -3.0, 1.0, 0.3
+FR, 3, 42, 10.0, -2.0, 0.1, 0.3
+)

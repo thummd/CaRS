@@ -1,0 +1,78 @@
+# DS3M-Causal Hybrid Model - OPTION C: Reduced Complexity
+# Addresses memory and training issues by:
+# 1. Fewer ICGNN layers (1 instead of 2)
+# 2. Smaller embedding size
+# 3. Shared ICGNN encoder across regimes (only output heads differ)
+# 4. Smaller hidden dimensions
+
+# Model architecture
+model:
+  # DS3M parameters - smaller
+  h_dim: 24           # Reduced from 32
+  z_dim: 4            # Reduced from 8
+  d_dim: 2            # Fewer regimes for simpler model
+  n_layers: 1
+
+  # FANTOM causal parameters - REDUCED
+  lag: 1
+  embedding_size: 8         # Reduced from 16
+  encoder_layers: [32]      # Single layer (was [32, 32])
+  decoder_layers: [32]      # Single layer (was [32, 32])
+  norm_layers: true
+
+  # DAG sharing - use shared backbone for efficiency
+  sharing_mode: shared_backbone  # Share encoder, only regime-specific output
+  tau_gumbel: 0.7
+  init_logits: [-0.3, -0.3]     # Moderate sparsity
+
+# Training parameters
+training:
+  learning_rate: 0.001
+  weight_decay: 0.0
+  gradient_clip: 10.0
+
+  # Augmented Lagrangian - simplified
+  alpha_init: 0.0
+  rho_init: 1.0
+  rho_max: 1.0e+6
+  alpha_max: 1.0e+6
+  progress_rate: 0.9
+  tol_dag: 1.0e-5
+
+  # Epochs - faster training
+  max_auglag_steps: 50
+  max_inner_epochs: 30
+  patience_dag: 5
+  patience_rho: 3
+
+  # Early stopping
+  early_stopping_patience: 25
+  early_stopping_min_delta: 0.01
+
+  # Loss weights
+  lambda_kl: 1.0
+  lambda_dag: 50.0        # Moderate DAG penalty
+  lambda_sparse: 2.0
+
+# Data parameters - can use more features with lighter model
+data:
+  timestep: 14
+  test_ratio: 0.2
+  val_ratio: 0.1
+  feature_groups:
+    - price
+    - load
+    - weather
+    - calendar
+    - generation       # Can add more features now
+    - commodity
+
+# Experiments
+experiments:
+  - name: DE_lite
+    country: DE
+    sharing_mode: shared_backbone
+
+  - name: FR_lite
+    country: FR
+    sharing_mode: shared_backbone

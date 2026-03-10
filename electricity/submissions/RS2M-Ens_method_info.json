@@ -1,0 +1,78 @@
+{
+  "method_name": "RS2M-Ens",
+  "full_name": "Regime-Switching State Space Model Ensemble",
+  "description": "Deep Switching State Space Model (DS3M) with 2 latent regimes. Uses a Markov-switching VAE to capture regime-dependent dynamics in electricity prices. Ensemble combines multiple seeds with softmax-weighted averaging.",
+  "key_insight": "Univariate modeling (TARGET only) outperforms multivariate. Seeds with 5-25% regime 0 allocation achieve best Spearman correlation. Regime switching captures market structure changes.",
+  "parameters": {
+    "method": "RS2M-Ens",
+    "base_model": "DS3M (Deep Switching State Space Model)",
+    "mode": "univariate",
+    "input": "TARGET only (price difference)",
+    "d_dim": 2,
+    "h_dim": 30,
+    "z_dim": 8,
+    "n_layers": 1,
+    "timestep": 14,
+    "n_epochs": 200,
+    "learning_rate": 0.001,
+    "ensemble_method": "softmax",
+    "ensemble_temperature": 5.0,
+    "n_models": 5,
+    "min_spearman_threshold": 0.3,
+    "spearman_validation": 0.6667430743882451
+  },
+  "models": [
+    {
+      "seed": "43",
+      "spearman": 0.6044147792032238,
+      "weight": 0.3502065007817991,
+      "regime_distribution": {
+        "0": 40,
+        "1": 258
+      },
+      "dir": "/lustre/home/dthumm/CASTOR/electricity/outputs/ds3m/ALL_TARGET_uv_d2_seed43_20260120_140929"
+    },
+    {
+      "seed": "59",
+      "spearman": 0.4876696755891387,
+      "weight": 0.19535090704395444,
+      "regime_distribution": {
+        "0": 14,
+        "1": 284
+      },
+      "dir": "/lustre/home/dthumm/CASTOR/electricity/outputs/ds3m/ALL_TARGET_uv_d2_seed59_20260120_153302"
+    },
+    {
+      "seed": "47",
+      "spearman": 0.4670921919244067,
+      "weight": 0.17625116407302238,
+      "regime_distribution": {
+        "0": 49,
+        "1": 249
+      },
+      "dir": "/lustre/home/dthumm/CASTOR/electricity/outputs/ds3m/ALL_TARGET_uv_d2_seed47_20260120_153302"
+    },
+    {
+      "seed": "51",
+      "spearman": 0.4409888655584599,
+      "weight": 0.15468540581573514,
+      "regime_distribution": {
+        "0": 166,
+        "1": 132
+      },
+      "dir": "/lustre/home/dthumm/CASTOR/electricity/outputs/ds3m/ALL_TARGET_uv_d2_seed51_20260120_153302"
+    },
+    {
+      "seed": "40",
+      "spearman": 0.3959681663212448,
+      "weight": 0.12350602228548893,
+      "regime_distribution": {
+        "0": 39,
+        "1": 259
+      },
+      "dir": "/lustre/home/dthumm/CASTOR/electricity/outputs/ds3m/ALL_TARGET_uv_d2_seed40_20260120_153303"
+    }
+  ],
+  "created": "2026-01-20T16:34:06.006254",
+  "validation_spearman": 0.6667430743882451
+}

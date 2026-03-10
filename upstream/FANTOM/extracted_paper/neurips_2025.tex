@@ -1,0 +1,236 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+
+% ready for submission
+%\usepackage{neurips_2025}
+
+\usepackage[table,dvipsnames,svgnames]{xcolor}
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    %\usepackage[preprint]{neurips_2025}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+     \usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+%\usepackage{xcolor}         % colors
+%\usepackage{lmodern}
+\usepackage{titletoc}
+\newcommand\DoToC{%
+  \startcontents
+  \printcontents{}{1}{\hrulefill\vskip0pt}
+  \vskip0pt \noindent\hrulefill
+  }
+\usepackage[dvipsnames]{xcolor}
+\usepackage[svgnames]{xcolor}
+\makeatletter
+    \newcommand{\colorboxed}[3][boxcolor]{\fcolorbox{#2}{#1}{\m@th$\displaystyle#3$}}
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{setspace}
+\usepackage{ltablex,booktabs,ragged2e,caption}
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{wrapfig}
+\usepackage{url}
+\usepackage{algorithm, algorithmic}
+%\usepackage{algorithmicx}
+%\usepackage[noend]{algpseudocode}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage{adjustbox}
+\hypersetup{
+    colorlinks,
+    linkcolor={RoyalBlue},
+    citecolor={RoyalBlue},
+    urlcolor={RoyalBlue}
+}
+\definecolor{Gray}{gray}{0.93}
+\definecolor{lightgray}{gray}{0.97}
+%\theoremstyle{plain}
+\usepackage[most]{tcolorbox}
+\usepackage{minitoc}
+\newtcolorbox{mybox}[1][]{
+enhanced jigsaw,
+colback=Gray,
+boxrule=0pt,
+overlay unbroken and first ={},
+breakable,
+top=1pt,bottom=1pt,
+left=1pt,right=1pt,
+arc=0pt,outer arc=0pt,
+#1}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\DeclareMathOperator*{\argmaxA}{arg\,max}
+\DeclareMathOperator*{\argminA}{arg\,min}
+
+\title{Flow based approach for Dynamic Temporal Causal models with non-Gaussian or Heteroscedastic Noises}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{%
+  Abdellah Rahmani \\
+  LTS4, EPFL\\
+  Lausanne, Switzerland \\
+  \texttt{abdellah.rahmani@epfl.ch} \\
+  % examples of more authors
+   \And
+  Pascal Frossard \\
+  LTS4, EPFL\\
+  Lausanne, Switzerland \\
+  \texttt{pascal.frossard@epfl.ch} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{abstract}
+Understanding causal relationships in multivariate time series is crucial in many scenarios, such as those dealing with financial or neurological data. Many such time series exhibit multiple regimes, i.e., consecutive temporal segments with a priori unknown boundaries, with each regime having its own causal structure. Inferring causal dependencies and regime shifts is critical for analyzing the underlying processes. However, causal structure learning in this setting is challenging due to (1) non-stationarity, i.e., each regime can have its own causal graph and mixing function, and (2) complex noise distributions, which may be non-Gaussian or heteroscedastic. Existing causal discovery approaches cannot address these challenges, since generally assume stationarity or Gaussian noise with constant variance. Hence, we introduce FANTOM, a unified framework for causal discovery that handles non-stationary processes along with non-Gaussian and heteroscedastic noises. FANTOM simultaneously infers the number of regimes and their corresponding indices and learns each regime’s Directed Acyclic Graph. It uses a Bayesian Expectation Maximization algorithm that maximizes the evidence lower bound of the data log-likelihood. On the theoretical side, we prove, under mild assumptions, that temporal heteroscedastic causal models, introduced in FANTOM's formulation, are identifiable in both stationary and non-stationary settings. In addition, extensive experiments on synthetic and real data show that FANTOM outperforms existing methods.
+\end{abstract}
+\input{intro}
+\input{Background_prob_form}
+\input{DyTCM}
+\input{theoritical_results}
+\input{Experiments}
+\input{Conc}
+\newpage
+\section*{Acknowledgment}
+We thank Alessandro Favero, Nikolaos Dimitriadis,  and Ortal Senouf for helpful feedbacks and comments. This work was supported by the SNSF Sinergia
+project ‘PEDESITE: Personalized Detection of Epileptic Seizure in the Internet of Things (IoT) Era’
+\bibliography{biblio}
+\bibliographystyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{Table of content}
+\DoToC 
+\clearpage
+\appendix
+\begin{figure}
+    \begin{center}
+    \includegraphics[width=0.35\textwidth]{figures/Fantom_graphical_model_tikz.pdf}
+\end{center}
+  \vspace{-15pt}
+      \caption{Graphical model of FANTOM. Observed variables (\(\boldsymbol{x}_t\)) are in gray, while latent variables (\(z_t\)) and parameters (\(\Theta\)) are in white. Blue edges represent parameter-variable interactions.}
+\end{figure}
+\section{Detailed related works}
+\label{detaled_related}
+\input{relatedwork}
+\section{Expectation step: Derivation, intuition and illustration}
+\label{Estep_illustration}
+\input{Estep_intuition}
+\section{Maximization step:}
+\label{Mstep_bayesian_details}
+\input{Variational_inf}
+\section{Limitations \& Risk of spurious causality}
+\label{limitations}
+\input{limitations}
+\section{Data generation and Baselines}
+\subsection{Synthetic data}
+\label{synthetic_data_gen}
+\input{synth_data}
+\subsection{Baselines}
+\label{baselines}
+\input{baselines}
+\subsection{Real world data}
+\subsubsection{Causal Chambers data}
+\label{causal_chambers}
+\input{causalchamber}
+\subsubsection{Epilepsy data}
+\label{epilepsy_data}
+\input{epilepsy_Data}
+\section{Additional Experiments}
+\label{additional_exp}
+\subsection{Ablation studies}
+\label{ablation}
+\input{ablation_studies}
+\subsection{Additional results on synthetic data}
+\subsubsection{Heteroscedastic noise with different number of nodes and regimes}
+\label{hetero}
+\input{hetero_addi_exp}
+\subsubsection{Non-Gaussian noise with different number of nodes and regimes}
+\label{nongauss}
+\input{non_gauss_add_exp}
+\subsubsection{Illustrations of learned graphs}
+\input{illustrations}
+\subsubsection{Time complexity analysis}
+\label{Time_complexity}
+\input{time_complex}
+\subsubsection{Regime detection experiments}
+\label{regime_detect_exp}
+\input{reg_detect_exp}
+\section{Proof of proposition}
+\label{prop_proof}
+\input{prop_proof_1}
+\section{Proofs of our theoretical contributions}
+\label{theorems proof}
+\input{theorem_THNM}
+\input{check_list}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\end{document}
