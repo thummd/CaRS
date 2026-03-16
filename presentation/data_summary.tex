@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{titling}
+
+% Compact title spacing
+\setlength{\droptitle}{-1.5cm}
+\pretitle{\begin{center}\Large\bfseries}
+\posttitle{\end{center}\vspace{-0.4cm}}
+\predate{\begin{center}\normalsize}
+\postdate{\end{center}\vspace{-0.5cm}}
+\preauthor{}
+\postauthor{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.2em}
+\pagestyle{empty}
+
+\title{CaRS Data Summary --- 12 European Electricity Markets}
+\author{}
+\date{Date Range: 2015-01-01 -- 2026-03-09 \quad|\quad Target: Day-ahead electricity price (EUR/MWh)}
+
+\begin{document}
+\maketitle
+
+\vspace{-0.3cm}
+
+% === Per-Country Table ===
+\begin{center}
+\textbf{Per-Country Dataset Summary} (Hourly frequency, $\sim$3M total observations)
+\vspace{0.1cm}
+
+\small
+\begin{tabular}{ll r r r}
+\toprule
+\textbf{Code} & \textbf{Country} & \textbf{Observations} & \textbf{Features} & \textbf{Missing \%} \\
+\midrule
+AT & Austria        & 312,600  & 166 & $<$0.01 \\
+BE & Belgium        & 391,296  & 160 & $<$0.01 \\
+CZ & Czech Republic & 143,469  & 153 & 0.01 \\
+DE & Germany        & 391,686  & 185 & $<$0.01 \\
+DK & Denmark        & 218,637  & 168 & $<$0.01 \\
+ES & Spain          & 197,469  & 154 & 0.02 \\
+FR & France         & 175,582  & 161 & 0.01 \\
+HU & Hungary        & 391,290  & 152 & $<$0.01 \\
+IT & Italy          & 129,069  & 155 & 0.01 \\
+NL & Netherlands    & 392,256  & 157 & $<$0.01 \\
+PL & Poland         & 143,469  & 164 & 0.01 \\
+SE & Sweden         & 109,485  & 128 & 0.01 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total}} & \textbf{2,996,308} & \textbf{128--185} & $<$\textbf{0.02} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.1cm}
+
+\begin{multicols}{2}
+
+% === Feature Groups ===
+\textbf{Feature Groups} (DE reference, 185 features):
+\vspace{0.1cm}
+
+\small
+\begin{tabular}{l r l}
+\toprule
+\textbf{Group} & \textbf{\#} & \textbf{Examples} \\
+\midrule
+Generation       & 33 & Nuclear, Solar, Wind, Gas \\
+Lag \& Rolling   & 31 & Price/load/storage lags \\
+Calendar         & 30 & DoW, holiday, season, hour \\
+Cross-border     & 24 & Flows to/from 8 neighbors \\
+Weather          & 13 & Temp., wind, radiation \\
+Commodities      & 11 & Nat.\ gas, Brent, WTI \\
+Gas Storage      &  9 & Fill \%, inject., withdrawal \\
+Macroeconomic    &  7 & GDP, CPI, unemployment \\
+Price            &  7 & Price, returns, lags \\
+Outages          &  6 & Planned/unplanned (MW) \\
+Oil Fundamentals &  5 & OPEC basket, inventories \\
+Sentiment        &  4 & VIX, EPU, fear/greed \\
+Trade            &  2 & EU trade bal., USD/EUR \\
+Transport        &  1 & Baltic Dry Index \\
+Hydrogen         &  1 & Grey H\textsubscript{2} cost \\
+Load             &  1 & Actual demand (MW) \\
+\midrule
+\textbf{Total}   & \textbf{185} & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3cm}
+
+{\footnotesize
+\textbf{Notes:}
+\begin{itemize}[nosep, leftmargin=1em]
+    \item Feature count varies by cross-border neighbors (DE: 8, SE: 4), generation mix, and gas storage presence
+    \item Missing values handled via forward-fill + backward-fill; clean datasets: 0\% missing
+\end{itemize}
+}
+
+\columnbreak
+
+% === Data Sources ===
+\textbf{Data Sources:}
+\vspace{0.1cm}
+
+\small
+\begin{tabular}{l l l}
+\toprule
+\textbf{Source} & \textbf{Freq.} & \textbf{Data} \\
+\midrule
+ENTSO-E\textsuperscript{1}       & Hourly   & Prices, gen., load, flows \\
+Open-Meteo\textsuperscript{2}    & Hourly   & Weather variables \\
+AGSI+/GIE\textsuperscript{3}     & Daily    & Gas storage levels \\
+Yahoo Finance\textsuperscript{4}  & Daily    & Commodities, VIX, BDI \\
+FRED\textsuperscript{5}          & Daily    & Macro, oil, trade, sent. \\
+Eurostat\textsuperscript{6}      & Monthly  & EU trade balance \\
+OPEC\textsuperscript{7}          & Daily    & OPEC basket price \\
+PolicyUncert.\textsuperscript{8} & Daily    & Econ.\ Policy Uncert.\ Idx \\
+\bottomrule
+\end{tabular}
+
+{\tiny
+\textsuperscript{1}\url{transparency.entsoe.eu} \quad
+\textsuperscript{2}\url{open-meteo.com} \\
+\textsuperscript{3}\url{agsi.gie.eu} \quad
+\textsuperscript{4}\texttt{yfinance} package \\
+\textsuperscript{5}\url{fred.stlouisfed.org} \quad
+\textsuperscript{6}\url{ec.europa.eu/eurostat} \\
+\textsuperscript{7}\url{opec.org} \quad
+\textsuperscript{8}\url{policyuncertainty.com}
+}
+
+\vspace{0.3cm}
+
+% === Price Statistics ===
+\textbf{Price Statistics} (EUR/MWh):
+\vspace{0.1cm}
+
+\small
+\begin{tabular}{l r r r r}
+\toprule
+\textbf{Country} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+\midrule
+AT & 95.3  & 88.7 & $-$500 & 920 \\
+BE & 77.8  & 79.5 & $-$500 & 871 \\
+CZ & 84.8  & 74.2 & $-$225 & 871 \\
+DE & 73.5  & 80.4 & $-$500 & 936 \\
+DK & 93.3  & 93.2 & $-$223 & 936 \\
+ES & 75.7  & 53.9 & $-$15  & 700 \\
+FR & 72.5  & 72.1 & $-$135 & 2988 \\
+HU & 88.8  & 89.2 & $-$500 & 1047 \\
+IT & 103.5 & 80.0 &     0  & 871 \\
+NL & 77.0  & 78.3 & $-$500 & 873 \\
+PL & 112.2 & 74.2 & $-$133 & 1036 \\
+SE & 45.0  & 43.3 & $-$60  & 590 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+
+{\footnotesize
+\textbf{Data Frequencies:}
+\begin{itemize}[nosep, leftmargin=1em]
+    \item \textbf{Hourly}: Prices, generation, load, flows, weather
+    \item \textbf{Daily}: Commodities, gas storage, outages, macro, sentiment, oil, transport, trade
+    \item \textbf{Monthly}: EU trade balance (Eurostat)
+    \item Daily/monthly $\rightarrow$ hourly via forward-fill
+\end{itemize}
+}
+
+\end{multicols}
+
+\end{document}

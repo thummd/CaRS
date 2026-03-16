@@ -224,6 +224,10 @@ def download_epu_data(
             print("    Could not identify EPU value column")
             return pd.DataFrame()
 
+        # Drop non-numeric rows (e.g., attribution text at bottom)
+        df = df[pd.to_numeric(df[year_col], errors='coerce').notna()]
+        df = df[pd.to_numeric(df[month_col], errors='coerce').notna()]
+
         # Create datetime index
         df['date'] = pd.to_datetime(
             df[year_col].astype(int).astype(str) + '-' +

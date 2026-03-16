@@ -65,8 +65,9 @@ FEATURE_GROUPS = {
         'gas_storage_net_flow_gwh', 'gas_storage_trend_pct',
     ],
     'macro': [
-        'macro_eu_industrial_prod', 'macro_eu_cpi', 'macro_eu_gdp_growth',
-        'macro_de_ifo', 'macro_eu_unemployment',
+        'macro_eu_cpi', 'macro_eu_gdp_growth', 'macro_de_ifo',
+        'macro_eu_consumer_confidence', 'macro_eu_energy_hicp',
+        'macro_eu_bond_yield', 'macro_eu_m3_money',
     ],
     'sentiment': [
         'sentiment_vix', 'sentiment_gold', 'sentiment_eurusd', 'sentiment_epu_eu',

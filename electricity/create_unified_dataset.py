@@ -24,12 +24,12 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-from country_config import (
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paths import DATA_DIR
+from country_config import (
     get_registered_countries, get_all_pairs, get_neighbors,
     has_gas_storage, COUNTRY_REGISTRY,
 )
+from paths import DATA_DIR
 
 # Data directories
 DATA_DIR = DATA_DIR
@@ -224,20 +224,20 @@ def create_unified_dataset(country: str, frequency: str = 'D') -> pd.DataFrame:
     # Load base data with calendar features
     if frequency == 'H':
         # Hourly mode: use existing merged hourly files
-        calendar_file = DATA_DIR / f"merged_hourly_{country}_2015_2024_calendar.csv"
+        calendar_file = DATA_DIR / f"merged_hourly_{country}_2015_2026_calendar.csv"
         base_df = load_and_prepare_data(calendar_file, "Hourly calendar-enhanced base data",
                                          frequency=frequency, source_frequency='hourly')
         if base_df.empty:
-            base_file = DATA_DIR / f"merged_hourly_{country}_2015_2024.csv"
+            base_file = DATA_DIR / f"merged_hourly_{country}_2015_2026.csv"
             base_df = load_and_prepare_data(base_file, "Hourly base data",
                                              frequency=frequency, source_frequency='hourly')
     else:
-        calendar_file = DATA_DIR / f"merged_daily_{country}_2015_2024_calendar.csv"
+        calendar_file = DATA_DIR / f"merged_daily_{country}_2015_2026_calendar.csv"
         base_df = load_and_prepare_data(calendar_file, "Calendar-enhanced base data")
 
     if base_df.empty:
         # Fall back to non-calendar version
-        base_file = DATA_DIR / f"merged_daily_{country}_2015_2024.csv"
+        base_file = DATA_DIR / f"merged_daily_{country}_2015_2026.csv"
         base_df = load_and_prepare_data(base_file, "Base data")
 
     if base_df.empty:
@@ -255,23 +255,23 @@ def create_unified_dataset(country: str, frequency: str = 'D') -> pd.DataFrame:
 
     # Load outage data
     if frequency == 'H':
-        outage_file = DATA_DIR / f"outages/outage_hourly_{country}_2015_2024.csv"
+        outage_file = DATA_DIR / f"outages/outage_hourly_{country}_2015_2026.csv"
         outage_df = load_and_prepare_data(outage_file, "Hourly outage data",
                                            frequency=frequency, source_frequency='hourly')
         if outage_df.empty:
             # Fallback: forward-fill daily outages to hourly
-            outage_file = DATA_DIR / f"outages/outage_daily_{country}_2015_2024.csv"
+            outage_file = DATA_DIR / f"outages/outage_daily_{country}_2015_2026.csv"
             outage_df = load_and_prepare_data(outage_file, "Outage data (daily, upsampled)",
                                                frequency=frequency, source_frequency='daily')
     else:
-        outage_file = DATA_DIR / f"outages/outage_daily_{country}_2015_2024.csv"
+        outage_file = DATA_DIR / f"outages/outage_daily_{country}_2015_2026.csv"
         outage_df = load_and_prepare_data(outage_file, "Outage data")
 
     # Load commodity data (try multiple possible filenames)
     commodity_files = [
         DATA_DIR / "commodities/commodity_prices.csv",
-        DATA_DIR / "commodities/commodities_2015_2024.csv",
-        DATA_DIR / "commodities/commodities_2015-01-01_2024-12-31.csv",
+        DATA_DIR / "commodities/commodities_2015_2026.csv",
+        DATA_DIR / "commodities/commodities_2015-01-01_2026-03-10.csv",
     ]
     commodity_df = pd.DataFrame()
     for cf in commodity_files:
@@ -305,8 +305,8 @@ def create_unified_dataset(country: str, frequency: str = 'D') -> pd.DataFrame:
 
     # Load gas storage data (AGSI+ fill levels, injection/withdrawal)
     gas_storage_files = [
-        DATA_DIR / f"gas_storage/gas_storage_{country}_2015-01-01_2024-12-31.csv",
-        DATA_DIR / f"gas_storage/gas_storage_{country}_2015_2024.csv",
+        DATA_DIR / f"gas_storage/gas_storage_{country}_2015-01-01_2026-03-10.csv",
+        DATA_DIR / f"gas_storage/gas_storage_{country}_2015_2026.csv",
     ]
     gas_storage_df = pd.DataFrame()
     for gsf in gas_storage_files:
@@ -353,6 +353,90 @@ def create_unified_dataset(country: str, frequency: str = 'D') -> pd.DataFrame:
         unified = unified.join(gas_storage_df, how='left')
         print(f"    After gas storage merge: {unified.shape}")
 
+    # Load macroeconomic indicators (EU-wide, country-agnostic)
+    macro_files = [
+        DATA_DIR / "macro/macro_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "macro/macro_2015_2026.csv",
+    ]
+    macro_df = pd.DataFrame()
+    for mf in macro_files:
+        if mf.exists():
+            macro_df = load_and_prepare_data(mf, f"Macro data ({mf.name})",
+                                              frequency=frequency, source_frequency='daily')
+            break
+    if macro_df.empty:
+        print("  NOTE: Macro data not found - run download_macro_data.py")
+
+    # Load sentiment indicators (global, country-agnostic)
+    sentiment_files = [
+        DATA_DIR / "sentiment/sentiment_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "sentiment/sentiment_2015_2026.csv",
+    ]
+    sentiment_df = pd.DataFrame()
+    for sf in sentiment_files:
+        if sf.exists():
+            sentiment_df = load_and_prepare_data(sf, f"Sentiment data ({sf.name})",
+                                                  frequency=frequency, source_frequency='daily')
+            break
+    if sentiment_df.empty:
+        print("  NOTE: Sentiment data not found - run download_sentiment_data.py")
+
+    # Load oil fundamentals / OPEC data (global, country-agnostic)
+    oil_files = [
+        DATA_DIR / "oil_fundamentals/oil_fundamentals_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "oil_fundamentals/oil_fundamentals_2015_2026.csv",
+    ]
+    oil_df = pd.DataFrame()
+    for of_ in oil_files:
+        if of_.exists():
+            oil_df = load_and_prepare_data(of_, f"Oil fundamentals ({of_.name})",
+                                            frequency=frequency, source_frequency='daily')
+            break
+    if oil_df.empty:
+        print("  NOTE: Oil fundamentals data not found - run download_oil_fundamentals_data.py")
+
+    # Load transport index data (global, country-agnostic)
+    transport_files = [
+        DATA_DIR / "transport/transport_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "transport/transport_2015_2026.csv",
+    ]
+    transport_df = pd.DataFrame()
+    for tf in transport_files:
+        if tf.exists():
+            transport_df = load_and_prepare_data(tf, f"Transport data ({tf.name})",
+                                                  frequency=frequency, source_frequency='daily')
+            break
+    if transport_df.empty:
+        print("  NOTE: Transport data not found - run download_transport_data.py")
+
+    # Load trade data (EU-wide, country-agnostic)
+    trade_files = [
+        DATA_DIR / "trade/trade_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "trade/trade_2015_2026.csv",
+    ]
+    trade_df = pd.DataFrame()
+    for tdf in trade_files:
+        if tdf.exists():
+            trade_df = load_and_prepare_data(tdf, f"Trade data ({tdf.name})",
+                                              frequency=frequency, source_frequency='daily')
+            break
+    if trade_df.empty:
+        print("  NOTE: Trade data not found - run download_trade_data.py")
+
+    # Load hydrogen data (global, country-agnostic)
+    hydrogen_files = [
+        DATA_DIR / "hydrogen/hydrogen_2015-01-01_2026-03-10.csv",
+        DATA_DIR / "hydrogen/hydrogen_2015_2026.csv",
+    ]
+    hydrogen_df = pd.DataFrame()
+    for hf in hydrogen_files:
+        if hf.exists():
+            hydrogen_df = load_and_prepare_data(hf, f"Hydrogen data ({hf.name})",
+                                                 frequency=frequency, source_frequency='daily')
+            break
+    if hydrogen_df.empty:
+        print("  NOTE: Hydrogen data not found - run download_hydrogen_data.py")
+
     # Add macro data (EU-wide indicators)
     if not macro_df.empty:
         unified = unified.join(macro_df, how='left')
@@ -382,90 +466,6 @@ def create_unified_dataset(country: str, frequency: str = 'D') -> pd.DataFrame:
     if not hydrogen_df.empty:
         unified = unified.join(hydrogen_df, how='left')
         print(f"    After hydrogen merge: {unified.shape}")
-
-    # Load macroeconomic indicators (EU-wide, country-agnostic)
-    macro_files = [
-        DATA_DIR / "macro/macro_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "macro/macro_2015_2024.csv",
-    ]
-    macro_df = pd.DataFrame()
-    for mf in macro_files:
-        if mf.exists():
-            macro_df = load_and_prepare_data(mf, f"Macro data ({mf.name})",
-                                              frequency=frequency, source_frequency='daily')
-            break
-    if macro_df.empty:
-        print("  NOTE: Macro data not found - run download_macro_data.py")
-
-    # Load sentiment indicators (global, country-agnostic)
-    sentiment_files = [
-        DATA_DIR / "sentiment/sentiment_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "sentiment/sentiment_2015_2024.csv",
-    ]
-    sentiment_df = pd.DataFrame()
-    for sf in sentiment_files:
-        if sf.exists():
-            sentiment_df = load_and_prepare_data(sf, f"Sentiment data ({sf.name})",
-                                                  frequency=frequency, source_frequency='daily')
-            break
-    if sentiment_df.empty:
-        print("  NOTE: Sentiment data not found - run download_sentiment_data.py")
-
-    # Load oil fundamentals / OPEC data (global, country-agnostic)
-    oil_files = [
-        DATA_DIR / "oil_fundamentals/oil_fundamentals_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "oil_fundamentals/oil_fundamentals_2015_2024.csv",
-    ]
-    oil_df = pd.DataFrame()
-    for of_ in oil_files:
-        if of_.exists():
-            oil_df = load_and_prepare_data(of_, f"Oil fundamentals ({of_.name})",
-                                            frequency=frequency, source_frequency='daily')
-            break
-    if oil_df.empty:
-        print("  NOTE: Oil fundamentals data not found - run download_oil_fundamentals_data.py")
-
-    # Load transport index data (global, country-agnostic)
-    transport_files = [
-        DATA_DIR / "transport/transport_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "transport/transport_2015_2024.csv",
-    ]
-    transport_df = pd.DataFrame()
-    for tf in transport_files:
-        if tf.exists():
-            transport_df = load_and_prepare_data(tf, f"Transport data ({tf.name})",
-                                                  frequency=frequency, source_frequency='daily')
-            break
-    if transport_df.empty:
-        print("  NOTE: Transport data not found - run download_transport_data.py")
-
-    # Load trade data (EU-wide, country-agnostic)
-    trade_files = [
-        DATA_DIR / "trade/trade_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "trade/trade_2015_2024.csv",
-    ]
-    trade_df = pd.DataFrame()
-    for tdf in trade_files:
-        if tdf.exists():
-            trade_df = load_and_prepare_data(tdf, f"Trade data ({tdf.name})",
-                                              frequency=frequency, source_frequency='daily')
-            break
-    if trade_df.empty:
-        print("  NOTE: Trade data not found - run download_trade_data.py")
-
-    # Load hydrogen data (global, country-agnostic)
-    hydrogen_files = [
-        DATA_DIR / "hydrogen/hydrogen_2015-01-01_2024-12-31.csv",
-        DATA_DIR / "hydrogen/hydrogen_2015_2024.csv",
-    ]
-    hydrogen_df = pd.DataFrame()
-    for hf in hydrogen_files:
-        if hf.exists():
-            hydrogen_df = load_and_prepare_data(hf, f"Hydrogen data ({hf.name})",
-                                                 frequency=frequency, source_frequency='daily')
-            break
-    if hydrogen_df.empty:
-        print("  NOTE: Hydrogen data not found - run download_hydrogen_data.py")
 
     # Fix FR Wind Offshore placeholder: France had no offshore wind before June 2023
     # ENTSO-E reports a constant ~362 MW placeholder for 2015-2023
@@ -577,8 +577,8 @@ def create_pair_dataset(country_a: str, country_b: str, frequency: str = 'D') ->
     print(f"{'='*60}")
 
     # Load clean unified datasets for both countries
-    file_a = OUTPUT_DIR / f"unified_{country_a}_2015_2024{freq_suffix}_clean.csv"
-    file_b = OUTPUT_DIR / f"unified_{country_b}_2015_2024{freq_suffix}_clean.csv"
+    file_a = OUTPUT_DIR / f"unified_{country_a}_2015_2026{freq_suffix}_clean.csv"
+    file_b = OUTPUT_DIR / f"unified_{country_b}_2015_2026{freq_suffix}_clean.csv"
 
     if not file_a.exists() or not file_b.exists():
         print(f"  ERROR: {country_a} and {country_b} unified datasets must exist first.")
@@ -587,12 +587,17 @@ def create_pair_dataset(country_a: str, country_b: str, frequency: str = 'D') ->
         print("  Run this script without --create_merged first to create them.")
         return pd.DataFrame()
 
+    # Downcast floats to float32 to reduce memory for large datasets
     print(f"  Loading {country_a} dataset...")
     df_a = pd.read_csv(file_a, index_col=0, parse_dates=True)
+    for col in df_a.select_dtypes(include=['float64']).columns:
+        df_a[col] = df_a[col].astype('float32')
     print(f"    Shape: {df_a.shape}, Date range: {df_a.index.min()} to {df_a.index.max()}")
 
     print(f"  Loading {country_b} dataset...")
     df_b = pd.read_csv(file_b, index_col=0, parse_dates=True)
+    for col in df_b.select_dtypes(include=['float64']).columns:
+        df_b[col] = df_b[col].astype('float32')
     print(f"    Shape: {df_b.shape}, Date range: {df_b.index.min()} to {df_b.index.max()}")
 
     # Add country prefixes to all columns (except common calendar features)
@@ -608,17 +613,24 @@ def create_pair_dataset(country_a: str, country_b: str, frequency: str = 'D') ->
     b_cols = {c: f"{country_b}_{c}" for c in df_b.columns if c not in common_cols}
 
     df_a_renamed = df_a.drop(columns=common_cols, errors='ignore').rename(columns=a_cols)
+    del df_a
     df_b_renamed = df_b.drop(columns=common_cols, errors='ignore').rename(columns=b_cols)
+    del df_b
+    import gc; gc.collect()
 
     # Merge on date index (inner join to get only overlapping dates)
     print("\n  Merging datasets...")
     df_merged = df_a_renamed.join(df_b_renamed, how='inner')
+    del df_a_renamed, df_b_renamed
+    gc.collect()
 
     # Add common columns back
     if not common_data.empty:
         for col in common_cols:
             if col in common_data.columns:
                 df_merged[col] = common_data.loc[df_merged.index, col]
+    del common_data
+    gc.collect()
 
     print(f"    Merged shape: {df_merged.shape}")
     print(f"    Date range: {df_merged.index.min()} to {df_merged.index.max()}")
@@ -731,12 +743,12 @@ def main():
             unified = create_unified_dataset(country, frequency=frequency)
 
             if not unified.empty:
-                output_file = OUTPUT_DIR / f"unified_{country}_2015_2024{freq_suffix}.csv"
+                output_file = OUTPUT_DIR / f"unified_{country}_2015_2026{freq_suffix}.csv"
                 unified.to_csv(output_file)
                 print(f"\n  Saved to {output_file}")
 
                 unified_clean = unified.dropna(subset=['price_change'])
-                clean_file = OUTPUT_DIR / f"unified_{country}_2015_2024{freq_suffix}_clean.csv"
+                clean_file = OUTPUT_DIR / f"unified_{country}_2015_2026{freq_suffix}_clean.csv"
                 unified_clean.to_csv(clean_file)
                 print(f"  Saved clean version to {clean_file}")
                 print(f"  Clean shape: {unified_clean.shape}")
@@ -752,20 +764,25 @@ def main():
             # Default: DE-FR for backward compatibility
             pairs = [('DE', 'FR')]
 
+        import gc
         for country_a, country_b in pairs:
             merged = create_pair_dataset(country_a, country_b, frequency=frequency)
 
             if not merged.empty:
                 pair_label = f"{country_a}_{country_b}"
-                output_file = OUTPUT_DIR / f"unified_{pair_label}_2015_2024{freq_suffix}.csv"
+                output_file = OUTPUT_DIR / f"unified_{pair_label}_2015_2026{freq_suffix}.csv"
                 merged.to_csv(output_file)
                 print(f"\n  Saved to {output_file}")
 
                 if 'price_spread_change' in merged.columns:
                     merged_clean = merged.dropna(subset=['price_spread_change'])
-                    clean_file = OUTPUT_DIR / f"unified_{pair_label}_2015_2024{freq_suffix}_clean.csv"
+                    clean_file = OUTPUT_DIR / f"unified_{pair_label}_2015_2026{freq_suffix}_clean.csv"
                     merged_clean.to_csv(clean_file)
                     print(f"  Clean shape: {merged_clean.shape}")
+                    del merged_clean
+
+            del merged
+            gc.collect()
 
     print("\n" + "=" * 70)
     print("Unified dataset creation complete!")

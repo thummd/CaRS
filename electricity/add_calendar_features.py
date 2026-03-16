@@ -175,7 +175,11 @@ def main():
     parser = argparse.ArgumentParser(description='Add calendar features')
     parser.add_argument('--countries', type=str, default=None,
                         help='Comma-separated country codes (default: all registered)')
+    parser.add_argument('--years', type=str, default='2015-2026',
+                        help='Year range (e.g., 2015-2026)')
     args = parser.parse_args()
+
+    start_year, end_year = args.years.split('-')
 
     print("=" * 60)
     print("Adding Calendar Features to Electricity Datasets")
@@ -185,8 +189,8 @@ def main():
 
     for country in countries:
         # Process daily dataset
-        daily_input = DATA_DIR / f"merged_daily_{country}_2015_2024.csv"
-        daily_output = DATA_DIR / f"merged_daily_{country}_2015_2024_calendar.csv"
+        daily_input = DATA_DIR / f"merged_daily_{country}_{start_year}_{end_year}.csv"
+        daily_output = DATA_DIR / f"merged_daily_{country}_{start_year}_{end_year}_calendar.csv"
 
         if daily_input.exists():
             df = process_dataset(daily_input, daily_output, country)
@@ -203,8 +207,8 @@ def main():
             print(f"\nNOTE: {daily_input} not found")
 
         # Process hourly dataset (if it exists)
-        hourly_input = DATA_DIR / f"merged_hourly_{country}_2015_2024.csv"
-        hourly_output = DATA_DIR / f"merged_hourly_{country}_2015_2024_calendar.csv"
+        hourly_input = DATA_DIR / f"merged_hourly_{country}_{start_year}_{end_year}.csv"
+        hourly_output = DATA_DIR / f"merged_hourly_{country}_{start_year}_{end_year}_calendar.csv"
         if hourly_input.exists():
             process_dataset(hourly_input, hourly_output, country)
         else:

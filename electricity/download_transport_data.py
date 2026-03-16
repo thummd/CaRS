@@ -57,12 +57,6 @@ def download_bdi_wrds(
     Returns:
         DataFrame with daily BDI values
     """
-    try:
-        import wrds
-    except ImportError:
-        print("  WRDS library not installed. Install with: pip install wrds")
-        return pd.DataFrame()
-
     creds = _load_env_credentials()
     username = os.environ.get('WRDS_USERNAME') or creds.get('WRDS_USERNAME')
     password = os.environ.get('WRDS_PASSWORD') or creds.get('WRDS_PASSWORD')
@@ -74,12 +68,34 @@ def download_bdi_wrds(
     print(f"  Connecting to WRDS as {username}...")
 
     try:
-        # Connect with explicit credentials
+        # Set credentials in environment so WRDS doesn't prompt interactively
         os.environ['WRDS_USERNAME'] = username
         if password:
             os.environ['WRDS_PASSWORD'] = password
 
-        db = wrds.Connection(wrds_username=username)
+        # Create .pgpass file for non-interactive WRDS auth
+        pgpass_path = Path.home() / '.pgpass'
+        pgpass_entry = f"wrds-pgdata.wharton.upenn.edu:9737:wrds:{username}:{password}"
+        needs_pgpass = True
+        if pgpass_path.exists():
+            existing = pgpass_path.read_text()
+            if f"wrds:{username}:" in existing:
+                needs_pgpass = False
+        if needs_pgpass and password:
+            with open(pgpass_path, 'a') as f:
+                f.write(pgpass_entry + '\n')
+            pgpass_path.chmod(0o600)
+
+        # Connect via sqlalchemy to avoid interactive prompts from wrds library
+        from sqlalchemy import create_engine, text
+        from urllib.parse import quote_plus
+        engine = create_engine(
+            f"postgresql://{username}:{quote_plus(password)}@wrds-pgdata.wharton.upenn.edu:9737/wrds",
+            connect_args={'sslmode': 'require'},
+        )
+        # Verify connection before proceeding
+        with engine.connect() as test_conn:
+            test_conn.execute(text("SELECT 1"))
 
         # Try multiple possible table locations for BDI
         queries = [
@@ -101,34 +117,38 @@ def download_bdi_wrds(
 
         for i, query in enumerate(queries):
             try:
-                df = db.raw_sql(query)
+                df = pd.read_sql(query, engine)
                 if df is not None and len(df) > 0:
                     df['date'] = pd.to_datetime(df['date'])
                     df = df.set_index('date')
                     df = df.sort_index()
                     print(f"    Got {len(df)} daily BDI observations from WRDS")
-                    db.close()
+                    engine.dispose()
                     return df
             except Exception as e:
                 if i == 0:
                     print(f"    Query {i+1} failed: {e}")
                 continue
 
-        # Try listing available libraries to help debug
-        print("  Could not find BDI data in WRDS. Listing available libraries...")
+        # Try listing available schemas to help debug
+        print("  Could not find BDI data in WRDS. Listing available schemas...")
         try:
-            libraries = db.list_libraries()
+            schemas_df = pd.read_sql(
+                "SELECT schema_name FROM information_schema.schemata ORDER BY schema_name",
+                engine,
+            )
+            libraries = schemas_df['schema_name'].tolist()
             relevant = [lib for lib in libraries if any(
                 k in lib.lower() for k in ['bloom', 'baltic', 'freight', 'ship', 'transport']
             )]
             if relevant:
-                print(f"    Potentially relevant libraries: {relevant}")
+                print(f"    Potentially relevant schemas: {relevant}")
             else:
-                print(f"    No shipping-related libraries found. Available: {libraries[:20]}...")
+                print(f"    No shipping-related schemas found. Available: {libraries[:20]}...")
         except Exception:
             pass
 
-        db.close()
+        engine.dispose()
 
     except Exception as e:
         print(f"  WRDS connection error: {e}")
@@ -163,6 +183,15 @@ def download_bdi_quandl(
             print("  Neither nasdaqdatalink nor quandl installed.")
             print("  Install with: pip install nasdaq-data-link")
             return pd.DataFrame()
+
+    # Set API key from environment / .env
+    creds = _load_env_credentials()
+    api_key = (os.environ.get('QUANDL_API_KEY') or os.environ.get('QUANDL_API')
+               or creds.get('QUANDL_API_KEY') or creds.get('QUANDL_API'))
+    if api_key:
+        nasdaqdatalink.ApiConfig.api_key = api_key
+    else:
+        print("  Warning: QUANDL_API not set — requests may be rate-limited")
 
     # Try various dataset codes
     dataset_codes = [

@@ -15,11 +15,13 @@ Usage:
 
 import os
 import sys
+import io
 import argparse
 from pathlib import Path
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paths import CARS_ROOT, COMMODITY_DIR, OIL_FUND_DIR
@@ -28,10 +30,20 @@ DATA_DIR = OIL_FUND_DIR
 
 # FRED series for oil fundamentals
 FRED_OIL_SERIES = {
-    'oil_us_inventories': {
-        'series_id': 'WCESTUS1',
-        'description': 'US Ending Stocks of Crude Oil (weekly, EIA)',
-        'frequency': 'W',
+    'oil_brent': {
+        'series_id': 'DCOILBRENTEU',
+        'description': 'Brent Crude Oil Price (daily, EIA)',
+        'frequency': 'D',
+    },
+    'oil_wti': {
+        'series_id': 'DCOILWTICO',
+        'description': 'WTI Crude Oil Price (daily, EIA)',
+        'frequency': 'D',
+    },
+    'oil_henry_hub_gas': {
+        'series_id': 'DHHNGSP',
+        'description': 'Henry Hub Natural Gas Spot Price (daily, EIA)',
+        'frequency': 'D',
     },
 }
 
@@ -116,6 +128,11 @@ def download_fred_oil_data(
         (combined_daily.index >= start) & (combined_daily.index <= end)
     ]
 
+    # Derive Brent-WTI spread from FRED data
+    if 'oil_brent' in combined_daily.columns and 'oil_wti' in combined_daily.columns:
+        combined_daily['oil_brent_wti_spread'] = combined_daily['oil_brent'] - combined_daily['oil_wti']
+        print(f"  Derived Brent-WTI spread from FRED data")
+
     print(f"  Daily shape (after ffill): {combined_daily.shape}")
     return combined_daily
 
@@ -139,8 +156,17 @@ def download_opec_basket_price(
     print("  Downloading OPEC basket price...")
 
     try:
-        # Try to fetch from OPEC website
-        df = pd.read_xml(OPEC_BASKET_URL)
+        # Fetch XML with requests to handle SSL issues and User-Agent filtering
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        response = requests.get(
+            OPEC_BASKET_URL,
+            verify=False,
+            headers={'User-Agent': 'Mozilla/5.0 (CaRS Research)'},
+            timeout=30,
+        )
+        response.raise_for_status()
+        df = pd.read_xml(io.BytesIO(response.content))
 
         # Parse date and price columns
         date_col = [c for c in df.columns if 'date' in c.lower() or 'day' in c.lower()]
@@ -224,10 +250,13 @@ def download_spgci_opec_data(
         wos = ci.WorldOilSupply()
 
         # Get OPEC total production
+        start_year = int(start[:4])
+        end_year = int(end[:4])
         opec_data = wos.get_production(
             country='OPEC',
-            period_gte=start,
-            period_lte=end,
+            year_gte=start_year,
+            year_lte=end_year,
+            paginate=True,
         )
 
         if opec_data is not None and len(opec_data) > 0:
@@ -343,11 +372,13 @@ def create_oil_fundamentals_dataset(
     if not opec_price.empty:
         all_data.append(opec_price)
 
-    # 3. Brent-WTI spread (derived)
-    print("\n--- Brent-WTI Spread ---")
-    spread = compute_brent_wti_spread()
-    if not spread.empty:
-        all_data.append(spread)
+    # 3. Brent-WTI spread (derived from commodity files, only if not already from FRED)
+    has_spread = not fred_data.empty and 'oil_brent_wti_spread' in fred_data.columns
+    if not has_spread:
+        print("\n--- Brent-WTI Spread ---")
+        spread = compute_brent_wti_spread()
+        if not spread.empty:
+            all_data.append(spread)
 
     # 4. SPGCI OPEC production (optional)
     print("\n--- SPGCI OPEC Production ---")

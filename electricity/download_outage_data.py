@@ -407,7 +407,7 @@ def main():
     parser.add_argument('--countries', type=str, default=None,
                         help='Comma-separated country codes (default: all registered)')
     parser.add_argument('--start-year', type=int, default=2015)
-    parser.add_argument('--end-year', type=int, default=2024)
+    parser.add_argument('--end-year', type=int, default=datetime.now().year)
     args = parser.parse_args()
 
     print("=" * 60)

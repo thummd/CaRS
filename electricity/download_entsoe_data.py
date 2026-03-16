@@ -27,9 +27,10 @@ import os
 from datetime import datetime, timedelta
 import warnings
 
-from country_config import (
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paths import CARS_ROOT, ENTSOE_DIR
+
+from country_config import (
     get_entsoe_zone, get_entsoe_zones, is_multi_zone,
     get_neighbors, get_flow_zone_pairs, get_registered_countries,
     COUNTRY_REGISTRY,
@@ -538,8 +539,8 @@ def main():
     parser = argparse.ArgumentParser(description='Download ENTSO-E data')
     parser.add_argument('--countries', type=str, default=None,
                         help='Comma-separated country codes (default: all registered)')
-    parser.add_argument('--start', type=str, default='2019-01-01')
-    parser.add_argument('--end', type=str, default='2024-12-31')
+    parser.add_argument('--start', type=str, default='2015-01-01')
+    parser.add_argument('--end', type=str, default=datetime.now().strftime('%Y-%m-%d'))
     parser.add_argument('--include-flows', action='store_true',
                         help='Include cross-border flows')
     args = parser.parse_args()

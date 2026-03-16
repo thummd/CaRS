@@ -31,29 +31,39 @@ DATA_DIR = MACRO_DIR
 
 # FRED series IDs for macroeconomic indicators
 FRED_MACRO_SERIES = {
-    'macro_eu_industrial_prod': {
-        'series_id': 'PRMNTO01EZM661S',
-        'description': 'Eurozone Manufacturing Production Index (monthly)',
-        'frequency': 'M',
-    },
     'macro_eu_cpi': {
         'series_id': 'CP0000EZ19M086NEST',
         'description': 'Eurozone HICP - All Items (monthly)',
         'frequency': 'M',
     },
     'macro_eu_gdp_growth': {
-        'series_id': 'NAEXKP01EZQ659S',
-        'description': 'Eurozone Real GDP (quarterly)',
+        'series_id': 'CLVMNACSCAB1GQEA19',
+        'description': 'Eurozone Real GDP (quarterly, Eurostat)',
         'frequency': 'Q',
     },
     'macro_de_ifo': {
-        'series_id': 'BSCICP03DEM665S',
-        'description': 'German IFO Business Climate Index (monthly)',
+        'series_id': 'BSCICP02DEM460S',
+        'description': 'German Consumer Confidence / Business Climate (monthly)',
         'frequency': 'M',
     },
-    'macro_eu_unemployment': {
-        'series_id': 'LRHUTTTTEZM156S',
-        'description': 'EU Unemployment Rate (monthly)',
+    'macro_eu_consumer_confidence': {
+        'series_id': 'CSCICP02EZM460S',
+        'description': 'Euro Area Consumer Confidence Composite (monthly)',
+        'frequency': 'M',
+    },
+    'macro_eu_energy_hicp': {
+        'series_id': 'ENRGY0EZ19M086NEST',
+        'description': 'Eurozone HICP - Energy (monthly)',
+        'frequency': 'M',
+    },
+    'macro_eu_bond_yield': {
+        'series_id': 'IRLTLT01EZM156N',
+        'description': 'Euro Area 10-Year Government Bond Yield (monthly)',
+        'frequency': 'M',
+    },
+    'macro_eu_m3_money': {
+        'series_id': 'MABMM301EZM657S',
+        'description': 'Euro Area Broad Money (M3) Growth Rate (monthly)',
         'frequency': 'M',
     },
 }

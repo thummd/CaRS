@@ -235,7 +235,8 @@ def main():
     """Download gas storage data."""
     parser = argparse.ArgumentParser(description='Download AGSI+ gas storage data')
     parser.add_argument('--start', type=str, default='2015-01-01', help='Start date')
-    parser.add_argument('--end', type=str, default='2024-12-31', help='End date')
+    parser.add_argument('--end', type=str,
+                        default=datetime.now().strftime('%Y-%m-%d'), help='End date')
     parser.add_argument('--countries', type=str, default=None,
                         help='Countries (comma-separated, default: all with gas storage)')
     parser.add_argument('--no-cache', action='store_true', help='Force re-download')

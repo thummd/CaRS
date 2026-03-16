@@ -126,8 +126,17 @@ def fetch_weather_data(
     else:
         params['daily'] = ','.join(variables)
 
-    response = requests.get(BASE_URL, params=params, timeout=60)
-    response.raise_for_status()
+    for attempt in range(5):
+        response = requests.get(BASE_URL, params=params, timeout=60)
+        if response.status_code == 429:
+            wait = 30 * (2 ** attempt)  # 30s, 60s, 120s, 240s, 480s
+            print(f"    Rate limited, waiting {wait}s (attempt {attempt+1}/5)...")
+            time.sleep(wait)
+            continue
+        response.raise_for_status()
+        break
+    else:
+        response.raise_for_status()  # raise the last 429
     data = response.json()
 
     if hourly:
@@ -408,13 +417,14 @@ def download_country_weather(
             )
             df['location'] = loc['name']
             all_data.append(df)
-            time.sleep(0.5)  # Be nice to the API
+            time.sleep(5)  # Be nice to the API — avoid 429 rate limits
         except Exception as e:
             print(f"    Error fetching {loc['name']}: {e}")
             continue
 
     if not all_data:
-        raise ValueError("No data fetched for any location")
+        print(f"Error: No data fetched for any location")
+        return None
 
     # Combine all locations
     combined = pd.concat(all_data)
@@ -571,7 +581,7 @@ def main():
     parser.add_argument('--countries', type=str, default=None,
                         help='Comma-separated country codes (default: all registered)')
     parser.add_argument('--start', type=str, default='2012-01-01')
-    parser.add_argument('--end', type=str, default='2024-12-31')
+    parser.add_argument('--end', type=str, default=datetime.now().strftime('%Y-%m-%d'))
     parser.add_argument('--method', type=str, default='cities',
                         choices=['cities', 'gridded'])
     args = parser.parse_args()

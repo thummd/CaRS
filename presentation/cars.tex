@@ -294,48 +294,154 @@ more efficient markets, and reduced consumer costs.
 %==============================================================================
 \section{Data}
 
-\begin{frame}{Data Description: European Electricity Markets}
+% --- Data Summary Slide 1: Dataset Overview ---
+\begin{frame}{Dataset Overview: 12 European Electricity Markets}
 \begin{columns}
-\begin{column}{0.5\textwidth}
-\textbf{Target Variables:}
-\begin{itemize}
-    \item \textbf{DE}: German day-ahead price (EUR/MWh)
-    \item \textbf{FR}: French day-ahead price (EUR/MWh)
-    \item \textbf{DE\_FR}: Price spread %(DE - FR, calculated)
+\begin{column}{0.55\textwidth}
+\textbf{Per-Country Dataset Summary (Hourly, 2015--2026):}
+\vspace{0.15cm}
+
+\begin{table}
+\tiny
+\begin{tabular}{ll r r r}
+\toprule
+\textbf{Code} & \textbf{Country} & \textbf{Obs.} & \textbf{Feat.} & \textbf{Miss.\,\%} \\
+\midrule
+AT & Austria        & 312,600  & 166 & $<$0.01 \\
+BE & Belgium        & 391,296  & 160 & $<$0.01 \\
+CZ & Czech Republic & 143,469  & 153 & 0.01 \\
+DE & Germany        & 391,686  & 185 & $<$0.01 \\
+DK & Denmark        & 218,637  & 168 & $<$0.01 \\
+ES & Spain          & 197,469  & 154 & 0.02 \\
+FR & France         & 175,582  & 161 & 0.01 \\
+HU & Hungary        & 391,290  & 152 & $<$0.01 \\
+IT & Italy          & 129,069  & 155 & 0.01 \\
+NL & Netherlands    & 392,256  & 157 & $<$0.01 \\
+PL & Poland         & 143,469  & 164 & 0.01 \\
+SE & Sweden         & 109,485  & 128 & 0.01 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total}} & \textbf{2,996,308} & \textbf{128--185} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{column}
+
+\begin{column}{0.45\textwidth}
+\textbf{Date Range:} 2015-01-01 -- 2026-03-09 \\[0.15cm]
+\textbf{Target:} Day-ahead electricity price (EUR/MWh) \\[0.15cm]
+
+\textbf{Data Frequencies:}
+\begin{itemize}\scriptsize
+    \item \textbf{Hourly}: Prices, generation, load, flows, weather
+    \item \textbf{Daily}: Commodities, gas storage, outages, macro, sentiment, oil, transport, trade
+    \item Daily $\rightarrow$ hourly via forward-fill
 \end{itemize}
 
-\textbf{Explanatory Features (19 total):}
-\begin{itemize}
-    \item \textbf{Generation (9)}: Wind, Solar, Hydro, Nuclear, Gas, Coal, Lignite, Biomass (MW)
-    \item \textbf{Load (1)}: Actual demand (MW)
-    \item \textbf{Commodities (3)}: Natural Gas, Brent, WTI (prices)
-    \item \textbf{Weather (6)}: Temperature, Wind, Radiation, Cloud, Precipitation
+\vspace{0.2cm}
+\textbf{Missing Values:}
+\begin{itemize}\scriptsize
+    \item All datasets $<$0.02\% missing (before cleaning)
+    \item Handled via forward-fill + backward-fill
+    \item Clean versions: 0\% missing
 \end{itemize}
+
+\vspace{0.2cm}
+\textbf{Feature count varies by:}
+\begin{itemize}\scriptsize
+    \item Cross-border neighbors (DE: 8, SE: 4)
+    \item Generation mix availability
+    \item Gas storage presence (SE: none)
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% --- Data Summary Slide 2: Feature Categories & Sources ---
+\begin{frame}{Feature Categories \& Data Sources}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Feature Groups (DE reference, 185 features):}
+\vspace{0.1cm}
+
+\begin{table}
+\scriptsize
+\begin{tabular}{l r l}
+\toprule
+\textbf{Group} & \textbf{\#} & \textbf{Examples} \\
+\midrule
+Generation    & 33 & Nuclear, Solar, Wind, Gas \\
+Lag \& Rolling & 31 & Price/load/storage lags \\
+Calendar      & 30 & DoW, holiday, season, hour \\
+Cross-border  & 24 & Flows to/from 8 neighbors \\
+Weather       & 13 & Temp., wind, radiation \\
+Commodities   & 11 & Nat.\ gas, Brent, WTI \\
+Gas Storage   &  9 & Fill \%, injection, withdrawal \\
+Price         &  7 & Price, returns, lags \\
+Outages       &  6 & Planned/unplanned (MW) \\
+Macroeconomic &  7 & GDP, CPI, unemployment \\
+Oil Fundamentals & 5 & OPEC basket, inventories \\
+Sentiment     &  4 & VIX, EPU, fear/greed \\
+Trade         &  2 & EU trade bal., USD/EUR \\
+Transport     &  1 & Baltic Dry Index \\
+Hydrogen      &  1 & Grey H\textsubscript{2} cost \\
+Load          &  1 & Actual demand (MW) \\
+\midrule
+\textbf{Total} & \textbf{185} & \\
+\bottomrule
+\end{tabular}
+\end{table}
 \end{column}
 
 \begin{column}{0.5\textwidth}
-\textbf{Data Statistics (Daily, 2015-2024):}
+\textbf{Data Sources:}
+\vspace{0.1cm}
+
 \begin{table}
 \scriptsize
-\begin{tabular}{l|ccc}
+\begin{tabular}{l l}
 \toprule
-& \textbf{DE} & \textbf{FR} & \textbf{Spread} \\
+\textbf{Source} & \textbf{Freq.} \\
 \midrule
-Samples & 3,652 & 3,652 & 3,651 \\
-Mean & 71 EUR & 78 EUR & -7 EUR \\
-Std & 78 EUR & 88 EUR & 27 EUR \\
-Min & -50 EUR & -9 EUR & -480 EUR \\
-Max & 705 EUR & 740 EUR & 222 EUR \\
+ENTSO-E Transparency\textsuperscript{1}  & Hourly \\
+Open-Meteo\textsuperscript{2}            & Hourly \\
+AGSI+ / GIE\textsuperscript{3}           & Daily \\
+Yahoo Finance\textsuperscript{4}          & Daily \\
+FRED\textsuperscript{5}                   & Daily \\
+Eurostat\textsuperscript{6}              & Monthly \\
+OPEC\textsuperscript{7}                  & Daily \\
+PolicyUncertainty\textsuperscript{8}     & Daily \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Key characteristics:}
-\begin{itemize}
-    \item Heavy tails (kurtosis: 13 DE, 12 FR, 42 spread)
-    \item Strong autocorrelation (lag-1: 0.94, 0.97, 0.71)
-    \item Prices right-skewed; spread left-skewed
-\end{itemize}
+{\tiny
+\textsuperscript{1} \url{transparency.entsoe.eu} \quad
+\textsuperscript{2} \url{open-meteo.com} \\
+\textsuperscript{3} \url{agsi.gie.eu} \quad
+\textsuperscript{4} \texttt{yfinance} \quad
+\textsuperscript{5} \url{fred.stlouisfed.org} \\
+\textsuperscript{6} \url{ec.europa.eu/eurostat} \quad
+\textsuperscript{7} \url{opec.org} \\
+\textsuperscript{8} \url{policyuncertainty.com} \\
+}
+
+\vspace{0.1cm}
+\textbf{Price Statistics (EUR/MWh):}
+\vspace{-0.1cm}
+
+\begin{table}
+\tiny
+\begin{tabular}{l r r r r}
+\toprule
+& \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+\midrule
+DE & 73.5 & 80.4 & -500 & 936 \\
+FR & 72.5 & 72.1 & -135 & 2988 \\
+SE & 45.0 & 43.3 & -60 & 590 \\
+PL & 112.2 & 74.2 & -133 & 1036 \\
+\bottomrule
+\end{tabular}
+\end{table}
 \end{column}
 \end{columns}
 \end{frame}

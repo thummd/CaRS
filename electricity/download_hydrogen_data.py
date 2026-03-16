@@ -109,10 +109,14 @@ def download_spgci_hydrogen(
 
         for symbol in sym_config['symbols']:
             try:
-                data = md.get_assessments_by_symbol(
+                from datetime import date as dt_date
+                start_date = dt_date.fromisoformat(start)
+                end_date = dt_date.fromisoformat(end)
+                data = md.get_assessments_by_symbol_historical(
                     symbol=symbol,
-                    assess_date_gte=start,
-                    assess_date_lte=end,
+                    assess_date_gte=start_date,
+                    assess_date_lte=end_date,
+                    paginate=True,
                 )
 
                 if data is not None and len(data) > 0:
@@ -141,7 +145,11 @@ def download_spgci_hydrogen(
                     print(f"    No data for {symbol}")
 
             except Exception as e:
-                print(f"    Error for {symbol}: {e}")
+                err_str = str(e)
+                if 'Invalid symbols' in err_str or '400' in err_str:
+                    print(f"    Symbol {symbol} not in SPGCI subscription (requires Hydrogen add-on)")
+                else:
+                    print(f"    Error for {symbol}: {e}")
 
     if all_series:
         combined = pd.concat(all_series, axis=1)
@@ -189,7 +197,25 @@ def derive_grey_hydrogen_cost(
         except Exception as e:
             print(f"    Could not load SPGCI data: {e}")
 
-    # Fallback: use Yahoo Finance natural gas (Henry Hub) with EU conversion
+    # Fallback: use FRED Henry Hub gas price
+    if gas_price is None:
+        try:
+            from fredapi import Fred
+            api_key = os.environ.get('FRED_API_KEY')
+            if api_key is None:
+                creds = _load_env_credentials()
+                api_key = creds.get('FRED_API_KEY')
+            if api_key:
+                fred = Fred(api_key=api_key)
+                data = fred.get_series('DHHNGSP', observation_start=start, observation_end=end)
+                if data is not None and len(data) > 0:
+                    # Henry Hub ($/MMBtu) -> approximate EUR/MWh: * 3.412 (MMBtu/MWh)
+                    gas_price = data * 3.412
+                    print(f"    Using FRED Henry Hub gas price ({len(data)} obs, converted to $/MWh)")
+        except Exception as e:
+            print(f"    Could not load FRED gas data: {e}")
+
+    # Fallback: use commodity CSV files
     if gas_price is None:
         commodity_dir = COMMODITY_DIR
         commodity_files = sorted(commodity_dir.glob("commodities_*.csv"))
