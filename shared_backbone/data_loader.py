@@ -20,20 +20,22 @@ from paths import UNIFIED_DIR
     data = prepare_unified_ds3m_data('DE_FR', timestep=14)  # Spread prediction
 """
 
+import sys
 import numpy as np
 import pandas as pd
 import torch
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Data directory (uses existing CASTOR unified data)
-UNIFIED_DIR = UNIFIED_DIR
+# Ensure project root is on path for paths import
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from paths import UNIFIED_DIR
 
 # Feature groups for easy selection (single-country datasets)
 FEATURE_GROUPS = {
     'price': ['Day_Ahead_Price', 'price_lag1', 'price_change', 'price_change_pct'],
     'generation': [
-        'Biomass', 'Fossil Brown coal/Lignite_Actual Aggregated',
+        'Biomass_Actual Aggregated', 'Fossil Brown coal/Lignite_Actual Aggregated',
         'Fossil Gas_Actual Aggregated', 'Fossil Hard coal_Actual Aggregated',
         'Hydro Pumped Storage_Actual Aggregated', 'Nuclear_Actual Aggregated',
         'Solar_Actual Aggregated', 'Wind Onshore_Actual Aggregated',
@@ -81,13 +83,36 @@ FEATURE_GROUPS_DE_FR = {
 }
 
 
-def load_unified_dataset(country: str, clean: bool = True) -> pd.DataFrame:
-    """Load unified dataset for a country or the merged DE-FR dataset."""
+def load_unified_dataset(
+    country: str,
+    clean: bool = True,
+    date_range: str = '2015_2026',
+    frequency: str = 'H'
+) -> pd.DataFrame:
+    """
+    Load unified dataset for a country or country pair.
+
+    Args:
+        country: Country code ('DE', 'FR', etc.) or pair ('DE_FR')
+        clean: If True, load the clean version (no NaN in target)
+        date_range: Dataset date range, e.g. '2015_2026' or '2015_2024'
+        frequency: 'H' for hourly (default for extended datasets),
+                   'D' for daily, or '' for no frequency suffix
+    """
+    freq_suffix = '_hourly' if frequency == 'H' else ''
     suffix = '_clean' if clean else ''
-    file_path = UNIFIED_DIR / f"unified_{country}_2015_2024{suffix}.csv"
+    file_path = UNIFIED_DIR / f"unified_{country}_{date_range}{freq_suffix}{suffix}.csv"
 
     if not file_path.exists():
-        raise FileNotFoundError(f"Dataset not found: {file_path}")
+        # Fallback: try without frequency suffix (old format)
+        fallback = UNIFIED_DIR / f"unified_{country}_{date_range}{suffix}.csv"
+        if fallback.exists():
+            file_path = fallback
+        else:
+            raise FileNotFoundError(
+                f"Dataset not found: {file_path}\n"
+                f"Also tried: {fallback}"
+            )
 
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
     return df
@@ -206,7 +231,9 @@ def prepare_unified_ds3m_data(
     target_col: str = None,
     handle_outliers: bool = True,
     outlier_threshold: float = 5.0,
-    task_type: str = 'prediction'
+    task_type: str = 'prediction',
+    train_end_date: Optional[str] = None,
+    test_end_date: Optional[str] = None
 ) -> Dict:
     """
     Prepare unified data for DS3M training.
@@ -221,15 +248,23 @@ def prepare_unified_ds3m_data(
         handle_outliers: If True, clip extreme target values
         outlier_threshold: Z-score threshold for outlier clipping
         task_type: 'prediction' or 'estimation'
+        train_end_date: If set, use date-based split instead of ratio.
+            Training ends at this date (exclusive). Format: 'YYYY-MM-DD'.
+        test_end_date: If set, test period ends at this date (exclusive).
+            If None with train_end_date, uses all remaining data as test.
 
     Returns:
         Dictionary with trainX, trainY, testX, testY, etc.
     """
     if target_col is None:
-        target_col = 'price_spread_change_pct' if country == 'DE_FR' else 'price_change_pct'
+        if '_' in country and len(country) <= 5:
+            # Country pair: predict spread
+            target_col = 'price_spread_change_pct'
+        else:
+            target_col = 'Day_Ahead_Price'
 
     df = load_unified_dataset(country, clean=True)
-    df = df.fillna(method='ffill').fillna(method='bfill')
+    df = df.ffill().bfill()
 
     feature_cols = get_feature_columns(df, feature_groups, exclude_target=True, country=country)
 
@@ -252,15 +287,30 @@ def prepare_unified_ds3m_data(
 
     # Temporal split (no shuffling!)
     n_total = len(X_all)
-    n_test = int(n_total * test_ratio)
-    n_val = int((n_total - n_test) * val_ratio)
-    n_train = n_total - n_test - n_val
 
-    X_train, X_val, X_test = X_all[:n_train], X_all[n_train:n_train + n_val], X_all[n_train + n_val:]
-    Y_train, Y_val, Y_test = Y_all[:n_train], Y_all[n_train:n_train + n_val], Y_all[n_train + n_val:]
+    if train_end_date is not None:
+        # Date-based split for rolling-window evaluation
+        train_mask = timestamps < train_end_date
+        n_train_val = int(train_mask.sum())
+        n_val = int(n_train_val * val_ratio)
+        n_train = n_train_val - n_val
+
+        if test_end_date is not None:
+            test_mask = (timestamps >= train_end_date) & (timestamps < test_end_date)
+            n_test = int(test_mask.sum())
+        else:
+            n_test = n_total - n_train_val
+    else:
+        # Ratio-based split (default)
+        n_test = int(n_total * test_ratio)
+        n_val = int((n_total - n_test) * val_ratio)
+        n_train = n_total - n_test - n_val
+
+    X_train, X_val, X_test = X_all[:n_train], X_all[n_train:n_train + n_val], X_all[n_train + n_val:n_train + n_val + n_test]
+    Y_train, Y_val, Y_test = Y_all[:n_train], Y_all[n_train:n_train + n_val], Y_all[n_train + n_val:n_train + n_val + n_test]
     ts_train = timestamps[:n_train]
     ts_val = timestamps[n_train:n_train + n_val]
-    ts_test = timestamps[n_train + n_val:]
+    ts_test = timestamps[n_train + n_val:n_train + n_val + n_test]
 
     # Normalize using training data ONLY
     X_train_norm, X_val_norm, X_test_norm, X_moments = normalize_features(X_train, X_val, X_test)

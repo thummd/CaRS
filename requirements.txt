@@ -14,3 +14,6 @@ pyro-ppl>=1.8.0
 PyYAML>=5.4.1
 networkx
 holidays>=0.40
+xgboost>=2.0
+hmmlearn>=0.3
+statsmodels>=0.14

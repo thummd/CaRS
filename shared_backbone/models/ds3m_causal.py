@@ -471,7 +471,8 @@ class DS3MCausal(nn.Module):
                     x_history = torch.cat([padding, x_history], dim=1)
 
                 y_pred_d, y_std_d, all_preds_d = self.causal_emissions[d](
-                    x_history, A_d, h_t, z_t
+                    x_history, A_d, h_t, z_t,
+                    edge_mask=getattr(self, '_edge_mask', None)
                 )
 
                 # Weight by regime probability
@@ -554,7 +555,8 @@ class DS3MCausal(nn.Module):
         self,
         x: torch.Tensor,
         y_context: Optional[torch.Tensor] = None,
-        n_samples: int = 100
+        n_samples: int = 100,
+        edge_mask: Optional[torch.Tensor] = None
     ) -> Dict[str, torch.Tensor]:
         """
         Generate predictions (inference mode).
@@ -563,6 +565,8 @@ class DS3MCausal(nn.Module):
             x: Input features [timestep, batch, x_dim]
             y_context: Known target values for conditioning (optional)
             n_samples: Number of Monte Carlo samples
+            edge_mask: Optional binary mask [lag+1, num_nodes, num_nodes] to
+                zero out specific edges for ablation. 1 = keep, 0 = ablate.
 
         Returns:
             predictions: Mean predictions [timestep, batch, y_dim]
@@ -571,6 +575,9 @@ class DS3MCausal(nn.Module):
         """
         self.eval()
         timestep, batch_size, _ = x.shape
+
+        # Temporarily store edge mask for forward pass
+        self._edge_mask = edge_mask
 
         with torch.no_grad():
             all_preds = []
@@ -592,6 +599,8 @@ class DS3MCausal(nn.Module):
 
             # Get regime assignments from last forward pass
             regimes = result['regime_posteriors'].argmax(dim=-1)
+
+        self._edge_mask = None  # Clear after use
 
         return {
             'predictions': predictions_mean,

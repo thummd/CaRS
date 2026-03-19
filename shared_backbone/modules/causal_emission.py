@@ -373,6 +373,7 @@ class CausalEmission(nn.Module):
         A: torch.Tensor,
         h_t: Optional[torch.Tensor] = None,
         z_t: Optional[torch.Tensor] = None,
+        edge_mask: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Generate emission (prediction) for target variable.
@@ -382,6 +383,8 @@ class CausalEmission(nn.Module):
             A: Binary adjacency matrix [lag+1, num_nodes, num_nodes]
             h_t: DS3M hidden state [batch, h_dim] (optional)
             z_t: DS3M latent state [batch, z_dim] (optional)
+            edge_mask: Binary mask [lag+1, num_nodes, num_nodes] to zero out
+                specific edges for ablation analysis. 1 = keep, 0 = ablate.
 
         Returns:
             mean: Predicted target mean [batch, 1]
@@ -398,8 +401,13 @@ class CausalEmission(nn.Module):
         # Get weighted adjacency
         W_adj = self.icgnn.get_weighted_adjacency()
 
+        # Apply edge mask for ablation (zero out specific edges)
+        A_masked = A
+        if edge_mask is not None:
+            A_masked = A * edge_mask
+
         # Get ICGNN predictions for all nodes
-        predictions, variance = self.icgnn.predict(X, W_adj, A)
+        predictions, variance = self.icgnn.predict(X, W_adj, A_masked)
 
         # predictions shape: [batch, num_nodes]
         if predictions.dim() == 1:

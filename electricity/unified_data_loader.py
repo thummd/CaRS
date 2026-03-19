@@ -143,16 +143,22 @@ def load_unified_dataset(
     """
     freq_suffix = '_hourly' if frequency == 'H' else ''
     suffix = '_clean' if clean else ''
-    file_path = UNIFIED_DIR / f"unified_{country}_2015_2024{freq_suffix}{suffix}.csv"
+    date_range = '2015_2026'
+    file_path = UNIFIED_DIR / f"unified_{country}_{date_range}{freq_suffix}{suffix}.csv"
 
     if not file_path.exists():
-        is_pair = '_' in country and len(country) <= 5
-        raise FileNotFoundError(
-            f"Dataset not found: {file_path}\n"
-            f"Run: python create_unified_dataset.py --countries {country.replace('_', ',')} "
-            f"--frequency {'H' if frequency == 'H' else 'D'}"
-            + (f" --pairs {country.replace('_', '-')}" if is_pair else "")
-        )
+        # Fallback: try old 2015_2024 format
+        fallback = UNIFIED_DIR / f"unified_{country}_2015_2024{freq_suffix}{suffix}.csv"
+        if fallback.exists():
+            file_path = fallback
+        else:
+            is_pair = '_' in country and len(country) <= 5
+            raise FileNotFoundError(
+                f"Dataset not found: {file_path}\n"
+                f"Run: python create_unified_dataset.py --countries {country.replace('_', ',')} "
+                f"--frequency {'H' if frequency == 'H' else 'D'}"
+                + (f" --pairs {country.replace('_', '-')}" if is_pair else "")
+            )
 
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
     return df

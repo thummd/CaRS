@@ -357,48 +357,33 @@ class AugmentedLagrangianTrainer:
         testY: torch.Tensor
     ) -> Dict[str, float]:
         """
-        Compute validation metrics: Spearman correlation and directional accuracy.
-
-        Directional accuracy measures the fraction of correctly predicted
-        price movement directions (up/down) relative to the previous timestep.
+        Compute validation metrics: RMSE, MAE, sMAPE, Spearman, directional
+        accuracy, and CRPS (if prediction uncertainty available).
 
         Args:
             testX: Test input tensor
             testY: Test target tensor
 
         Returns:
-            Dict with 'spearman' and 'directional_accuracy' keys
+            Dict with metric names as keys
         """
-        from scipy.stats import spearmanr
+        from electricity.evaluation.metrics import compute_all_metrics
 
         self.model.eval()
         with torch.no_grad():
             pred_result = self.model.predict(testX, n_samples=50)
             predictions = pred_result['predictions'][-1].cpu().numpy()
+            predictions_std = pred_result['predictions_std'][-1].cpu().numpy()
             actuals = testY[-1].cpu().numpy()
-
-            # Spearman correlation
-            spearman, _ = spearmanr(actuals.flatten(), predictions.flatten())
-            spearman = float(spearman) if not np.isnan(spearman) else 0.0
-
-            # Directional accuracy
-            prev_actuals = testY[-2].cpu().numpy()  # Previous timestep
-            actual_direction = np.sign(actuals - prev_actuals)
-            pred_direction = np.sign(predictions - prev_actuals)
-            # Only count samples where there was actual movement
-            valid_mask = actual_direction.flatten() != 0
-            if valid_mask.sum() > 0:
-                directional_accuracy = float(
-                    np.mean(actual_direction.flatten()[valid_mask] == pred_direction.flatten()[valid_mask])
-                )
-            else:
-                directional_accuracy = 0.5  # Default if no movement
+            prev_actuals = testY[-2].cpu().numpy()
 
         self.model.train()
-        return {
-            'spearman': spearman,
-            'directional_accuracy': directional_accuracy
-        }
+        return compute_all_metrics(
+            y_true=actuals,
+            y_pred=predictions,
+            y_prev=prev_actuals,
+            y_pred_std=predictions_std
+        )
 
     def train(
         self,
@@ -450,12 +435,21 @@ class AugmentedLagrangianTrainer:
             if testX is not None and testY is not None:
                 val_metrics = self.compute_validation_metrics(testX, testY)
                 self.history['val_spearman'].append(val_metrics['spearman'])
-                self.history['val_directional_accuracy'].append(val_metrics['directional_accuracy'])
+                self.history['val_directional_accuracy'].append(val_metrics.get('directional_accuracy', 0.0))
+                self.history['val_rmse'].append(val_metrics.get('rmse', 0.0))
+                self.history['val_mae'].append(val_metrics.get('mae', 0.0))
+                self.history['val_crps'].append(val_metrics.get('crps', 0.0))
                 self.history['tau'].append(tau)
 
                 if self.verbose:
-                    print(f"  Validation: Spearman={val_metrics['spearman']:.4f}, "
-                          f"DirAcc={val_metrics['directional_accuracy']:.4f}")
+                    parts = [f"Spearman={val_metrics['spearman']:.4f}"]
+                    if 'rmse' in val_metrics:
+                        parts.append(f"RMSE={val_metrics['rmse']:.4f}")
+                    if 'directional_accuracy' in val_metrics:
+                        parts.append(f"DirAcc={val_metrics['directional_accuracy']:.4f}")
+                    if 'crps' in val_metrics:
+                        parts.append(f"CRPS={val_metrics['crps']:.4f}")
+                    print(f"  Validation: {', '.join(parts)}")
 
                 # Early stopping based on selected metric
                 early_stop_metric = val_metrics[self.early_stopping_metric]
