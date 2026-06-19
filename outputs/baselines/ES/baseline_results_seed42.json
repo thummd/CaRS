@@ -1,0 +1,12 @@
+{
+  "msvar": {
+    "metrics": {
+      "rmse": 1.775087943017155,
+      "mae": 0.553354619511524,
+      "smape": 76.2942703717803,
+      "spearman": 0.0,
+      "directional_accuracy": 0.7265205286067213
+    },
+    "elapsed_seconds": 52.68435788154602
+  }
+}

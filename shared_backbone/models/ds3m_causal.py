@@ -96,10 +96,42 @@ class DS3MCausal(nn.Module):
         lambda_sparse: float = 0.01,  # Light sparsity to allow edge learning
         lambda_kl: float = 1.0,
         lambda_recon: float = 1.0,  # Reconstruction loss for all nodes (prevents W gradient starvation)
+        lambda_w_aux: float = 0.0,  # W-routed auxiliary loss: forces the target prediction through W rather than the latent bypass (0 = off)
+        lambda_var_reg: float = 0.01,  # Gentle variance regularization (prevents blowup)
         # Target index
         target_idx: int = 0,  # Target variable index (Price = index 0)
         # Regime differentiation
         regime_noise_std: float = 0.0,  # Noise for regime deviation initialization
+        # Attention aggregation
+        use_attention: bool = True,  # Attention-weighted causal aggregation in ICGNN
+        # ICGNN W initialization scale
+        w_init_scale: float = 0.01,  # Std of N(0, scale²) for W init. Higher = stronger initial edges.
+        # Aggregation mode
+        aggregation_mode: str = "linear",  # "linear", "dual_channel", or "cam"
+        cam_hidden_dim: int = 32,  # Hidden dim for CAM per-parent MLPs
+        emission_embedding_size: int = 32,  # CARGO node-embedding dim.
+        emission_encoder_layers=(64, 64),  # hidden sizes of the CARGO g-encoder; () = LINEAR
+        emission_decoder_layers=(64, 64),  # hidden sizes of the CARGO decoder
+        # MLP f. () = a LINEAR readout over the W-weighted aggregation, which
+        # removes f's capacity to fit the target from a random-W projection
+        # and forces the structural weights W to carry the causal signal
+        # (constrained-emission prototype for W identifiability on small data).
+        dual_channel: bool = False,  # Deprecated: use aggregation_mode="dual_channel"
+        # Elastic-net sparsity
+        elastic_threshold: float = 0.0,  # Min edge magnitude to reward (0 = off)
+        elastic_weight: float = 0.0,     # Strength of reverse penalty (0.1-0.5 typical)
+        # DAG constraint: "notears" (default; tr(exp(A))-d) or "dagma" (logdet-based;
+        # ~1.5x faster, smoother gradients, more numerically stable)
+        dag_constraint: str = "notears",
+        # Physical-interconnect prior on cross-border CARGO emission
+        # rows (CARGO = Causal Additive Regime-Gated Output).
+        # `physical_mask` is shape (lag+1, num_nodes, num_nodes) and
+        # is shared across all regimes (the physical topology is the
+        # same in stable and crisis). Pass None to leave the prior off.
+        physical_mask: Optional[torch.Tensor] = None,
+        physical_prior_mode: str = "off",
+        physical_prior_alpha_init: float = 0.05,
+        pure_scm_readout: bool = False,  # emit y = W.x directly (no learnable readout)
     ):
         """
         Initialize DS3M-Causal hybrid model.
@@ -141,7 +173,15 @@ class DS3MCausal(nn.Module):
         self.lambda_sparse = lambda_sparse
         self.lambda_kl = lambda_kl
         self.lambda_recon = lambda_recon
+        self.lambda_w_aux = lambda_w_aux
+        self.lambda_var_reg = lambda_var_reg
         self.target_idx = target_idx
+        self.w_init_scale = w_init_scale
+        self.aggregation_mode = aggregation_mode
+        self.cam_hidden_dim = cam_hidden_dim
+        self.dual_channel = dual_channel
+        self.elastic_threshold = elastic_threshold
+        self.elastic_weight = elastic_weight
 
         # ======== DS3M Encoder Components ========
         # GRU encoder (forward and backward)
@@ -164,9 +204,9 @@ class DS3MCausal(nn.Module):
 
         # ======== DS3M Discrete State (d_t) ========
         # Transition matrix: P(d_t | d_{t-1})
-        self.d_transition = nn.Parameter(
-            torch.ones(d_dim, d_dim, device=device) / d_dim
-        )
+        # Diagonal bias encourages regime stickiness (0.8 self-transition, 0.2/K others)
+        d_init = torch.eye(d_dim, device=device) * 0.8 + torch.ones(d_dim, d_dim, device=device) * 0.2 / d_dim
+        self.d_transition = nn.Parameter(d_init)
 
         # d_t posterior networks (one per regime)
         self.d_posterior_nets = nn.ModuleList([
@@ -210,9 +250,13 @@ class DS3MCausal(nn.Module):
             tau_gumbel=tau_gumbel,
             init_logits=init_logits or [1.0, 1.0],  # Sparsity bias: no-edge logit=1.0 → ~42% inst / ~73% lagged no-edge
             regime_noise_std=regime_noise_std,  # Noise for regime differentiation
+            dag_constraint=dag_constraint,
         )
 
-        # Causal emission networks (one per regime)
+        # CARGO emission networks (one per regime). The physical-
+        # interconnect mask is shared across regimes — physical
+        # topology doesn't change with the macroeconomic regime, only
+        # the weights on those edges do.
         self.causal_emissions = nn.ModuleList([
             CausalEmission(
                 num_nodes=self.num_nodes,
@@ -221,11 +265,20 @@ class DS3MCausal(nn.Module):
                 lag=lag,
                 h_dim=h_dim,
                 z_dim=z_dim,
-                embedding_size=32,
-                encoder_layer_sizes=[64, 64],
-                decoder_layer_sizes=[64, 64],
+                embedding_size=emission_embedding_size,
+                encoder_layer_sizes=list(emission_encoder_layers),
+                decoder_layer_sizes=list(emission_decoder_layers),
                 norm_layers=True,
                 heteroscedastic=True,
+                use_attention=use_attention,
+                w_init_scale=w_init_scale,
+                aggregation_mode=aggregation_mode,
+                cam_hidden_dim=cam_hidden_dim,
+                dual_channel=dual_channel,
+                physical_mask=physical_mask,
+                physical_prior_mode=physical_prior_mode,
+                physical_prior_alpha_init=physical_prior_alpha_init,
+                pure_scm_readout=pure_scm_readout,
             )
             for _ in range(d_dim)
         ])
@@ -401,6 +454,7 @@ class DS3MCausal(nn.Module):
         total_kl_d = torch.tensor(0.0, device=self.device)
         total_dag_penalty = torch.tensor(0.0, device=self.device)
         total_recon = torch.tensor(0.0, device=self.device)
+        total_w_aux = torch.tensor(0.0, device=self.device)
 
         predictions = []
         pred_stds = []
@@ -433,6 +487,7 @@ class DS3MCausal(nn.Module):
             # Compute per-regime contributions
             y_pred_mixture = torch.zeros(batch_size, self.y_dim, device=self.device)
             y_std_mixture = torch.zeros(batch_size, self.y_dim, device=self.device)
+            y_causal_mixture = torch.zeros(batch_size, self.y_dim, device=self.device)
 
             for d in range(self.d_dim):
                 # Get z posterior and prior
@@ -475,10 +530,16 @@ class DS3MCausal(nn.Module):
                     edge_mask=getattr(self, '_edge_mask', None)
                 )
 
+                # W-only prediction for this regime (flows purely through W,
+                # before the latent conditioning residual) — stashed by the
+                # emission module for the W-routed auxiliary loss below.
+                y_causal_d = self.causal_emissions[d]._last_causal_pred
+
                 # Weight by regime probability
                 d_prob = d_posterior[:, d:d+1]  # [batch, 1]
                 y_pred_mixture += d_prob * y_pred_d
                 y_std_mixture += d_prob * y_std_d
+                y_causal_mixture = y_causal_mixture + d_prob * y_causal_d
                 total_kl_z += (d_prob.squeeze() * kl_z_d).mean()
 
                 # Reconstruction loss: MSE over all nodes to give gradients to all W columns
@@ -487,6 +548,11 @@ class DS3MCausal(nn.Module):
 
                 # Accumulate DAG penalty (hierarchical for shared_backbone)
                 total_dag_penalty += dag_penalty_d
+
+            # W-routed auxiliary loss: the W-only (bypass-free) mixture prediction
+            # must itself predict the target, forcing signal through the causal
+            # weights W rather than the latent conditioning residual.
+            total_w_aux = total_w_aux + F.mse_loss(y_causal_mixture, y_t)
 
             predictions.append(y_pred_mixture)
             pred_stds.append(y_std_mixture)
@@ -508,8 +574,11 @@ class DS3MCausal(nn.Module):
         pred_stds = torch.stack(pred_stds, dim=0)
         regime_posteriors = torch.stack(regime_posteriors, dim=0)  # [timestep, batch, d_dim]
 
-        # Sparsity penalty (L1 on edge probabilities) - following FANTOM convention
-        sparse_penalty = self.dag_dist.sparsity_penalty()
+        # Sparsity penalty (L1 on edge probabilities, optionally elastic-net)
+        sparse_penalty = self.dag_dist.sparsity_penalty(
+            elastic_threshold=self.elastic_threshold,
+            elastic_weight=self.elastic_weight,
+        )
 
         # Compute total edge probability for monitoring
         total_edge_prob = torch.tensor(0.0, device=self.device)
@@ -517,6 +586,10 @@ class DS3MCausal(nn.Module):
             A_d = self.dag_dist.get_dag(d, sample=False)
             total_edge_prob = total_edge_prob + A_d.sum()
         avg_edges_per_regime = total_edge_prob / self.d_dim
+
+        # Variance regularization: penalize large predicted variance to strengthen
+        # gradient signal on mean predictions (prevents variance from absorbing errors)
+        var_reg = pred_stds.mean()
 
         # Compute total loss (matching FANTOM structure)
         # Note: sparse_penalty encourages sparsity via L1 norm on edge probabilities
@@ -526,7 +599,8 @@ class DS3MCausal(nn.Module):
             self.lambda_kl * (total_kl_z + total_kl_d) +
             self.lambda_dag * total_dag_penalty +
             self.lambda_sparse * sparse_penalty +
-            self.lambda_recon * total_recon
+            self.lambda_recon * total_recon +
+            self.lambda_var_reg * var_reg
         )
 
         result = {
@@ -537,6 +611,7 @@ class DS3MCausal(nn.Module):
             'dag_penalty': total_dag_penalty,
             'sparse_penalty': sparse_penalty,
             'recon_loss': total_recon,
+            'w_aux_loss': total_w_aux,
             'avg_edges_per_regime': avg_edges_per_regime,
             'predictions': predictions,
             'pred_stds': pred_stds,
@@ -607,6 +682,135 @@ class DS3MCausal(nn.Module):
             'predictions_std': predictions_std,
             'regimes': regimes
         }
+
+    def predict_streaming(
+        self,
+        x_stream: torch.Tensor,
+        y_seed: Optional[torch.Tensor] = None,
+        lazy_threshold: float = 0.99,
+    ) -> Dict[str, torch.Tensor]:
+        """Streaming-inference forward pass with encoder-state caching and
+        lazy regime evaluation.
+
+        Trades the bidirectional encoder (used in training) for a single
+        forward-only GRU pass that maintains its hidden state across
+        timesteps. On a sliding window of stride 1 this turns the encoder's
+        cost from ``O(T)`` per window down to ``O(1)`` (one GRU step per
+        new observation), saving ~13x on the encoder for a 14-step window.
+
+        Additionally, when the regime posterior ``q(d_t|h_t)`` concentrates
+        on a single regime (``max_d q(d_t) >= lazy_threshold``), only that
+        regime's causal-emission MLP is evaluated. With K=2 regimes and a
+        post-crisis test window where one regime dominates, this halves the
+        emission cost on the vast majority of timesteps.
+
+        Args:
+            x_stream: Streaming input ``[T, B, x_dim]`` — typically one
+                new timestep at a time (T=1) but works for longer chunks.
+            y_seed: Optional previous-target sequence for the encoder input
+                concatenation; defaults to zeros (the model is robust to
+                this since the bidirectional Y component is dropped here).
+            lazy_threshold: If the max regime posterior exceeds this value,
+                only that regime's emission is evaluated. Set to 1.0 to
+                disable lazy evaluation (still gives encoder-cache speedup).
+
+        Returns:
+            Dict with ``predictions [T, B, y_dim]``, ``regimes [T, B]`` (hard
+            assignments), and ``regime_posteriors [T, B, d_dim]``.
+        """
+        self.eval()
+        T, B, _ = x_stream.shape
+
+        if y_seed is None:
+            y_seed = torch.zeros(T, B, self.y_dim, device=self.device)
+
+        with torch.no_grad():
+            xy = torch.cat([x_stream, y_seed], dim=-1)
+
+            # Forward-only GRU pass — caches hidden state across calls if the
+            # caller stores ``self._stream_h``. Otherwise initialises fresh.
+            h0 = getattr(self, "_stream_h", None)
+            if h0 is not None and h0.shape[1] != B:
+                h0 = None  # batch size changed; reset
+            h_fwd, h_last = self.rnn_forward(xy, h0)
+            self._stream_h = h_last.detach()
+
+            # Discrete-state Markov advance
+            d_prev = getattr(self, "_stream_d", None)
+            if d_prev is None or d_prev.shape[0] != B:
+                d_prev = torch.ones(B, self.d_dim, device=self.device) / self.d_dim
+
+            # Continuous-latent advance (regime-conditional means)
+            z_prev = getattr(self, "_stream_z", None)
+            if z_prev is None or z_prev.shape[0] != B:
+                z_prev = torch.zeros(B, self.z_dim, device=self.device)
+
+            preds_out = []
+            regimes_out = []
+            posteriors_out = []
+            for t in range(T):
+                h_t = h_fwd[t]
+                y_t = y_seed[t]
+                d_post = self.get_d_posterior(h_t, y_t, d_prev)
+                posteriors_out.append(d_post)
+
+                # Lazy regime selection: if confidence high, evaluate only
+                # the dominant regime's causal emission.
+                conf, dom = d_post.max(dim=-1)
+                lazy = (conf >= lazy_threshold).all()
+
+                # Build a single-step input window [B, lag+1, x_dim] —
+                # CausalEmission.forward expects batch-first shape and
+                # interprets the last lag position as "current".
+                x_t = x_stream[t]
+                x_window = torch.zeros(B, self.lag + 1, x_stream.shape[-1], device=self.device)
+                x_window[:, -1, :] = x_t
+
+                if lazy:
+                    # Single-regime emission for whichever regime dominates.
+                    d_active = int(dom.mode().values.item())
+                    A = self.dag_dist.get_dag(d_active, sample=False)
+                    z_mean, _ = self.get_z_prior(z_prev, d_active)
+                    pred, _, _ = self.causal_emissions[d_active](
+                        x_window, A=A, h_t=h_t, z_t=z_mean,
+                    )
+                    preds_out.append(pred)
+                    regimes_out.append(torch.full((B,), d_active, device=self.device, dtype=torch.long))
+                    z_prev = z_mean
+                else:
+                    # Mixture: weight by posterior probability
+                    mixed = torch.zeros(B, 1, device=self.device)
+                    z_next_acc = torch.zeros_like(z_prev)
+                    for d in range(self.d_dim):
+                        A = self.dag_dist.get_dag(d, sample=False)
+                        z_mean, _ = self.get_z_prior(z_prev, d)
+                        pred, _, _ = self.causal_emissions[d](
+                            x_window, A=A, h_t=h_t, z_t=z_mean,
+                        )
+                        w = d_post[:, d:d + 1]
+                        mixed = mixed + w * pred
+                        z_next_acc = z_next_acc + w * z_mean
+                    preds_out.append(mixed)
+                    regimes_out.append(dom)
+                    z_prev = z_next_acc
+
+                d_prev = d_post
+
+            self._stream_d = d_prev.detach()
+            self._stream_z = z_prev.detach()
+
+            return {
+                "predictions": torch.stack(preds_out, dim=0),
+                "regimes": torch.stack(regimes_out, dim=0),
+                "regime_posteriors": torch.stack(posteriors_out, dim=0),
+            }
+
+    def reset_streaming_state(self) -> None:
+        """Drop the cached encoder/regime/latent state so the next
+        ``predict_streaming`` call starts fresh."""
+        for attr in ("_stream_h", "_stream_d", "_stream_z"):
+            if hasattr(self, attr):
+                delattr(self, attr)
 
     def get_causal_graphs(self) -> List[np.ndarray]:
         """

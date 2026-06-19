@@ -83,3 +83,54 @@ python3 electricity/extract_W_tensors.py     # needs torch + the final.tar files
 figure reproduces bit-for-bit from the extract alone (verified: the
 spillover and domestic-driver weight dictionaries are numerically
 identical to the full-checkpoint render).
+
+## Results tables
+
+The forecast-quality table is computed entirely from the small per-seed
+`results.json` metric files (no model checkpoint needed):
+
+```bash
+python3 electricity/render_forecast_quality_table.py
+# CARGO rows come from
+#   outputs/experiments/12market_cargo_controls_daily/<MKT>/h{1,7,14}/seed<N>/results.json
+# Multi-horizon aggregation only:
+python3 electricity/aggregate_multihorizon_metrics.py
+```
+
+**Baseline rows caveat.** `render_forecast_quality_table.load_baselines`
+expects `--baseline_dir <dir>/<MKT>/h{h}/baseline_results_seed42.json`
+(default `outputs/baselines/daily`). The shipped baseline metrics are the
+single-seed (seed 42) run at `outputs/baselines/<MKT>/baseline_results_seed42.json`
+— a flat, h1-only layout — so with the defaults the CARGO rows populate
+and the baseline rows render as `---`. Point `--baseline_dir` at a matching
+per-horizon layout, or regenerate the baselines with
+`electricity/baselines/run_baselines.py`, to fill them in.
+
+## Model checkpoints & CaRS model code
+
+The full trained CaRS checkpoints are committed under
+`outputs/experiments/<experiment>/<MKT>/h{H}/seed<N>/checkpoints/final.tar`
+(106 checkpoints, ~1.2 GB total) across four experiments
+(`12market_cargo_controls_daily`, `12market_cargo_controls`,
+`daily_dec8_confirm`, `12market_gat_spillover`). The model/training code
+that produced and can load them lives in `shared_backbone/`:
+
+- `shared_backbone/models/ds3m_causal.py` — the DS3M-causal (CaRS) model.
+- `shared_backbone/modules/{causal_emission,shared_dag,hierarchical_dag,physical_prior}.py`
+  — the per-regime causal emission heads (the `causal_emissions.<r>.icgnn.W`
+  weights), the shared structural DAG, and the soft physical prior.
+- `shared_backbone/training/train_e2e.py`, `shared_backbone/run_shared_backbone.py`
+  — end-to-end training / experiment entry points.
+
+A checkpoint's `model_state_dict` is a plain tensor dict, e.g.:
+
+```python
+import torch
+sd = torch.load(".../seed42/checkpoints/final.tar",
+                map_location="cpu", weights_only=False)["model_state_dict"]
+W = sd["causal_emissions.0.icgnn.W"]   # structural weights, regime 0
+```
+
+Note: the checkpoints let you re-run **inference** without retraining, but
+inference and retraining both also require the full ~31 GB unified feature
+data (only the 12 daily price CSVs needed for Figure 1 are shipped here).

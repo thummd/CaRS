@@ -111,7 +111,9 @@ class LassoPerRegimeBaseline:
             self.lassos_[r] = LassoCV(
                 cv=n_folds,
                 max_iter=self.max_iter,
-                random_state=self.random_state
+                random_state=self.random_state,
+                # Disable precompute to avoid Gram matrix float32 validation errors
+                precompute=False,
             )
             self.lassos_[r].fit(X_r, Y_train[mask])
 

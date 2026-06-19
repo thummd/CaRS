@@ -55,7 +55,29 @@ FEATURE_GROUPS = {
         'outage_unplanned_unavailable_mw', 'outage_num_outages'
     ],
     'commodity': ['commodity_natural_gas', 'commodity_brent_oil', 'commodity_wti_oil'],
-    'flow': ['Flow_to_FR', 'Flow_from_FR', 'Net_Flow_FR']
+    'gas_storage': [
+        'gas_storage_level_twh', 'gas_storage_fill_pct',
+        'gas_storage_injection_gwh', 'gas_storage_withdrawal_gwh',
+        'gas_storage_net_flow_gwh', 'gas_storage_trend_pct',
+    ],
+    'spgci': ['spgci_ttf_gas', 'spgci_coal', 'spgci_carbon'],
+    'macro': [
+        'macro_eu_cpi', 'macro_eu_gdp_growth', 'macro_de_ifo',
+        'macro_eu_consumer_confidence', 'macro_eu_energy_hicp',
+        'macro_eu_bond_yield', 'macro_eu_m3_money',
+    ],
+    'sentiment': ['sentiment_vix', 'sentiment_gold', 'sentiment_eurusd', 'sentiment_epu_eu'],
+    'gen_forecast': ['forecast_Solar', 'forecast_Wind Onshore', 'forecast_Wind Offshore', 'gen_forecast_total'],
+    'demand_forecast': ['load_forecast', 'load_forecast_Forecasted Load'],
+    'imbalance': ['imbalance_Long', 'imbalance_Short', 'imbalance_price'],
+    'ntc': [],  # Dynamically matched (ntc_* columns)
+    'pipeline': [
+        'pipeline_gas_import_gwh', 'pipeline_gas_export_gwh',
+        'pipeline_gas_net_import_gwh', 'pipeline_gas_total_flow_gwh',
+    ],
+    'hydro_reservoir': ['hydro_reservoir_total_mwh'],
+    'flow': ['Flow_to_FR', 'Flow_from_FR', 'Net_Flow_FR'],
+    'spillover': [],  # Dynamically matched: *_price_lag*h, *_flow_lag*h
 }
 
 # Feature groups for DE-FR merged dataset (prefixed with DE_ or FR_)
@@ -118,6 +140,144 @@ def load_unified_dataset(
     return df
 
 
+ALL_COUNTRIES = ['DE', 'FR', 'NL', 'BE', 'AT', 'IT', 'ES', 'PL', 'DK', 'SE', 'HU', 'CZ']
+
+# Physical interconnections (bidirectional) — used for flow spillover features
+INTERCONNECTIONS = {
+    'DE': ['FR', 'NL', 'BE', 'AT', 'CZ', 'PL', 'DK', 'SE'],
+    'FR': ['DE', 'BE', 'ES', 'IT'],
+    'NL': ['DE', 'BE', 'DK'],
+    'BE': ['DE', 'FR', 'NL'],
+    'AT': ['DE', 'CZ', 'HU', 'IT'],
+    'IT': ['FR', 'AT'],
+    'ES': ['FR'],
+    'PL': ['DE', 'CZ', 'SE'],
+    'DK': ['DE', 'NL', 'SE'],
+    'SE': ['DE', 'DK', 'PL'],
+    'HU': ['AT'],
+    'CZ': ['DE', 'AT', 'PL'],
+}
+
+
+def load_resampled_dataset(country: str) -> pd.DataFrame:
+    """Load hourly resampled dataset (common period, identical row counts)."""
+    path = UNIFIED_DIR / f"unified_{country}_hourly_common.csv"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Resampled dataset not found: {path}\n"
+            f"Run: python -m electricity.resample_to_hourly"
+        )
+    return pd.read_csv(path, index_col=0, parse_dates=True)
+
+
+def prepare_spillover_features(
+    target_country: str,
+    all_countries: Optional[List[str]] = None,
+    lag_horizons: Optional[List[int]] = None,
+    include_flows: bool = True,
+    frequency: str = 'H',
+) -> pd.DataFrame:
+    """
+    Load target country's full features + LAGGED prices and flows from other countries.
+
+    Only uses historical information — no contemporaneous cross-country data.
+    This is a forecasting task: at time t, other countries' prices at t are unknown.
+
+    Loads from the Luminus-extended unified hourly datasets and aligns all
+    markets to a common date range (intersection of available periods).
+
+    Args:
+        target_country: Country to forecast (e.g., 'DE')
+        all_countries: All countries to include spillover from
+        lag_horizons: Lag horizons in hours for price spillover features
+        include_flows: Whether to include lagged cross-border flow features
+
+    Returns:
+        DataFrame with domestic features + lagged spillover features
+    """
+    if all_countries is None:
+        all_countries = ALL_COUNTRIES
+
+    # Frequency-aware lag suffix and default horizons.
+    # Hourly: lag1h captures next-hour momentum, lag24h captures the
+    # same-hour-yesterday diurnal cycle. Daily: lag1d captures
+    # day-to-day momentum, lag7d captures the same-day-last-week
+    # weekly cycle. Either way the (horizon, suffix) units in the
+    # column name match what `shift(lag)` actually applies on the
+    # frequency-specific index.
+    if frequency == 'D':
+        lag_suffix = 'd'
+        default_lags = [1, 7]
+    else:
+        lag_suffix = 'h'
+        default_lags = [1, 24]
+    if lag_horizons is None:
+        lag_horizons = default_lags
+
+    # Load target country's full dataset at the requested frequency
+    try:
+        df = load_unified_dataset(target_country, clean=True, frequency=frequency)
+    except FileNotFoundError:
+        # Fallback to old resampled common-period data
+        df = load_resampled_dataset(target_country)
+
+    other_countries = [c for c in all_countries if c != target_country]
+
+    # Collect other countries' prices for lagging
+    other_prices = {}
+    for country in other_countries:
+        try:
+            other_df = load_unified_dataset(country, clean=True, frequency=frequency)
+        except FileNotFoundError:
+            try:
+                other_df = load_resampled_dataset(country)
+            except FileNotFoundError:
+                continue
+
+        if 'Day_Ahead_Price' in other_df.columns:
+            other_prices[country] = other_df['Day_Ahead_Price']
+
+    # Find common date range across all markets
+    common_start = df.index.min()
+    common_end = df.index.max()
+    for country, price_series in other_prices.items():
+        common_start = max(common_start, price_series.index.min())
+        common_end = min(common_end, price_series.index.max())
+
+    # Align to common period
+    df = df.loc[common_start:common_end]
+
+    # Add lagged price features from other countries (index-aligned).
+    # The suffix matches the data frequency so e.g. daily features are
+    # *_price_lag1d / *_price_lag7d, hourly features are
+    # *_price_lag1h / *_price_lag24h.
+    for country, price_series in other_prices.items():
+        price_aligned = price_series.reindex(df.index)
+        for lag in lag_horizons:
+            col_name = f'{country}_price_lag{lag}{lag_suffix}'
+            df[col_name] = price_aligned.shift(lag)
+
+    # Add lagged flow features for physically connected countries
+    # (uses the same per-frequency lag pair as the price lags).
+    if include_flows:
+        neighbors = INTERCONNECTIONS.get(target_country, [])
+        for neighbor in neighbors:
+            flow_to = f'Flow_to_{neighbor}'
+            flow_from = f'Flow_from_{neighbor}'
+
+            for flow_col in [flow_to, flow_from]:
+                if flow_col in df.columns:
+                    for lag in lag_horizons:
+                        lag_col = f'{flow_col}_lag{lag}{lag_suffix}'
+                        df[lag_col] = df[flow_col].shift(lag)
+
+    # Drop rows with NaN from lag computation
+    max_lag = max(lag_horizons)
+    df = df.iloc[max_lag:]
+
+    return df
+
+
 def get_feature_columns(
     df: pd.DataFrame,
     groups: Optional[List[str]] = None,
@@ -128,7 +288,7 @@ def get_feature_columns(
     is_de_fr = country == 'DE_FR' or any(c.startswith('DE_') or c.startswith('FR_') for c in df.columns[:20])
 
     target_cols = ['price_change', 'price_change_pct', 'price_direction',
-                   'Price_Change', 'Price_Return',
+                   'Price_Change', 'Price_Return', 'price_return',
                    'price_spread_change', 'price_spread_change_pct']
 
     if groups is None:
@@ -137,12 +297,39 @@ def get_feature_columns(
         cols = []
         feature_groups = FEATURE_GROUPS_DE_FR if is_de_fr else FEATURE_GROUPS
 
+        # Dynamic group matching: maps group name to column-matching patterns
+        # Used when static lists don't match (e.g., different country prefixes)
+        dynamic_patterns = {
+            'weather': ['temperature', 'wind_speed', 'shortwave_radiation',
+                        'cloud_cover', 'precipitation', 'humidity'],
+            'ntc': ['ntc_'],
+            'imbalance': ['imbalance_'],
+            'pipeline': ['pipeline_'],
+            'hydro_reservoir': ['hydro_'],
+            'gen_forecast': ['forecast_', 'gen_forecast'],
+            'demand_forecast': ['load_forecast'],
+            'flow': ['Flow_to_', 'Flow_from_', 'Net_Flow_'],
+            'spillover': ['_price_lag', '_flow_lag'],
+        }
+
         for group in groups:
+            n_before = len(cols)
+            # Try static list first
             if group in feature_groups:
                 for col in feature_groups[group]:
                     if col in df.columns:
                         cols.append(col)
-            elif group in FEATURE_GROUPS:
+
+            # Also try dynamic pattern matching (catches country-prefixed columns
+            # and columns not in the static list)
+            if group in dynamic_patterns:
+                patterns = dynamic_patterns[group]
+                for col in df.columns:
+                    if any(p in col for p in patterns) and col not in target_cols:
+                        cols.append(col)
+
+            # Original fallback for DE_FR renaming
+            if len(cols) == n_before and group not in dynamic_patterns and group in FEATURE_GROUPS:
                 for col in FEATURE_GROUPS[group]:
                     if col in df.columns:
                         cols.append(col)
@@ -191,18 +378,25 @@ def create_temporal_windows(
     X: np.ndarray,
     Y: np.ndarray,
     timestep: int,
-    task_type: str = 'prediction'
+    task_type: str = 'prediction',
+    horizon: int = 1,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Create sliding windows for time series tasks.
 
-    task_type='prediction': X[t:t+T], Y[t+1:t+T+1] (forecast)
+    task_type='prediction': X[t:t+T], Y[t+h:t+T+h] (forecast h steps ahead)
     task_type='estimation': X[t:t+T], Y[t:t+T] (concurrent estimation)
+
+    Args:
+        horizon: Forecast horizon in steps (default 1 = next step).
+                 h=6 means predict 6 hours ahead at each position.
     """
+    assert horizon >= 1, "horizon must be >= 1"
     if len(Y.shape) == 1:
         Y = Y.reshape(-1, 1)
 
-    n_samples = len(X) - timestep
+    # Reduce sample count for h>1 to prevent out-of-bounds access
+    n_samples = len(X) - timestep - (horizon - 1)
     n_features = X.shape[1]
 
     X_win = np.zeros((n_samples, timestep, n_features))
@@ -211,7 +405,7 @@ def create_temporal_windows(
     for i in range(n_samples):
         X_win[i] = X[i:i + timestep]
         if task_type == 'prediction':
-            Y_win[i] = Y[i + 1:i + timestep + 1]
+            Y_win[i] = Y[i + horizon:i + timestep + horizon]
         else:
             Y_win[i] = Y[i:i + timestep]
 
@@ -233,7 +427,13 @@ def prepare_unified_ds3m_data(
     outlier_threshold: float = 5.0,
     task_type: str = 'prediction',
     train_end_date: Optional[str] = None,
-    test_end_date: Optional[str] = None
+    test_end_date: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    resampled: bool = False,
+    spillover: bool = False,
+    horizon: int = 1,
+    frequency: str = 'H',
 ) -> Dict:
     """
     Prepare unified data for DS3M training.
@@ -252,6 +452,8 @@ def prepare_unified_ds3m_data(
             Training ends at this date (exclusive). Format: 'YYYY-MM-DD'.
         test_end_date: If set, test period ends at this date (exclusive).
             If None with train_end_date, uses all remaining data as test.
+        resampled: If True, load hourly resampled datasets (common period)
+        spillover: If True, include lagged prices + flows from all other countries
 
     Returns:
         Dictionary with trainX, trainY, testX, testY, etc.
@@ -261,10 +463,36 @@ def prepare_unified_ds3m_data(
             # Country pair: predict spread
             target_col = 'price_spread_change_pct'
         else:
-            target_col = 'Day_Ahead_Price'
+            target_col = 'price_return'
 
-    df = load_unified_dataset(country, clean=True)
-    df = df.ffill().bfill()
+    if spillover:
+        # Load domestic + lagged cross-country features (no contemporaneous leakage)
+        df = prepare_spillover_features(country, frequency=frequency)
+        df = df.ffill().bfill()
+    elif resampled:
+        df = load_resampled_dataset(country)
+        df = df.ffill().bfill()
+    else:
+        df = load_unified_dataset(country, clean=True, frequency=frequency)
+        df = df.ffill().bfill()
+
+    # Restrict to a structural-break era (e.g. pre/post a regulatory change) so
+    # the causal graph is fit on a single mechanism regime. Applied before the
+    # return computation so the first in-era return is the only edge effect.
+    if start_date is not None:
+        df = df[df.index >= start_date]
+    if end_date is not None:
+        df = df[df.index < end_date]
+
+    # Compute hourly price return on the fly if requested
+    if target_col == 'price_return' and 'price_return' not in df.columns:
+        price_col = 'Day_Ahead_Price'
+        if price_col in df.columns:
+            # Percentage return with denominator offset to avoid division by zero
+            df['price_return'] = df[price_col].diff() / (df[price_col].shift(1).abs() + 1.0)
+            df['price_return'] = df['price_return'].fillna(0.0)
+            # Replace inf values from near-zero denominator
+            df['price_return'] = df['price_return'].replace([np.inf, -np.inf], 0.0)
 
     feature_cols = get_feature_columns(df, feature_groups, exclude_target=True, country=country)
 
@@ -323,9 +551,9 @@ def prepare_unified_ds3m_data(
     Y_test_norm = (Y_test - Y_moments[0]) / Y_moments[1]
 
     # Create windows
-    trainX, trainY = create_temporal_windows(X_train_norm, Y_train_norm, timestep, task_type)
-    valX, valY = create_temporal_windows(X_val_norm, Y_val_norm, timestep, task_type)
-    testX, testY = create_temporal_windows(X_test_norm, Y_test_norm, timestep, task_type)
+    trainX, trainY = create_temporal_windows(X_train_norm, Y_train_norm, timestep, task_type, horizon)
+    valX, valY = create_temporal_windows(X_val_norm, Y_val_norm, timestep, task_type, horizon)
+    testX, testY = create_temporal_windows(X_test_norm, Y_test_norm, timestep, task_type, horizon)
 
     return {
         'trainX': torch.from_numpy(trainX).float(),
@@ -339,6 +567,7 @@ def prepare_unified_ds3m_data(
         'feature_cols': feature_cols,
         'target_col': target_col,
         'task_type': task_type,
+        'horizon': horizon,
         'n_train': n_train,
         'n_val': n_val,
         'n_test': n_test,

@@ -125,12 +125,27 @@ class AugmentedLagrangianTrainer:
         lambda_regime_diff: float = 1.0,  # Weight for regime differentiation penalty
         # Early stopping metric
         early_stopping_metric: str = 'directional_accuracy',  # 'directional_accuracy' or 'spearman'
+        # Mini-batching
+        batch_size: int = 4096,  # Samples per mini-batch (0 = full batch)
+        # Regime entropy regularization (for K>2)
+        lambda_entropy: float = 0.0,  # 0 = disabled; recommended 1.0 for K>2
+        # W-routed auxiliary loss: weight on MSE(W-only prediction, target) to
+        # force the causal weights onto the prediction path (0 = disabled)
+        lambda_w_aux: float = 0.0,
+        # Mixed precision (bf16) for forward/backward; DAG penalty's matrix
+        # operations keep fp32 precision via autocast's internal op policy.
+        # Yields ~1.5-2x speedup on A100/H100 with negligible accuracy loss.
+        use_amp: bool = False,
         # Logging
         verbose: bool = True,
     ):
         self.model = model
         self.optimizer = optimizer
         self.device = device
+        self.batch_size = batch_size
+        self.lambda_entropy = lambda_entropy
+        self.lambda_w_aux = lambda_w_aux
+        self.use_amp = use_amp and device.type == 'cuda'
 
         self.alpha = alpha_init
         self.rho = rho_init
@@ -258,12 +273,27 @@ class AugmentedLagrangianTrainer:
                         # Using negative distance so minimizing loss = maximizing distance
                         regime_diff_loss = regime_diff_loss - l2_dist
 
+        # Regime entropy regularization (prevents collapse for K>2)
+        entropy_loss = torch.tensor(0.0, device=self.device)
+        if self.lambda_entropy > 0:
+            regime_posteriors = result.get('regime_posteriors', None)
+            if regime_posteriors is not None:
+                from electricity.ds3m_fantom.training.regime_regularization import regime_entropy_loss
+                entropy_loss = regime_entropy_loss(regime_posteriors)
+
+        # W-routed auxiliary loss: MSE between the W-only (bypass-free) prediction
+        # and the target, accumulated in the model forward. Forces the causal
+        # weights onto the prediction path rather than the latent residual.
+        w_aux_loss = result.get('w_aux_loss', torch.tensor(0.0, device=self.device))
+
         augmented = (
             elbo +
             self.alpha * dag_penalty +
             0.5 * self.rho * dag_penalty ** 2 +
             self.lambda_target * target_loss +
-            self.lambda_regime_diff * regime_diff_loss
+            self.lambda_regime_diff * regime_diff_loss +
+            self.lambda_entropy * entropy_loss +
+            self.lambda_w_aux * w_aux_loss
         )
 
         return augmented, target_loss, regime_diff_loss
@@ -295,37 +325,78 @@ class AugmentedLagrangianTrainer:
         best_epoch = 0
         patience_counter = 0
 
+        n_samples = trainX.shape[1]
+        use_minibatch = self.batch_size > 0 and n_samples > self.batch_size
+
         for epoch in range(self.max_inner_epochs):
-            self.optimizer.zero_grad()
+            if use_minibatch:
+                # Mini-batch training: accumulate gradients over random batches
+                perm = torch.randperm(n_samples)
+                epoch_loss = 0.0
+                epoch_results = defaultdict(float)
+                n_batches = 0
 
-            # Forward pass
-            result = self.model(trainX, trainY)
+                for start in range(0, n_samples, self.batch_size):
+                    end = min(start + self.batch_size, n_samples)
+                    idx = perm[start:end]
+                    batchX = trainX[:, idx, :]
+                    batchY = trainY[:, idx, :]
 
-            # Compute augmented loss (includes target and regime diff constraints)
-            loss, target_loss, regime_diff_loss = self.compute_augmented_loss(result)
+                    self.optimizer.zero_grad()
+                    if self.use_amp:
+                        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+                            result = self.model(batchX, batchY)
+                            loss, target_loss, regime_diff_loss = self.compute_augmented_loss(result)
+                    else:
+                        result = self.model(batchX, batchY)
+                        loss, target_loss, regime_diff_loss = self.compute_augmented_loss(result)
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
+                    self.optimizer.step()
 
-            # Backward
-            loss.backward()
+                    epoch_loss += loss.item()
+                    for key in ['nll', 'kl_z', 'kl_d', 'dag_penalty']:
+                        epoch_results[key] += result[key].item()
+                    n_batches += 1
 
-            # Gradient clipping
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
+                # Track epoch-average losses
+                tracker['loss'].append(epoch_loss / n_batches)
+                for key in ['nll', 'kl_z', 'kl_d', 'dag_penalty']:
+                    tracker[key].append(epoch_results[key] / n_batches)
+            else:
+                # Full-batch training (original behavior)
+                self.optimizer.zero_grad()
+                if self.use_amp:
+                    with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+                        result = self.model(trainX, trainY)
+                        loss, target_loss, regime_diff_loss = self.compute_augmented_loss(result)
+                else:
+                    result = self.model(trainX, trainY)
+                    loss, target_loss, regime_diff_loss = self.compute_augmented_loss(result)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10.0)
+                self.optimizer.step()
 
-            self.optimizer.step()
-
-            # Track losses
-            tracker['loss'].append(loss.item())
-            tracker['nll'].append(result['nll'].item())
-            tracker['kl_z'].append(result['kl_z'].item())
-            tracker['kl_d'].append(result['kl_d'].item())
-            tracker['dag_penalty'].append(result['dag_penalty'].item())
+                tracker['loss'].append(loss.item())
+                tracker['nll'].append(result['nll'].item())
+                tracker['kl_z'].append(result['kl_z'].item())
+                tracker['kl_d'].append(result['kl_d'].item())
+                tracker['dag_penalty'].append(result['dag_penalty'].item())
             tracker['sparse_penalty'].append(result['sparse_penalty'].item())
             tracker['target_loss'].append(target_loss.item())
             tracker['regime_diff_loss'].append(regime_diff_loss.item())
 
-            # Test loss
+            # Test loss (batched to avoid OOM with large models like GAT)
             if testX is not None and testY is not None:
                 with torch.no_grad():
-                    test_result = self.model(testX, testY)
+                    n_test = testX.shape[1]
+                    val_batch = min(self.batch_size, n_test)
+                    if val_batch < n_test:
+                        # Use a random subset for validation loss (faster + less memory)
+                        idx = torch.randperm(n_test)[:val_batch]
+                        test_result = self.model(testX[:, idx, :], testY[:, idx, :])
+                    else:
+                        test_result = self.model(testX, testY)
                     test_loss, _, _ = self.compute_augmented_loss(test_result)
                     tracker['test_loss'].append(test_loss.item())
 
@@ -341,11 +412,27 @@ class AugmentedLagrangianTrainer:
                 break
 
             if epoch % 10 == 0 and self.verbose:
+                # Compute W norm across all regime emissions for diagnostics
+                w_norms = []
+                for d in range(self.model.d_dim):
+                    w_norm = self.model.causal_emissions[d].icgnn.W.data.norm().item()
+                    w_norms.append(w_norm)
+                # Get mean predicted std for variance monitoring
+                with torch.no_grad():
+                    y_std_val = result.get('pred_stds', None)
+                    std_str = ""
+                    if y_std_val is not None:
+                        std_str = f", y_std={y_std_val.mean().item():.4f}"
+                    elif 'pred_stds' not in result:
+                        # Compute from stacked pred_stds if available
+                        pass
                 print(f"    Inner epoch {epoch}: loss={loss.item():.4f}, "
                       f"dag={result['dag_penalty'].item():.6f}, "
                       f"target={target_loss.item():.4f}, "
+                      f"w_aux={result.get('w_aux_loss', torch.tensor(0.0)).item():.4f}, "
                       f"regime_diff={regime_diff_loss.item():.4f}, "
-                      f"tau={self.current_tau:.4f}")
+                      f"tau={self.current_tau:.4f}, "
+                      f"W_norm={w_norms}{std_str}")
 
         done = patience_counter >= 10 or epoch >= self.max_inner_epochs - 1
 
@@ -370,10 +457,22 @@ class AugmentedLagrangianTrainer:
         from electricity.evaluation.metrics import compute_all_metrics
 
         self.model.eval()
+        n_test = testX.shape[1]
         with torch.no_grad():
-            pred_result = self.model.predict(testX, n_samples=50)
-            predictions = pred_result['predictions'][-1].cpu().numpy()
-            predictions_std = pred_result['predictions_std'][-1].cpu().numpy()
+            if self.batch_size > 0 and n_test > self.batch_size:
+                all_preds = []
+                all_stds = []
+                for start in range(0, n_test, self.batch_size):
+                    end = min(start + self.batch_size, n_test)
+                    batch_result = self.model.predict(testX[:, start:end, :], n_samples=5)
+                    all_preds.append(batch_result['predictions'][-1].cpu())
+                    all_stds.append(batch_result['predictions_std'][-1].cpu())
+                predictions = torch.cat(all_preds, dim=0).numpy()
+                predictions_std = torch.cat(all_stds, dim=0).numpy()
+            else:
+                pred_result = self.model.predict(testX, n_samples=5)
+                predictions = pred_result['predictions'][-1].cpu().numpy()
+                predictions_std = pred_result['predictions_std'][-1].cpu().numpy()
             actuals = testY[-1].cpu().numpy()
             prev_actuals = testY[-2].cpu().numpy()
 
@@ -504,6 +603,7 @@ def train_end_to_end(
     testY: torch.Tensor,
     config: Dict[str, Any],
     output_dir: Path,
+    Y_moments: Optional[np.ndarray] = None,
     verbose: bool = True
 ) -> Dict[str, Any]:
     """
@@ -545,6 +645,8 @@ def train_end_to_end(
         rho_max=float(config.get('rho_max', 1e9)),
         progress_rate=float(config.get('progress_rate', 0.9)),
         tol_dag=float(config.get('tol_dag', 1e-6)),
+        patience_dag=int(config.get('patience_dag', 5)),
+        patience_rho=int(config.get('patience_rho', 3)),
         max_auglag_steps=int(config.get('max_auglag_steps', 50)),
         max_inner_epochs=int(config.get('max_inner_epochs', 50)),
         # Early stopping parameters
@@ -559,8 +661,14 @@ def train_end_to_end(
         tau_anneal_steps=int(config.get('tau_anneal_steps', 100)),
         # Regime differentiation
         lambda_regime_diff=float(config.get('lambda_regime_diff', 1.0)),
+        lambda_entropy=float(config.get('lambda_entropy', 0.0)),
+        lambda_w_aux=float(config.get('lambda_w_aux', 0.0)),
         # Early stopping metric
         early_stopping_metric=config.get('early_stopping_metric', 'directional_accuracy'),
+        # Mini-batching
+        batch_size=int(config.get('batch_size', 4096)),
+        # Mixed precision
+        use_amp=bool(config.get('use_amp', False)),
         verbose=verbose,
     )
 
@@ -581,46 +689,89 @@ def train_end_to_end(
         'config': config,
     }, checkpoint_dir / 'final.tar')
 
-    # Evaluate
+    # Evaluate (with mini-batching for large test sets)
     model.eval()
-    with torch.no_grad():
-        pred_result = model.predict(testX, n_samples=100)
+    batch_size = int(config.get('batch_size', 4096))
+    n_test = testX.shape[1]
 
-    # Compute metrics
-    predictions = pred_result['predictions'][-1].cpu().numpy()  # Last timestep
-    actuals = testY[-1].cpu().numpy()  # Last timestep
-
-    from scipy.stats import spearmanr
-    spearman_corr, _ = spearmanr(actuals.flatten(), predictions.flatten())
-    rmse = np.sqrt(np.mean((predictions - actuals) ** 2))
-
-    # Compute directional accuracy
-    # Compare predicted direction vs actual direction relative to previous timestep
-    prev_actuals = testY[-2].cpu().numpy()  # Second to last timestep
-    actual_direction = np.sign(actuals - prev_actuals)  # +1 for up, -1 for down, 0 for no change
-    pred_direction = np.sign(predictions - prev_actuals)
-    # Only count samples where there was actual movement
-    valid_mask = actual_direction.flatten() != 0
-    if valid_mask.sum() > 0:
-        directional_accuracy = float(np.mean(actual_direction.flatten()[valid_mask] == pred_direction.flatten()[valid_mask]))
+    if batch_size > 0 and n_test > batch_size:
+        all_preds = []
+        all_stds = []
+        all_regimes = []
+        with torch.no_grad():
+            for start in range(0, n_test, batch_size):
+                end = min(start + batch_size, n_test)
+                batch_result = model.predict(testX[:, start:end, :], n_samples=20)
+                all_preds.append(batch_result['predictions'][-1].cpu())
+                all_stds.append(batch_result['predictions_std'][-1].cpu())
+                all_regimes.append(batch_result['regimes'][-1].cpu())
+        predictions = torch.cat(all_preds, dim=0).numpy()
+        predictions_std = torch.cat(all_stds, dim=0).numpy()
+        regime_assignments = torch.cat(all_regimes, dim=0).numpy()
     else:
-        directional_accuracy = 0.5  # Default if no movement
+        with torch.no_grad():
+            pred_result = model.predict(testX, n_samples=20)
+        predictions = pred_result['predictions'][-1].cpu().numpy()
+        predictions_std = pred_result['predictions_std'][-1].cpu().numpy()
+        regime_assignments = pred_result['regimes'][-1].cpu().numpy()
+
+    # Compute metrics using the comprehensive evaluation module
+    actuals = testY[-1].cpu().numpy()  # Last timestep
+    prev_actuals = testY[-2].cpu().numpy()  # Previous timestep for DirAcc
+
+    from electricity.evaluation.metrics import compute_all_metrics
+
+    # Prediction uncertainty for CRPS
+    pred_std_arr = predictions_std
+
+    metrics = compute_all_metrics(
+        y_true=actuals,
+        y_pred=predictions,
+        y_prev=prev_actuals,
+        y_pred_std=pred_std_arr,
+    )
+
+    # Denormalized metrics (original EUR/MWh scale)
+    if Y_moments is not None:
+        y_mean, y_std = float(Y_moments[0]), float(Y_moments[1])
+        preds_eur = predictions * y_std + y_mean
+        actuals_eur = actuals * y_std + y_mean
+        metrics['rmse_eur_mwh'] = float(np.sqrt(np.mean((preds_eur - actuals_eur) ** 2)))
+        metrics['mae_eur_mwh'] = float(np.mean(np.abs(preds_eur - actuals_eur)))
+
+    # Save raw predictions for flexible post-hoc metric computation (MAPE, etc.)
+    np.save(output_dir / 'predictions.npy', predictions)
+    np.save(output_dir / 'predictions_std.npy', predictions_std)
+    np.save(output_dir / 'actuals.npy', actuals)
+    np.save(output_dir / 'prev_actuals.npy', prev_actuals)
+    np.save(output_dir / 'regime_assignments.npy', regime_assignments)
 
     # Get causal graphs
     graphs = model.get_causal_graphs()
 
     results = {
+        'horizon': int(config.get('horizon', 1)),
         'training_time': training_time,
         'final_alpha': trainer.alpha,
         'final_rho': trainer.rho,
         'final_dag_penalty': float(history['dag_penalty'][-1]) if history['dag_penalty'] else None,
-        'spearman': float(spearman_corr),
-        'rmse': float(rmse),
-        'directional_accuracy': directional_accuracy,
+        # All 6 core metrics
+        'directional_accuracy': metrics.get('directional_accuracy', 0.5),
+        'rmse': metrics.get('rmse', 0.0),
+        'spearman': metrics.get('spearman', 0.0),
+        'mae': metrics.get('mae', 0.0),
+        'smape': metrics.get('smape', 0.0),
+        'crps': metrics.get('crps', None),
+        # Denormalized
+        'rmse_eur_mwh': metrics.get('rmse_eur_mwh'),
+        'mae_eur_mwh': metrics.get('mae_eur_mwh'),
+        # Diagnostics
+        'pred_std': float(np.std(predictions)),
+        'pred_range': float(predictions.max() - predictions.min()),
         'history': history,
         'graphs': [g.tolist() for g in graphs],
         'regime_distribution': np.unique(
-            pred_result['regimes'][-1].cpu().numpy(), return_counts=True
+            regime_assignments, return_counts=True
         )
     }
 
@@ -639,9 +790,9 @@ def train_end_to_end(
         print("Training Complete")
         print(f"{'='*60}")
         print(f"Training time: {training_time:.2f}s")
-        print(f"Spearman correlation: {spearman_corr:.4f}")
-        print(f"RMSE: {rmse:.4f}")
-        print(f"Directional accuracy: {directional_accuracy:.4f}")
+        print(f"Spearman correlation: {results.get('spearman', 0.0):.4f}")
+        print(f"RMSE: {results.get('rmse', 0.0):.4f}")
+        print(f"Directional accuracy: {results.get('directional_accuracy', 0.0):.4f}")
         print(f"Final DAG penalty: {results['final_dag_penalty']:.8f}")
 
     return results
