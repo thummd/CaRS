@@ -31,6 +31,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'DE',
         'gas_storage_code': 'DE',
+        'has_hydro_reservoirs': False,  # ENTSO-E 16.1.D returns NoMatchingDataError for DE_LU (negligible reservoir capacity, ~9 GWh).
+        'has_lng_terminal': True,
     },
     'FR': {
         'name': 'France',
@@ -51,6 +53,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'FR',
         'gas_storage_code': 'FR',
+        'has_hydro_reservoirs': True,
+        'has_lng_terminal': True,
     },
     'NL': {
         'name': 'Netherlands',
@@ -71,6 +75,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'NL',
         'gas_storage_code': 'NL',
+        'has_hydro_reservoirs': False,
+        'has_lng_terminal': True,
     },
     'BE': {
         'name': 'Belgium',
@@ -91,6 +97,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'BE',
         'gas_storage_code': 'BE',
+        'has_hydro_reservoirs': False,
+        'has_lng_terminal': True,
     },
     'AT': {
         'name': 'Austria',
@@ -111,6 +119,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'AT',
         'gas_storage_code': 'AT',
+        'has_hydro_reservoirs': True,
+        'has_lng_terminal': False,
     },
     'IT': {
         'name': 'Italy',
@@ -131,6 +141,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'IT',
         'gas_storage_code': 'IT',
+        'has_hydro_reservoirs': True,
+        'has_lng_terminal': True,
     },
     'ES': {
         'name': 'Spain',
@@ -151,6 +163,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'ES',
         'gas_storage_code': 'ES',
+        'has_hydro_reservoirs': True,
+        'has_lng_terminal': True,
     },
     'PL': {
         'name': 'Poland',
@@ -171,6 +185,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'PL',
         'gas_storage_code': 'PL',
+        'has_hydro_reservoirs': False,
+        'has_lng_terminal': True,
     },
     'DK': {
         'name': 'Denmark',
@@ -191,6 +207,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'DK',
         'gas_storage_code': 'DK',
+        'has_hydro_reservoirs': False,
+        'has_lng_terminal': False,
     },
     'SE': {
         'name': 'Sweden',
@@ -211,6 +229,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'SE',
         'gas_storage_code': None,  # Sweden has no significant gas storage
+        'has_hydro_reservoirs': True,
+        'has_lng_terminal': False,
     },
     'HU': {
         'name': 'Hungary',
@@ -231,6 +251,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'HU',
         'gas_storage_code': 'HU',
+        'has_hydro_reservoirs': False,
+        'has_lng_terminal': False,
     },
     'CZ': {
         'name': 'Czech Republic',
@@ -251,6 +273,8 @@ COUNTRY_REGISTRY = {
         },
         'holidays_iso': 'CZ',
         'gas_storage_code': 'CZ',
+        'has_hydro_reservoirs': False,  # ENTSO-E 16.1.D returns NoMatchingDataError for CZ (TSO does not publish aggregate reservoir level).
+        'has_lng_terminal': False,
     },
 }
 
@@ -388,6 +412,71 @@ def has_gas_storage(country: str) -> bool:
     if country not in COUNTRY_REGISTRY:
         return False
     return COUNTRY_REGISTRY[country].get('gas_storage_code') is not None
+
+
+def has_hydro_reservoirs(country: str) -> bool:
+    """Check if a country has significant hydro reservoir capacity."""
+    if country not in COUNTRY_REGISTRY:
+        return False
+    return COUNTRY_REGISTRY[country].get('has_hydro_reservoirs', False)
+
+
+def has_lng_terminal(country: str) -> bool:
+    """Check if a country has LNG import terminals."""
+    if country not in COUNTRY_REGISTRY:
+        return False
+    return COUNTRY_REGISTRY[country].get('has_lng_terminal', False)
+
+
+def get_zone_date_ranges(country: str, start: str, end: str) -> List[Tuple[str, str, str]]:
+    """Split a date range at zone transition boundaries.
+
+    Countries like DE changed bidding zones (DE_AT_LU -> DE_LU on 2018-10-01).
+    This returns a list of (zone_code, start, end) tuples that cover the full
+    range using the correct zone for each sub-period.
+
+    Args:
+        country: Country code (e.g., 'DE')
+        start: Start date (YYYY-MM-DD)
+        end: End date (YYYY-MM-DD)
+
+    Returns:
+        List of (zone_code, start_date, end_date) tuples
+    """
+    if country not in COUNTRY_REGISTRY:
+        return [(country, start, end)]
+
+    zone_config = COUNTRY_REGISTRY[country]['entsoe_zones']
+    current = zone_config['current']
+    historical = zone_config.get('historical', [])
+
+    if not historical:
+        # No zone transitions — single zone for the full range
+        zone = current[0] if isinstance(current, list) else current
+        return [(zone, start, end)]
+
+    # Build sorted list of (transition_date, new_zone_code)
+    transitions = []
+    for hist in historical:
+        transitions.append((hist['until'], hist['code']))
+    transitions.sort()
+
+    ranges = []
+    current_start = start
+
+    for transition_date, old_zone in transitions:
+        if current_start < transition_date and current_start < end:
+            # Period before this transition
+            period_end = min(transition_date, end)
+            ranges.append((old_zone, current_start, period_end))
+            current_start = transition_date
+
+    # Remaining period uses current zone
+    if current_start < end:
+        zone = current[0] if isinstance(current, list) else current
+        ranges.append((zone, current_start, end))
+
+    return ranges
 
 
 def get_registered_countries() -> List[str]:

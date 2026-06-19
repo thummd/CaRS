@@ -25,6 +25,13 @@ TRANSPORT_DIR = DATA_DIR / "transport"
 TRADE_DIR = DATA_DIR / "trade"
 HYDROGEN_DIR = DATA_DIR / "hydrogen"
 OUTAGE_DIR = DATA_DIR / "outages"
+HYDRO_RESERVOIR_DIR = DATA_DIR / "hydro_reservoirs"
+GEN_FORECAST_DIR = DATA_DIR / "generation_forecasts"
+DEMAND_FORECAST_DIR = DATA_DIR / "demand_forecasts"
+NTC_DIR = DATA_DIR / "ntc"
+ENTSOG_DIR = DATA_DIR / "entsog"
+BALANCING_DIR = DATA_DIR / "balancing"
+ERA5_DIR = DATA_DIR / "era5"
 
 # Upstream benchmark repos
 UPSTREAM_DIR = CARS_ROOT / "upstream"

@@ -25,14 +25,21 @@ from paths import UNIFIED_DIR
 
 import numpy as np
 import pandas as pd
-import torch
+try:
+    import torch
+except ImportError:
+    # torch is only needed by the prepare_*_data tensor helpers; plotting
+    # and dataset-loading utilities (load_unified_dataset, etc.) work
+    # without it, so allow import in a torch-free environment.
+    torch = None
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from country_config import get_neighbors, get_registered_countries
+from paths import UNIFIED_DIR as _UNIFIED_DIR
 
 # Data directory
-UNIFIED_DIR = UNIFIED_DIR
+UNIFIED_DIR = _UNIFIED_DIR
 
 # Feature groups for easy selection (single-country datasets)
 FEATURE_GROUPS = {
@@ -79,6 +86,22 @@ FEATURE_GROUPS = {
     'transport': ['transport_bdi', 'transport_container_freight'],
     'trade': ['trade_eu_balance', 'trade_eu_energy_imports', 'trade_de_balance'],
     'hydrogen': ['hydrogen_green_cost', 'hydrogen_grey_cost'],
+    'hydro_reservoir': [
+        'hydro_reservoir_total_mwh',
+    ],
+    'gen_forecast': [
+        'forecast_Solar', 'forecast_Wind Onshore', 'forecast_Wind Offshore',
+        'gen_forecast_total',
+    ],
+    'demand_forecast': ['load_forecast'],
+    'imbalance': ['imbalance_price'],
+    'pipeline': [
+        'pipeline_gas_import_gwh', 'pipeline_gas_export_gwh',
+        'pipeline_gas_net_import_gwh', 'pipeline_gas_total_flow_gwh',
+    ],
+    'lng': [
+        'lng_inventory_twh', 'lng_sendout_gwh', 'lng_fill_pct',
+    ],
     'flow': ['Flow_to_FR', 'Flow_from_FR', 'Net_Flow_FR'],
     'calendar_hourly': [
         'hour_of_day', 'is_peak_hour', 'hour_sin', 'hour_cos',
@@ -161,7 +184,62 @@ def load_unified_dataset(
             )
 
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
+
+    # Austria-specific patch: pre-2018-10-01, AT was part of the merged
+    # DE-AT-LU bidding zone and shared the German clearing price. The
+    # ENTSO-E Transparency Platform's AT-only series starts only in
+    # October 2018; our acquisition pipeline back-filled the earlier
+    # period with a synthetic constant (59.53 EUR/MWh). We substitute
+    # the corresponding DE prices (which carry the merged-zone clearing
+    # value for the same period) so that AT carries the correct
+    # historical merged-zone signal.
+    if country == 'AT':
+        df = _backfill_at_merged_zone(df, frequency=frequency, clean=clean)
+
     return df
+
+
+def _backfill_at_merged_zone(at_df: pd.DataFrame, frequency: str, clean: bool) -> pd.DataFrame:
+    """Replace synthetic-constant AT prices pre-2018-10-01 with DE merged-zone prices.
+
+    Detects a leading run of constant `Day_Ahead_Price` values (the artefact
+    from the merged DE-AT-LU bidding zone period) and substitutes the DE
+    clearing prices over the matching index. If DE is unavailable for that
+    period, the constant run is left as-is and the caller can mask it
+    downstream.
+    """
+    if 'Day_Ahead_Price' not in at_df.columns:
+        return at_df
+    p = at_df['Day_Ahead_Price']
+    # First-row diff is NaN; treat as "matches the constant run" so the
+    # leading run is detected from row 0.
+    diff_abs = p.diff().abs().fillna(0.0)
+    diff_zero = (diff_abs < 1e-9)
+    constant_prefix = diff_zero.cummin().astype(bool)
+    if not constant_prefix.any() or int(constant_prefix.sum()) < 24 * 30:
+        return at_df
+
+    try:
+        freq_suffix = '_hourly' if frequency == 'H' else ''
+        suffix = '_clean' if clean else ''
+        de_path = UNIFIED_DIR / f"unified_DE_2015_2026{freq_suffix}{suffix}.csv"
+        if not de_path.exists():
+            return at_df
+        de_df = pd.read_csv(de_path, index_col=0, parse_dates=True)
+    except Exception:
+        return at_df
+
+    if 'Day_Ahead_Price' not in de_df.columns:
+        return at_df
+
+    target_idx = at_df.index[constant_prefix]
+    de_aligned = de_df['Day_Ahead_Price'].reindex(target_idx)
+    if int(de_aligned.notna().sum()) < 24 * 30:
+        return at_df
+
+    out = at_df.copy()
+    out.loc[target_idx, 'Day_Ahead_Price'] = de_aligned.values
+    return out
 
 
 def build_feature_groups(df: pd.DataFrame, country: str = None) -> Dict[str, List[str]]:
@@ -258,7 +336,37 @@ def build_feature_groups(df: pd.DataFrame, country: str = None) -> Dict[str, Lis
     groups['hydrogen'] = [c for c in cols if c.lower().startswith('hydrogen_')]
 
     # Flow features
-    groups['flow'] = [c for c in cols if 'flow' in c.lower() and 'gas_storage' not in c.lower()]
+    groups['flow'] = [c for c in cols if 'flow' in c.lower()
+                      and 'gas_storage' not in c.lower()
+                      and 'pipeline' not in c.lower()]
+
+    # Hydro reservoir features
+    groups['hydro_reservoir'] = [c for c in cols if 'hydro_' in c.lower()
+                                  and c not in groups.get('generation', [])]
+
+    # Generation forecast features
+    groups['gen_forecast'] = [c for c in cols if 'forecast_' in c.lower()
+                               and 'load' not in c.lower()]
+
+    # Demand forecast features
+    groups['demand_forecast'] = [c for c in cols if 'load_forecast' in c.lower()]
+
+    # NTC features
+    groups['ntc'] = [c for c in cols if 'ntc_' in c.lower()]
+
+    # Imbalance price features
+    groups['imbalance'] = [c for c in cols if 'imbalance_' in c.lower()]
+
+    # Pipeline flow features (ENTSOG)
+    groups['pipeline'] = [c for c in cols if 'pipeline_' in c.lower()]
+
+    # LNG terminal features
+    groups['lng'] = [c for c in cols if 'lng_' in c.lower()]
+
+    # ERA5 reanalysis features
+    groups['era5'] = [c for c in cols if 'era5' in c.lower()
+                       or ('wind_u_' in c.lower()) or ('wind_v_' in c.lower())
+                       or ('ssrd' in c.lower())]
 
     # Spread features (pair datasets only)
     groups['spread'] = [c for c in cols if 'spread' in c.lower()]
